@@ -1,0 +1,26 @@
+# FastAPI core
+fastapi==0.110.0
+uvicorn[standard]==0.29.0
+python-multipart==0.0.9
+pydantic==2.6.1
+
+# File handling & async
+aiofiles==23.2.1
+python-dotenv==1.0.1
+
+# OCR & PDF processing
+pytesseract==0.3.10
+pdf2image==1.17.0
+Pillow==10.2.0
+
+# OpenAI
+openai>=1.12.0
+
+# Auth & Security
+python-jose==3.3.0
+bcrypt==4.1.2
+email-validator==2.1.1
+
+# Mongo / BSON (DO NOT use standalone bson)
+pymongo==4.6.1
+
