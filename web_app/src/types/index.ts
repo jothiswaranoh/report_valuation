@@ -83,3 +83,25 @@ export interface DashboardStats {
   approvedReports: number;
   recentUploads: number;
 }
+
+// API Response Types
+export interface APIResponse<T = unknown> {
+  success: boolean;
+  data?: T;
+  error?: string;
+  message?: string;
+}
+
+export interface PaginatedResponse<T> {
+  items: T[];
+  total: number;
+  page: number;
+  per_page: number;
+  total_pages: number;
+}
+
+export interface ErrorResponse {
+  detail: string;
+  status_code: number;
+}
+
