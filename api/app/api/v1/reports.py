@@ -2,8 +2,9 @@
 Reports API routes
 """
 
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Query
 import logging
+from datetime import datetime
 from pydantic import BaseModel
 
 from app.repositories.report_repo import ReportRepository, OriginalFileRepository
@@ -62,6 +63,20 @@ async def create_report(
       or datetime.utcnow().isoformat()
   }
 
+@router.get("/reports/check")
+async def check_report_name(
+  report_name: str = Query(..., min_length=1),
+  current_user: dict = Depends(get_current_user)
+):
+  """Check if report name already exists"""
+  exists = ReportRepository.exists_by_name(
+    report_name,
+    user_id=current_user["id"]
+  )
+
+  return {
+    "exists": exists
+  }
 
 class UpdateReportRequest(BaseModel):
   report_name: str

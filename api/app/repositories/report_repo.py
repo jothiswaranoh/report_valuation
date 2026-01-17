@@ -68,6 +68,15 @@ class ReportRepository:
             return None
     
     @staticmethod
+    def exists_by_name(report_name: str, user_id: str = None) -> bool:
+        """Check if a report name already exists"""
+        query = {"report_name": report_name}
+        if user_id:
+            query["user_id"] = ObjectId(user_id)
+
+        return reports.count_documents(query) > 0
+
+    @staticmethod
     def delete(report_id: str) -> bool:
         """Delete a report and all related data"""
         oid = ObjectId(report_id)
