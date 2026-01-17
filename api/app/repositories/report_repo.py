@@ -50,7 +50,32 @@ class ReportRepository:
             report["user_id"] = str(report["user_id"])
             result.append(report)
         return result
+        
+    @staticmethod
+    def update_name(report_id: str, report_name: str, updated_by: str) -> Optional[dict]:
+        """Update report name"""
+        try:
+            reports.update_one(
+            {"_id": ObjectId(report_id)},
+            {"$set": {
+                "report_name": report_name,
+                "updated_by": ObjectId(updated_by),
+                "updated_at": datetime.utcnow()
+            }}
+            )
+            return ReportRepository.get_by_id(report_id)
+        except:
+            return None
     
+    @staticmethod
+    def exists_by_name(report_name: str, user_id: str = None) -> bool:
+        """Check if a report name already exists"""
+        query = {"report_name": report_name}
+        if user_id:
+            query["user_id"] = ObjectId(user_id)
+
+        return reports.count_documents(query) > 0
+
     @staticmethod
     def delete(report_id: str) -> bool:
         """Delete a report and all related data"""

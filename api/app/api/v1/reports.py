@@ -2,11 +2,10 @@
 Reports API routes
 """
 
-from fastapi import APIRouter, UploadFile, File, HTTPException, Form, Depends
-from fastapi.responses import StreamingResponse
-import os
+from fastapi import APIRouter, HTTPException, Depends, Query
 import logging
 from datetime import datetime
+from pydantic import BaseModel
 
 from app.models.report import DocumentRequest
 from app.services.report_service import DocumentProcessingService
@@ -162,6 +161,66 @@ async def get_reports(current_user: dict = Depends(get_current_user)):
     
     return {"success": True, "reports": reports}
 
+
+@router.get("/reports/check")
+async def check_report_name(
+  report_name: str = Query(..., min_length=1),
+  current_user: dict = Depends(get_current_user)
+):
+  """Check if report name already exists"""
+  exists = ReportRepository.exists_by_name(
+    report_name,
+    user_id=current_user["id"]
+  )
+
+  return {
+    "exists": exists
+  }
+
+class UpdateReportRequest(BaseModel):
+  report_name: str
+
+
+@router.put("/reports/{report_id}")
+async def update_report(
+  report_id: str,
+  payload: UpdateReportRequest,
+  current_user: dict = Depends(get_current_user)
+):
+  """Update report name"""
+  report = ReportRepository.get_by_id(report_id)
+  if not report:
+    raise HTTPException(
+      status_code=404,
+      detail="Report not found"
+    )
+
+  if (
+    report["user_id"] != current_user["id"]
+    and "admin" not in current_user.get("roles", [])
+  ):
+    raise HTTPException(
+      status_code=403,
+      detail="Access denied"
+    )
+
+  updated_report = ReportRepository.update_name(
+    report_id,
+    payload.report_name,
+    current_user["id"]
+  )
+
+  if not updated_report:
+    raise HTTPException(
+      status_code=500,
+      detail="Failed to update report"
+    )
+
+  return {
+    "id": updated_report["id"],
+    "report_name": updated_report["report_name"],
+    "created_at": updated_report["created_at"]
+  }
 
 @router.get("/reports/{report_id}")
 async def get_report(report_id: str, current_user: dict = Depends(get_current_user)):
