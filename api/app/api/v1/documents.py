@@ -164,3 +164,67 @@ async def get_document_status(document_id: str):
     "document_id": document_id,
     "status": "processing"
   }
+
+@router.delete("/documents/{document_id}")
+async def delete_document(
+  document_id: str,
+  current_user: dict = Depends(get_current_user)
+):
+  """Delete a document"""
+  try:
+    file_doc = OriginalFileRepository.get_by_id(document_id)
+    if not file_doc:
+      raise HTTPException(
+        status_code=404,
+        detail="Document not found"
+      )
+
+    # Access check
+    if (
+      str(file_doc.get("created_by")) != current_user["id"]
+      and "admin" not in current_user.get("roles", [])
+    ):
+      raise HTTPException(
+        status_code=403,
+        detail="Access denied"
+      )
+
+    # Delete file from storage if exists
+    file_path = file_doc.get("file_path")
+    if file_path and os.path.exists(file_path):
+      try:
+        os.remove(file_path)
+      except Exception as e:
+        logger.error(
+          f"Failed to delete file from storage: {file_path}",
+          exc_info=True
+        )
+        raise HTTPException(
+          status_code=500,
+          detail="Failed to delete document file"
+        )
+
+    # Delete DB record
+    success = OriginalFileRepository.delete(document_id)
+    if not success:
+      raise HTTPException(
+        status_code=500,
+        detail="Failed to delete document"
+      )
+
+    return {
+      "success": True,
+      "message": "Document deleted successfully"
+    }
+
+  except HTTPException:
+    raise
+  except Exception as e:
+    logger.error(
+      f"Error deleting document: {str(e)}",
+      exc_info=True
+    )
+    raise HTTPException(
+      status_code=500,
+      detail="Failed to delete document"
+    )

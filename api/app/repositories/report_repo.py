@@ -144,3 +144,15 @@ class OriginalFileRepository:
             file["report_id"] = str(file["report_id"])
             result.append(file)
         return result
+    
+    @staticmethod
+    def delete(file_id: str) -> bool:
+        """Delete a document record"""
+        try:
+            result = original_files.delete_one(
+            {"_id": ObjectId(file_id)}
+            )
+            return result.deleted_count > 0
+        except:
+            return False
+        
