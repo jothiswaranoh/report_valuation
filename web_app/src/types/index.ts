@@ -1,3 +1,6 @@
+// User Management Types (admin-managed system users)
+export * from './User';
+
 export type ReportStatus = 'draft' | 'review' | 'approved';
 
 export type PropertyType = 'Residential' | 'Commercial' | 'Industrial' | 'Land' | 'Mixed Use';
