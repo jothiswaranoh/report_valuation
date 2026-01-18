@@ -26,10 +26,29 @@ processing_service = DocumentProcessingService()
 async def process_document(
   file: UploadFile = File(...),
   client_name: str = Form(...),
+  report_id: str = Form(...),
   current_user: dict = Depends(get_current_user),
 ):
-  """Upload and process a document"""
+  """Upload and process a document under an existing report"""
   try:
+    # Validate report
+    report = ReportRepository.get_by_id(report_id)
+    if not report:
+      raise HTTPException(
+        status_code=404,
+        detail="Report not found"
+      )
+
+    if (
+      report["user_id"] != current_user["id"]
+      and "admin" not in current_user.get("roles", [])
+    ):
+      raise HTTPException(
+        status_code=403,
+        detail="Access denied"
+      )
+
+    # Validate file type
     file_ext = file.filename.split(".")[-1].lower()
     if file_ext not in config.SUPPORTED_FILE_TYPES:
       raise HTTPException(
@@ -44,14 +63,9 @@ async def process_document(
     safe_client = client_name.strip().replace(" ", "_").lower()
     file_size_mb = len(content) / (1024 * 1024)
 
-    report = ReportRepository.create_report(
-      report_name=f"{safe_client}_{file.filename}",
-      user_id=current_user["id"],
-      created_by=current_user["id"]
-    )
-
+    # Create document record under existing report
     file_doc = OriginalFileRepository.create(
-      report_id=report["id"],
+      report_id=report_id,
       file_name=file.filename,
       file_type=file_ext,
       file_path=None,
@@ -88,12 +102,15 @@ async def process_document(
       file_type="pdf" if file_ext == "pdf" else "image"
     )
 
-    await processing_service.process_document(request, document_id)
+    await processing_service.process_document(
+      request,
+      document_id
+    )
 
     return {
       "success": True,
       "document_id": document_id,
-      "report_id": report["id"],
+      "report_id": report_id,
       "message": "Document processing started",
       "sse_endpoint": f"/api/v1/stream/{document_id}",
       "file_name": file.filename,
@@ -109,7 +126,7 @@ async def process_document(
     )
     raise HTTPException(
       status_code=500,
-      detail=f"Internal server error: {str(e)}"
+      detail="Internal server error"
     )
 
 
