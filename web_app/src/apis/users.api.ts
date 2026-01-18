@@ -1,54 +1,61 @@
 import { apiClient } from '../services/apiClient';
+import type {
+  User,
+  Role,
+  CreateUserRequest,
+  UpdateUserRequest,
+  GetUsersResponse,
+} from '../types/User';
 
-export interface User {
-    id: string;
-    email: string;
-    name: string;
-    role: string;
-    created_at: string;
-    updated_at: string;
-}
+// Re-export types for consumers
+export type { User, Role, CreateUserRequest, UpdateUserRequest, GetUsersResponse };
 
-export interface CreateUserRequest {
-    email: string;
-    password: string;
-    name: string;
-    role: string;
-}
-
-export interface UpdateUserRequest {
-    email?: string;
-    name?: string;
-    role?: string;
-}
-
-export interface UsersListResponse {
-    users: User[];
-    total: number;
-    page: number;
-    per_page: number;
-}
+/* =========================
+   API
+========================= */
 
 export const usersApi = {
-    getAll: async (page = 1, perPage = 10): Promise<UsersListResponse> => {
-        return apiClient.get<UsersListResponse>(`/api/v1/users?page=${page}&per_page=${perPage}`);
-    },
+  /**
+   * GET /api/v1/users
+   */
+  getUsers: () =>
+    apiClient.get<GetUsersResponse>('/api/v1/users'),
 
-    getById: async (userId: string): Promise<User> => {
-        return apiClient.get<User>(`/api/v1/users/${userId}`);
-    },
+  /**
+   * POST /api/v1/users
+   */
+  createUser: (data: CreateUserRequest) =>
+    apiClient.post<User>('/api/v1/users', data),
 
-    create: async (data: CreateUserRequest): Promise<User> => {
-        return apiClient.post<User>('/api/v1/users', data);
-    },
+  /**
+   * GET /api/v1/users/{user_id}
+   */
+  getUserById: (userId: string) =>
+    apiClient.get<User>(`/api/v1/users/${userId}`),
 
-    update: async (userId: string, data: UpdateUserRequest): Promise<User> => {
-        return apiClient.patch<User>(`/api/v1/users/${userId}`, data);
-    },
+  /**
+   * PUT /api/v1/users/{user_id}
+   */
+  updateUser: (userId: string, data: UpdateUserRequest) =>
+    apiClient.put<User>(`/api/v1/users/${userId}`, data),
 
-    delete: async (userId: string): Promise<void> => {
-        return apiClient.delete<void>(`/api/v1/users/${userId}`);
-    },
+  /**
+   * DELETE /api/v1/users/{user_id}
+   */
+  deleteUser: (userId: string) =>
+    apiClient.delete<void>(`/api/v1/users/${userId}`),
+
+  /**
+   * GET /api/v1/roles
+   */
+  getRoles: () =>
+    apiClient.get<Role[]>('/api/v1/roles'),
+
+  /**
+   * POST /api/v1/roles
+   */
+  createRole: (name: string) =>
+    apiClient.post<Role>('/api/v1/roles', { name }),
 };
 
 export default usersApi;
