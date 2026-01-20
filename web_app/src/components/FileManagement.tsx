@@ -75,9 +75,8 @@ export default function FileManagement({ fileTree, reports, onNavigate }: FileMa
     return (
       <div key={node.id}>
         <div
-          className={`flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-lg transition-colors ${
-            isSelected ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
-          }`}
+          className={`flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-lg transition-colors ${isSelected ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
+            }`}
           style={{ paddingLeft: `${level * 16 + 12}px` }}
           onClick={() => {
             if (node.type === 'folder') {

@@ -5,7 +5,7 @@ web_app/yarn-debug.log*
 web_app/yarn-error.log*
 web_app/pnpm-debug.log*
 web_app/lerna-debug.log*
-
+.gitignore
 web_app/node_modules
 web_app/dist
 web_app/dist-ssr

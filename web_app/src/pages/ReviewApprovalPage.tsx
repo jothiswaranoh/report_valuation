@@ -134,10 +134,9 @@ export default function ReviewApprovalPage() {
                   <button
                     onClick={() => handleStatusChange(report.id, item.status)}
                     className={`flex items-center gap-2 px-4 py-2 border-2 rounded-lg
-                      ${
-                        report.status === item.status
-                          ? getStatusColor(item.status)
-                          : 'border-gray-200 text-gray-600'
+                      ${report.status === item.status
+                        ? getStatusColor(item.status)
+                        : 'border-gray-200 text-gray-600'
                       }`}
                   >
                     {item.icon}

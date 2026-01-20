@@ -75,7 +75,7 @@ export default function Upload() {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    
+
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const newFiles = Array.from(e.dataTransfer.files)
         .filter(file => file.type === 'application/pdf')
@@ -87,10 +87,10 @@ export default function Upload() {
           uploadDate: new Date(),
           fileSize: formatFileSize(file.size)
         }));
-      
+
       setFiles(prev => [...prev, ...newFiles]);
       setSelectedFiles(prev => [...prev, ...newFiles.map(f => f.id)]);
-      
+
       if (newFiles.length > 0 && currentStep === 2) {
         setCurrentStep(3);
       }
@@ -109,11 +109,11 @@ export default function Upload() {
           uploadDate: new Date(),
           fileSize: formatFileSize(file.size)
         }));
-      
+
       setFiles(prev => [...prev, ...newFiles]);
       setSelectedFiles(prev => [...prev, ...newFiles.map(f => f.id)]);
       e.target.value = '';
-      
+
       if (newFiles.length > 0 && currentStep === 2) {
         setCurrentStep(3);
       }
@@ -165,9 +165,9 @@ export default function Upload() {
 
   const handleImportAndAnalyze = () => {
     if (selectedFiles.length === 0) return;
-    
+
     setCurrentStep(4);
-    
+
     setFiles(prev => prev.map(file => ({
       ...file,
       status: selectedFiles.includes(file.id) ? 'processing' : file.status,
@@ -196,7 +196,7 @@ export default function Upload() {
     };
 
     setRecentProjects(prev => [newProject, ...prev]);
-    
+
     setProjectName('');
     setFiles([]);
     setSelectedFiles([]);
@@ -229,13 +229,12 @@ export default function Upload() {
             ].map((step, idx) => (
               <div key={step.num} className="flex items-center flex-1">
                 <div className="flex flex-col items-center flex-1">
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 transition-all ${
-                    currentStep > step.num
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 transition-all ${currentStep > step.num
                       ? 'bg-green-500 text-white'
                       : currentStep === step.num
-                      ? 'bg-blue-600 text-white ring-4 ring-blue-100'
-                      : 'bg-gray-200 text-gray-500'
-                  }`}>
+                        ? 'bg-blue-600 text-white ring-4 ring-blue-100'
+                        : 'bg-gray-200 text-gray-500'
+                    }`}>
                     {currentStep > step.num ? <CheckCircle size={24} /> : <step.icon size={24} />}
                   </div>
                   <span className={`text-sm font-medium ${currentStep >= step.num ? 'text-gray-900' : 'text-gray-500'}`}>
@@ -243,9 +242,8 @@ export default function Upload() {
                   </span>
                 </div>
                 {idx < 4 && (
-                  <div className={`h-1 flex-1 mx-2 mb-8 rounded transition-all ${
-                    currentStep > step.num ? 'bg-green-500' : 'bg-gray-200'
-                  }`} />
+                  <div className={`h-1 flex-1 mx-2 mb-8 rounded transition-all ${currentStep > step.num ? 'bg-green-500' : 'bg-gray-200'
+                    }`} />
                 )}
               </div>
             ))}
@@ -324,9 +322,8 @@ export default function Upload() {
               </div>
 
               <div
-                className={`border-3 border-dashed rounded-xl p-12 text-center transition-all cursor-pointer ${
-                  dragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-gray-50 hover:bg-gray-100'
-                }`}
+                className={`border-3 border-dashed rounded-xl p-12 text-center transition-all cursor-pointer ${dragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-gray-50 hover:bg-gray-100'
+                  }`}
                 onDragEnter={handleDrag}
                 onDragOver={handleDrag}
                 onDragLeave={handleDrag}
@@ -441,16 +438,15 @@ export default function Upload() {
                 {files.map((file) => (
                   <div
                     key={file.id}
-                    className={`p-4 border-2 rounded-lg transition-all cursor-pointer ${
-                      selectedFiles.includes(file.id) ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
-                    }`}
+                    className={`p-4 border-2 rounded-lg transition-all cursor-pointer ${selectedFiles.includes(file.id) ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
+                      }`}
                     onClick={() => toggleFileSelection(file.id)}
                   >
                     <div className="flex items-center gap-4">
                       <input
                         type="checkbox"
                         checked={selectedFiles.includes(file.id)}
-                        onChange={() => {}}
+                        onChange={() => { }}
                         className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-5 h-5"
                       />
                       <FileText size={24} className="text-blue-600" />
