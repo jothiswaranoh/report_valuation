@@ -5,6 +5,7 @@ import { Toaster } from 'react-hot-toast';
 
 import router from './router';
 import { AppProvider } from './providers';
+import { AppStoreProvider } from '../store/useAppStore';
 
 // Create Query Client (ONE TIME)
 const queryClient = new QueryClient({
@@ -20,8 +21,10 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AppProvider>
-        <RouterProvider router={router} />
-        <Toaster position="top-right" />
+        <AppStoreProvider>
+          <RouterProvider router={router} />
+          <Toaster position="top-right" />
+        </AppStoreProvider>
       </AppProvider>
     </QueryClientProvider>
   );

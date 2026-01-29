@@ -3,7 +3,6 @@ import {
   Upload as UploadIcon,
   FileText,
   CheckCircle,
-  AlertCircle,
   Loader2,
   X,
   FileStack,
@@ -13,9 +12,9 @@ import {
   ChevronUp,
   BarChart3,
   FolderOpen,
-  ArrowRight,
-  Home
+  ArrowRight
 } from 'lucide-react';
+import { useAppStore } from '../store/useAppStore';
 
 interface UploadedFile {
   id: string;
@@ -186,6 +185,8 @@ export default function Upload() {
     }, 3000);
   };
 
+  const { addReport } = useAppStore();
+
   const handleCreateProject = () => {
     const newProject: ProjectReport = {
       id: Math.random().toString(36).substr(2, 9),
@@ -196,6 +197,51 @@ export default function Upload() {
     };
 
     setRecentProjects(prev => [newProject, ...prev]);
+
+    // Add to global store
+    const processedFiles = files.filter(f => selectedFiles.includes(f.id));
+
+    // Create initial metadata
+    const initialMetadata = {
+      year: { value: new Date().getFullYear().toString(), aiConfidence: 'high' as const, needsReview: false },
+      bankName: { value: 'HDFC Bank', aiConfidence: 'low' as const, needsReview: true },
+      month: { value: new Date().toLocaleString('default', { month: 'long' }), aiConfidence: 'high' as const, needsReview: false },
+      customerName: { value: projectName, aiConfidence: 'medium' as const, needsReview: false },
+      propertyType: { value: 'Residential', aiConfidence: 'medium' as const, needsReview: false },
+      location: { value: 'Chennai', aiConfidence: 'low' as const, needsReview: true }
+    };
+
+    const newReport: any = {
+      id: newProject.id,
+      customerName: projectName,
+      bankName: 'HDFC Bank',
+      propertyType: 'Residential',
+      location: 'Chennai',
+      status: 'draft',
+      createdAt: newProject.createdAt,
+      updatedAt: new Date(),
+      year: new Date().getFullYear().toString(),
+      month: new Date().toLocaleString('default', { month: 'long' }),
+      files: processedFiles.map(f => ({
+        id: f.id,
+        name: f.file.name,
+        type: 'original',
+        size: f.fileSize,
+        uploadedAt: f.uploadDate,
+        url: URL.createObjectURL(f.file)
+      })),
+      metadata: initialMetadata,
+      content: {
+        summary: 'Auto-generated summary awaiting analysis.',
+        propertyDetails: 'Details to be extracted.',
+        valuationMethod: 'Comparable Sales',
+        finalValuation: 'Pending'
+      },
+      comments: [],
+      auditTrail: []
+    };
+
+    addReport(newReport);
 
     setProjectName('');
     setFiles([]);
@@ -230,10 +276,10 @@ export default function Upload() {
               <div key={step.num} className="flex items-center flex-1">
                 <div className="flex flex-col items-center flex-1">
                   <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 transition-all ${currentStep > step.num
-                      ? 'bg-green-500 text-white'
-                      : currentStep === step.num
-                        ? 'bg-blue-600 text-white ring-4 ring-blue-100'
-                        : 'bg-gray-200 text-gray-500'
+                    ? 'bg-green-500 text-white'
+                    : currentStep === step.num
+                      ? 'bg-blue-600 text-white ring-4 ring-blue-100'
+                      : 'bg-gray-200 text-gray-500'
                     }`}>
                     {currentStep > step.num ? <CheckCircle size={24} /> : <step.icon size={24} />}
                   </div>
