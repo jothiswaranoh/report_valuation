@@ -54,6 +54,17 @@ export const documentsApi = {
         return apiClient.uploadFile<ProcessResponse>(config.apiEndpoints.process, file);
     },
 
+    processMultiple: async (files: File[], clientName: string, reportId: string): Promise<any> => {
+        const formData = new FormData();
+        files.forEach((file) => {
+            formData.append('files', file);
+        });
+        formData.append('client_name', clientName);
+        formData.append('report_id', reportId);
+
+        return apiClient.post(config.apiEndpoints.processMultiple, formData);
+    },
+
     getStatus: async (documentId: string): Promise<SSEEventData> => {
         return apiClient.get<SSEEventData>(config.apiEndpoints.status(documentId));
     },

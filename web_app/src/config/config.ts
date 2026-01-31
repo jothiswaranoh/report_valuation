@@ -15,6 +15,7 @@ export const config = {
     importFiles: (reportId: string) => `${API_BASE_URL}/api/v1/reports/${reportId}/import`,
     analyzeReport: `${API_BASE_URL}/api/v1/reports/analysis`,
     checkReportName: `${API_BASE_URL}/api/v1/reports/check`,
+    processMultiple: `${API_BASE_URL}/api/v1/documents/process-multiple`,
   },
   maxFileSizeMB: 50,
   supportedFileTypes: ['application/pdf'],
