@@ -11,11 +11,17 @@ from app.db.session import db, reports, original_files, ai_extracted_content, fi
 class ReportRepository:
     
     @staticmethod
-    def create_report(report_name: str, user_id: str, created_by: str) -> dict:
+    def create_report(
+        report_name: str,
+        bank_name: str,
+        user_id: str,
+        created_by: str
+        ) -> dict:
         """Create a new report"""
         now = datetime.utcnow()
         doc = {
             "report_name": report_name,
+            "bank_name": bank_name,
             "user_id": ObjectId(user_id),
             "created_by": ObjectId(created_by),
             "updated_by": ObjectId(created_by),
@@ -38,17 +44,22 @@ class ReportRepository:
             return None
     
     @staticmethod
-    def get_all(user_id: str = None) -> List[dict]:
-        """Get all reports, optionally filtered by user"""
+    def get_all(user_id: str = None) -> list:
         query = {}
         if user_id:
             query["user_id"] = ObjectId(user_id)
-        
+
         result = []
         for report in reports.find(query):
-            report["id"] = str(report["_id"])
-            report["user_id"] = str(report["user_id"])
-            result.append(report)
+            result.append({
+            "id": str(report["_id"]),
+            "report_name": report.get("report_name"),
+            "bank_name": report.get("bank_name"),
+            "user_id": str(report.get("user_id")),
+            "created_at": report.get("created_at"),
+            "updated_at": report.get("updated_at")
+            })
+
         return result
         
     @staticmethod
@@ -155,4 +166,18 @@ class OriginalFileRepository:
             return result.deleted_count > 0
         except:
             return False
+        
+    @staticmethod
+    def update_file_content(file_id: str, content: str, updated_by: str) -> bool:
+        result = original_files.update_one(
+            {"_id": ObjectId(file_id)},
+            {"$set": {
+                "file_content": content,
+                "updated_by": ObjectId(updated_by),
+                "updated_at": datetime.utcnow()
+            }}
+        )
+        return result.modified_count > 0
+
+  
         

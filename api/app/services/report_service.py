@@ -7,11 +7,18 @@ from app.services.ocr_service import OCRService
 from app.services.translation_service import TranslationService
 from app.streaming.sse_manager import SSEManager
 from app.repositories.report_repo import OriginalFileRepository
+from app.core.config import config
+from datetime import datetime
+from app.db.session import original_files
+import re
 
 from app.db.session import db
 from bson import ObjectId
 
 logger = logging.getLogger(__name__)
+
+def contains_tamil(text: str) -> bool:
+    return bool(re.search(r"[\u0B80-\u0BFF]", text))
 
 class DocumentProcessingService:
     def __init__(self):
@@ -20,8 +27,39 @@ class DocumentProcessingService:
             api_key=os.getenv("OPENAI_API_KEY")
         )
         self.sse_manager = SSEManager()
-        self.active_processes: Dict[str, asyncio.Task] = {}
+        self.active_processes: Dict[str, asyncio.Task] = {}    
     
+    async def import_document(self, file_path: str) -> str:
+        """
+        OCR + translate a document and return final legal English text
+        """
+
+        # OCR page-by-page
+        pages = self.ocr_service.extract_text_from_pdf(file_path)
+
+        final_pages = []
+
+        for page_num, text in pages:
+            if not text.strip():
+                continue
+
+            # Tamil or mixed → translate
+            if contains_tamil(text):
+                translated = await self.translation_service.translate_to_legal_english(
+                    tamil_text=text,
+                    page_num=page_num
+                )
+                final_pages.append(
+                    f"Page {page_num}\n{translated}"
+                )
+            else:
+                # Already English
+                final_pages.append(
+                    f"Page {page_num}\n{text.strip()}"
+                )
+
+        return "\n\n".join(final_pages)
+      
     async def process_document(self, request: DocumentRequest, document_id: str) -> str:
         """Start document processing and return document ID"""
         logger.info(f"Starting document processing: {document_id}")

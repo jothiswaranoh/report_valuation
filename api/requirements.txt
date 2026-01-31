@@ -21,6 +21,16 @@ python-jose==3.3.0
 bcrypt==4.1.2
 email-validator==2.1.1
 
-# Mongo / BSON (DO NOT use standalone bson)
+# MongoDB
 pymongo==4.6.1
 
+# ============================
+# SYSTEM DEPENDENCIES (Required)
+# ============================
+# Tesseract OCR (with Tamil language pack)
+#   Ubuntu: sudo apt install tesseract-ocr tesseract-ocr-tam
+#   macOS:  brew install tesseract
+#
+# Poppler (required by pdf2image)
+#   Ubuntu: sudo apt install poppler-utils
+#   macOS:  brew install poppler
