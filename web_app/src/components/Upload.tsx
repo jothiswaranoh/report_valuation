@@ -7,7 +7,7 @@ import ProcessingStep from './upload/ProcessingStep';
 import CompletionStep from './upload/CompletionStep';
 import { UploadedFile, ProjectReport } from './upload/types';
 import { useCreateReport } from '../hooks/useReports';
-import apiService from '../services/apiService';
+import { useProcessMultipleDocuments } from '../hooks/useDocuments';
 import { reportsApi } from '../apis/report.api';
 
 export default function Upload() {
@@ -15,11 +15,12 @@ export default function Upload() {
   const [projectName, setProjectName] = useState('');
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
-  const [isProcessing, setIsProcessing] = useState(false);
 
-  const [recentProjects, setRecentProjects] = useState<ProjectReport[]>([]);
+
+  const [recentProjects] = useState<ProjectReport[]>([]);
   const [reportId, setReportId] = useState<string | null>(null);
   const createReportMutation = useCreateReport();
+  const processMultipleMutation = useProcessMultipleDocuments();
 
 
   const handleCreateReport = async () => {
@@ -45,62 +46,52 @@ export default function Upload() {
 
   const handleImportAndAnalyze = async () => {
     if (selectedFiles.length === 0) return;
-
     if (!reportId) {
       alert("Report ID is missing. Please restart.");
       return;
     }
 
     setCurrentStep(4);
-    setIsProcessing(true);
+    setCurrentStep(4);
 
     try {
-      // 1. Upload files if not already uploaded
-      const uploadedFileIds: string[] = [];
+      const filesToUpload = files
+        .filter(f => selectedFiles.includes(f.id))
+        .map(f => f.file);
 
-      for (const fileId of selectedFiles) {
-        const fileData = files.find(f => f.id === fileId);
-        if (!fileData) continue;
-
-        setFiles(prev => prev.map(f =>
-          f.id === fileId ? { ...f, status: 'processing', progress: 10 } : f
-        ));
-
-        try {
-          // apiService.processDocument is still valid for file upload
-          const response = await apiService.processDocument(fileData.file);
-          uploadedFileIds.push(response.document_id);
-
-          setFiles(prev => prev.map(f =>
-            f.id === fileId ? { ...f, status: 'completed', progress: 100 } : f
-          ));
-        } catch (err) {
-          console.error(`Failed to upload file ${fileData.file.name}`, err);
-          setFiles(prev => prev.map(f =>
-            f.id === fileId ? { ...f, status: 'error', progress: 0 } : f
-          ));
-        }
+      if (filesToUpload.length === 0) {
+        throw new Error("No files selected for upload.");
       }
 
-      if (uploadedFileIds.length === 0) {
-        throw new Error("No files were successfully uploaded.");
-      }
+      setFiles(prev => prev.map(f =>
+        selectedFiles.includes(f.id) ? { ...f, status: 'processing', progress: 10 } : f
+      ));
 
-      // 2. Import Files into Report (using reportsApi from report.api.ts)
-      await reportsApi.importFiles(reportId, uploadedFileIds);
+      // Using project name as client_name
+      await processMultipleMutation.mutateAsync({
+        files: filesToUpload,
+        clientName: projectName,
+        reportId: reportId
+      });
 
-      // 3. Trigger Analysis
+      setFiles(prev => prev.map(f =>
+        selectedFiles.includes(f.id) ? { ...f, status: 'completed', progress: 100 } : f
+      ));
+
+      // Trigger Analysis
       await reportsApi.analyzeReport(reportId);
 
-      // Success! Move to completion
       setCurrentStep(5);
 
     } catch (error) {
       console.error("Error in import/analyze flow:", error);
       alert("An error occurred during processing. Please try again.");
+      setFiles(prev => prev.map(f =>
+        selectedFiles.includes(f.id) ? { ...f, status: 'error', progress: 0 } : f
+      ));
       setCurrentStep(3);
     } finally {
-      setIsProcessing(false);
+      // Finished
     }
   };
 
