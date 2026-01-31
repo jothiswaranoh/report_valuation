@@ -21,10 +21,10 @@ export const mockReports: ValuationReport[] = [
       location: { value: 'Mumbai, Maharashtra', aiConfidence: 'high', needsReview: false },
     },
     files: [
-      { id: 'f1', name: 'original_document.pdf', type: 'original', size: '2.4 MB', uploadedAt: new Date('2024-01-15'), url: '#' },
+      { id: 'f1', name: 'original_document.pdf', type: 'original', size: '2.4 MB', uploadedAt: new Date('2024-01-15'), url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' },
       { id: 'f2', name: 'extracted_data.json', type: 'extracted', size: '45 KB', uploadedAt: new Date('2024-01-15'), url: '#' },
-      { id: 'f3', name: 'draft_report.pdf', type: 'draft', size: '1.8 MB', uploadedAt: new Date('2024-01-16'), url: '#' },
-      { id: 'f4', name: 'final_report.pdf', type: 'final', size: '2.1 MB', uploadedAt: new Date('2024-01-20'), url: '#' },
+      { id: 'f3', name: 'draft_report.pdf', type: 'draft', size: '1.8 MB', uploadedAt: new Date('2024-01-16'), url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' },
+      { id: 'f4', name: 'final_report.pdf', type: 'final', size: '2.1 MB', uploadedAt: new Date('2024-01-20'), url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' },
     ],
     content: {
       summary: 'This property valuation report provides a comprehensive assessment of a residential property located in Mumbai, Maharashtra. The property has been evaluated using the market comparison approach.',

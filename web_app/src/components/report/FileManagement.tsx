@@ -11,8 +11,9 @@ import {
     Search,
     Filter,
 } from 'lucide-react';
-import { FileNode, ValuationReport } from '../../types';
+import { FileNode, ValuationReport, ReportFile } from '../../types';
 import { formatDate } from '../../utils/formatDate';
+import { Modal } from '../common/Modal';
 
 interface FileManagementProps {
     fileTree: FileNode[];
@@ -24,6 +25,7 @@ export default function FileManagement({ fileTree, reports, onNavigate }: FileMa
     const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
     const [selectedNode, setSelectedNode] = useState<FileNode | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
+    const [previewFile, setPreviewFile] = useState<ReportFile | null>(null);
 
     const toggleNode = (nodeId: string) => {
         const newExpanded = new Set(expandedNodes);
@@ -133,6 +135,21 @@ export default function FileManagement({ fileTree, reports, onNavigate }: FileMa
 
     const selectedFiles = getSelectedFiles();
 
+
+    const handleDownload = (file: ReportFile) => {
+        if (file.url && file.url !== '#') {
+            const link = document.createElement('a');
+            link.href = file.url;
+            link.download = file.name;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } else {
+            // Fallback for demo files without a real URL
+            alert(`Downloading ${file.name} is not available in demo mode (simulated)`);
+        }
+    };
+
     return (
         <div className="h-screen flex flex-col">
             <div className="p-8 border-b border-gray-200 bg-white">
@@ -212,10 +229,18 @@ export default function FileManagement({ fileTree, reports, onNavigate }: FileMa
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-2">
-                                                    <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="View">
+                                                    <button
+                                                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                                        title="View"
+                                                        onClick={() => setPreviewFile(file)}
+                                                    >
                                                         <Eye size={18} className="text-gray-600" />
                                                     </button>
-                                                    <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Download">
+                                                    <button
+                                                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                                        title="Download"
+                                                        onClick={() => handleDownload(file)}
+                                                    >
                                                         <Download size={18} className="text-gray-600" />
                                                     </button>
                                                     {file.type === 'draft' && (
@@ -236,6 +261,39 @@ export default function FileManagement({ fileTree, reports, onNavigate }: FileMa
                     </div>
                 </div>
             </div>
+
+            <Modal
+                isOpen={!!previewFile}
+                onClose={() => setPreviewFile(null)}
+                title={previewFile?.name || 'File Preview'}
+                size="full"
+            >
+                <div className="h-[80vh] flex flex-col">
+                    {previewFile && (
+                        <div className="flex-1 bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200">
+                            {/* Since we don't have a real backend to serve the files, we'll show a placeholder or iframe if URL is present and not # */}
+                            {previewFile.url && previewFile.url !== '#' ? (
+                                <iframe
+                                    src={previewFile.url}
+                                    className="w-full h-full rounded-lg"
+                                    title={previewFile.name}
+                                />
+                            ) : (
+                                <div className="text-center p-8">
+                                    <FileText size={48} className="mx-auto text-gray-400 mb-4" />
+                                    <h3 className="text-lg font-medium text-gray-900 mb-2">{previewFile.name}</h3>
+                                    <p className="text-gray-500 mb-4">
+                                        This file was uploaded on {formatDate(previewFile.uploadedAt, 'long')}.
+                                    </p>
+                                    <div className="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg inline-block text-sm">
+                                        Preview not available in demo mode
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+            </Modal>
         </div>
     );
 }

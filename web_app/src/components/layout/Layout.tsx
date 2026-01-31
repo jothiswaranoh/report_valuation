@@ -4,15 +4,15 @@ import {
   LayoutDashboard,
   Upload,
   FolderTree,
-  FileEdit,
-  CheckCircle,
-  ChevronLeft,
-  ChevronRight,
-  Menu,
   Users,
-  LogOut
+  LogOut,
+  Menu,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
+import Modal from '../common/Modal';
+import Button from '../common/Button';
 
 interface NavItem {
   path: string;
@@ -30,6 +30,7 @@ const navItems: NavItem[] = [
 export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [logoutModalOpen, setLogoutModalOpen] = useState(false);
 
   const navigate = useNavigate();
   const { user, logout, loginLoading } = useAuth();
@@ -41,9 +42,14 @@ export default function Layout() {
       .join('')
       .toUpperCase() || 'U';
 
-  const handleLogout = async () => {
+  const performLogout = async () => {
     await logout();
     navigate('/login');
+    setLogoutModalOpen(false);
+  };
+
+  const handleLogoutClick = () => {
+    setLogoutModalOpen(true);
   };
 
   return (
@@ -127,7 +133,7 @@ export default function Layout() {
 
             {sidebarOpen && (
               <button
-                onClick={handleLogout}
+                onClick={handleLogoutClick}
                 disabled={loginLoading}
                 title="Logout"
                 className="p-2 rounded-md hover:bg-gray-100 text-gray-600 disabled:opacity-50"
@@ -138,6 +144,35 @@ export default function Layout() {
           </div>
         </div>
       </aside>
+
+      {/* Logout Confirmation Modal */}
+      <Modal
+        isOpen={logoutModalOpen}
+        onClose={() => setLogoutModalOpen(false)}
+        title="Confirm Logout"
+        size="sm"
+        footer={
+          <>
+            <Button
+              variant="outline"
+              onClick={() => setLogoutModalOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="danger"
+              onClick={performLogout}
+              isLoading={loginLoading}
+            >
+              Logout
+            </Button>
+          </>
+        }
+      >
+        <p className="text-gray-600">
+          Are you sure you want to log out?
+        </p>
+      </Modal>
 
       {/* Mobile overlay */}
       {mobileMenuOpen && (

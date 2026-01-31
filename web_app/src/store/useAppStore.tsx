@@ -1,9 +1,6 @@
-import { useState } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { ValuationReport, ReportStatus } from '../types';
 import { mockReports, mockDashboardStats } from '../data/mockData';
-
-// Simple state management using React hooks pattern
-// Can be replaced with Zustand or Redux if needed
 
 interface AppState {
     currentPage: string;
@@ -12,15 +9,24 @@ interface AppState {
     dashboardStats: typeof mockDashboardStats;
 }
 
-const initialState: AppState = {
-    currentPage: 'dashboard',
-    selectedReportId: null,
-    reports: mockReports,
-    dashboardStats: mockDashboardStats,
-};
+interface AppContextType extends AppState {
+    setCurrentPage: (page: string) => void;
+    setSelectedReportId: (id: string | null) => void;
+    updateReport: (reportId: string, content: ValuationReport['content']) => void;
+    updateReportStatus: (reportId: string, status: ReportStatus) => void;
+    addReport: (report: ValuationReport) => void;
+    selectedReport: ValuationReport | null;
+}
 
-export function useAppStore() {
-    const [state, setState] = useState<AppState>(initialState);
+const AppContext = createContext<AppContextType | undefined>(undefined);
+
+export function AppStoreProvider({ children }: { children: ReactNode }) {
+    const [state, setState] = useState<AppState>({
+        currentPage: 'dashboard',
+        selectedReportId: null,
+        reports: mockReports,
+        dashboardStats: mockDashboardStats,
+    });
 
     const setCurrentPage = (page: string) => {
         setState(prev => ({ ...prev, currentPage: page }));
@@ -52,27 +58,35 @@ export function useAppStore() {
         }));
     };
 
+    const addReport = (report: ValuationReport) => {
+        setState(prev => ({
+            ...prev,
+            reports: [report, ...prev.reports],
+        }));
+    };
+
     const getSelectedReport = (): ValuationReport | null => {
         if (!state.selectedReportId) return null;
         return state.reports.find(r => r.id === state.selectedReportId) || null;
     };
 
-    return {
-        // State
-        currentPage: state.currentPage,
-        selectedReportId: state.selectedReportId,
-        reports: state.reports,
-        dashboardStats: state.dashboardStats,
-
-        // Computed
+    const value = {
+        ...state,
         selectedReport: getSelectedReport(),
-
-        // Actions
         setCurrentPage,
         setSelectedReportId,
         updateReport,
         updateReportStatus,
+        addReport,
     };
+
+    return <AppContext.Provider value={value}> {children} </AppContext.Provider>;
 }
 
-export type AppStore = ReturnType<typeof useAppStore>;
+export function useAppStore() {
+    const context = useContext(AppContext);
+    if (context === undefined) {
+        throw new Error('useAppStore must be used within an AppStoreProvider');
+    }
+    return context;
+}
