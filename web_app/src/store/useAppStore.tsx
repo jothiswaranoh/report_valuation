@@ -80,7 +80,7 @@ export function AppStoreProvider({ children }: { children: ReactNode }) {
         addReport,
     };
 
-    return <AppContext.Provider value={ value }> { children } </AppContext.Provider>;
+    return <AppContext.Provider value={value}> {children} </AppContext.Provider>;
 }
 
 export function useAppStore() {
