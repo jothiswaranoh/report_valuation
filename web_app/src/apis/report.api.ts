@@ -84,10 +84,9 @@ export const reportsApi = {
    * Import files to a report
    * POST /api/v1/reports/{report_id}/import
    */
-  importFiles: (reportId: string, fileIds: string[]) =>
-    apiClient.post<{ success: boolean; imported_files: any[] }>(
-      `/api/v1/reports/${reportId}/import`,
-      { file_ids: fileIds }
+  importFiles: (reportId: string) =>
+    apiClient.post<{ success: boolean }>(
+      `/api/v1/reports/${reportId}/import`
     ),
 
   /**
