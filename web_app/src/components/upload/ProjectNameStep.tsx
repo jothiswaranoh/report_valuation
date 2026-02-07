@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { FolderOpen, ArrowRight, Building2 } from 'lucide-react';
 import { ProjectReport } from './types';
 import { useQuery } from '@tanstack/react-query';
@@ -49,6 +50,7 @@ export default function ProjectNameStep({
     onNext,
     recentProjects
 }: ProjectNameStepProps) {
+    const [showBankSuggestions, setShowBankSuggestions] = useState(false);
     const handleProjectNameSubmit = () => {
         if (projectName.trim() && bankName.trim()) {
             onNext();
@@ -129,6 +131,29 @@ export default function ProjectNameStep({
                             className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-lg transition-all shadow-sm hover:border-gray-400"
                             autoFocus
                         />
+
+                        {/* Custom Dropdown */}
+                        {showBankSuggestions && (
+                            <div className="absolute z-50 w-full mt-1 bg-white rounded-lg shadow-xl border border-gray-100 max-h-60 overflow-auto scrollbar-thin scrollbar-thumb-gray-200">
+                                {INDIAN_BANKS.filter(b => b.toLowerCase().includes(bankName.toLowerCase())).map((bank) => (
+                                    <div
+                                        key={bank}
+                                        className="px-4 py-3 hover:bg-blue-50 cursor-pointer text-gray-700 hover:text-blue-700 transition-colors border-b border-gray-50 last:border-0"
+                                        onClick={() => {
+                                            setBankName(bank);
+                                            setShowBankSuggestions(false);
+                                        }}
+                                    >
+                                        {bank}
+                                    </div>
+                                ))}
+                                {INDIAN_BANKS.filter(b => b.toLowerCase().includes(bankName.toLowerCase())).length === 0 && (
+                                    <div className="px-4 py-3 text-gray-400 italic text-sm">
+                                        No matching banks found
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
 
