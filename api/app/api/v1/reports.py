@@ -86,7 +86,7 @@ async def upload_files(
         raise HTTPException(status_code=403, detail="Access denied")
     
     # Create uploads directory if it doesn't exist
-    uploads_dir = os.path.join(config.upload_dir, report_id)
+    uploads_dir = os.path.join(config.UPLOAD_DIR, report_id)
     os.makedirs(uploads_dir, exist_ok=True)
     
     uploaded_files = []

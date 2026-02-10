@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
     Folder,
     FolderOpen,
@@ -29,6 +29,7 @@ interface FileManagementProps {
     onDownload?: (file: ReportFile) => void;
     onUpload?: (reportId: string, files: File[]) => Promise<void>;
     onDelete?: (item: FileNode | ReportFile) => Promise<void>;
+    isRefreshing?: boolean;
 }
 
 interface UploadFile {
@@ -38,13 +39,35 @@ interface UploadFile {
     error?: string;
 }
 
-export default function FileManagement({ fileTree, reports, onDownload, onUpload, onDelete }: FileManagementProps) {
+export default function FileManagement({ fileTree, reports, onDownload, onUpload, onDelete, isRefreshing }: FileManagementProps) {
     const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
     const [selectedNode, setSelectedNode] = useState<FileNode | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [previewFile, setPreviewFile] = useState<ReportFile | null>(null);
     const [previewBlobUrl, setPreviewBlobUrl] = useState<string | null>(null);
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+
+    // Helper to find node by ID in the tree
+    const findNodeById = (nodes: FileNode[], id: string): FileNode | null => {
+        for (const node of nodes) {
+            if (node.id === id) return node;
+            if (node.children) {
+                const found = findNodeById(node.children, id);
+                if (found) return found;
+            }
+        }
+        return null;
+    };
+
+    // Sync selectedNode with fileTree updates
+    useEffect(() => {
+        if (selectedNode && fileTree.length > 0) {
+            const updatedNode = findNodeById(fileTree, selectedNode.id);
+            if (updatedNode) {
+                setSelectedNode(updatedNode);
+            }
+        }
+    }, [fileTree]);
 
     // Upload-related state
     const [showUploadModal, setShowUploadModal] = useState(false);
@@ -109,6 +132,36 @@ export default function FileManagement({ fileTree, reports, onDownload, onUpload
         setPreviewFile(null);
     };
 
+    // Auto-expand and select first report on initial load
+    useEffect(() => {
+        if (fileTree.length > 0 && !selectedNode) {
+            const nodesToExpand = new Set<string>();
+
+            // Navigate to the first report:
+            // Year -> Bank -> Month -> Report
+            const yearNode = fileTree[0];
+            if (yearNode && yearNode.type === 'folder') {
+                nodesToExpand.add(yearNode.id);
+
+                const bankNode = yearNode.children?.[0];
+                if (bankNode && bankNode.type === 'folder') {
+                    nodesToExpand.add(bankNode.id);
+
+                    const monthNode = bankNode.children?.[0];
+                    if (monthNode && monthNode.type === 'folder') {
+                        nodesToExpand.add(monthNode.id);
+
+                        const reportNode = monthNode.children?.[0];
+                        if (reportNode) {
+                            setExpandedNodes(nodesToExpand);
+                            setSelectedNode(reportNode);
+                        }
+                    }
+                }
+            }
+        }
+    }, [fileTree]);
+
     const toggleNode = (nodeId: string) => {
         const newExpanded = new Set(expandedNodes);
         if (newExpanded.has(nodeId)) {
@@ -141,7 +194,7 @@ export default function FileManagement({ fileTree, reports, onDownload, onUpload
     const getFileTypeColor = (type: string) => {
         switch (type) {
             case 'original':
-                return 'bg-blue-50 text-blue-700 border-blue-100';
+                return 'bg-brand-50 text-brand-700 border-brand-100';
             case 'extracted':
                 return 'bg-purple-50 text-purple-700 border-purple-100';
             case 'draft':
@@ -149,7 +202,7 @@ export default function FileManagement({ fileTree, reports, onDownload, onUpload
             case 'final':
                 return 'bg-emerald-50 text-emerald-700 border-emerald-100';
             default:
-                return 'bg-gray-50 text-gray-700 border-gray-100';
+                return 'bg-secondary-50 text-secondary-700 border-secondary-100';
         }
     };
 
@@ -204,8 +257,8 @@ export default function FileManagement({ fileTree, reports, onDownload, onUpload
             <div key={node.id} className="mb-0.5">
                 <div
                     className={`flex items-center gap-2.5 px-3 py-2.5 cursor-pointer rounded-lg transition-all duration-200 group ${isSelected
-                        ? 'bg-blue-50 text-blue-700 shadow-sm ring-1 ring-blue-100'
-                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                        ? 'bg-brand-50 text-brand-700 shadow-sm ring-1 ring-brand-100'
+                        : 'text-secondary-600 hover:bg-secondary-50 hover:text-secondary-900'
                         }`}
                     style={{ paddingLeft: `${level * 16 + 12}px` }}
                     onClick={() => {
@@ -216,20 +269,20 @@ export default function FileManagement({ fileTree, reports, onDownload, onUpload
                     }}
                 >
                     {node.type === 'folder' && (
-                        <span className={`transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''} ${isSelected ? 'text-blue-500' : 'text-gray-400 group-hover:text-gray-600'}`}>
+                        <span className={`transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''} ${isSelected ? 'text-brand-500' : 'text-secondary-400 group-hover:text-secondary-600'}`}>
                             <ChevronRight size={14} strokeWidth={2.5} />
                         </span>
                     )}
 
                     {node.type === 'folder' ? (
-                        <div className={`${isSelected ? 'text-blue-500' : 'text-amber-400 group-hover:text-amber-500'} transition-colors`}>
+                        <div className={`${isSelected ? 'text-brand-500' : 'text-amber-400 group-hover:text-amber-500'} transition-colors`}>
                             {isExpanded ? <FolderOpen size={18} fill="currentColor" fillOpacity={0.2} /> : <Folder size={18} fill="currentColor" fillOpacity={0.2} />}
                         </div>
                     ) : (
-                        <FileText size={18} className={isSelected ? 'text-blue-500' : 'text-gray-400'} />
+                        <FileText size={18} className={isSelected ? 'text-brand-500' : 'text-secondary-400'} />
                     )}
 
-                    <span className={`text-sm truncate font-medium ${isSelected ? 'text-blue-700' : ''} flex-1`}>
+                    <span className={`text-sm truncate font-medium ${isSelected ? 'text-brand-700' : ''} flex-1`}>
                         {node.name}
                     </span>
 
@@ -378,31 +431,31 @@ export default function FileManagement({ fileTree, reports, onDownload, onUpload
     };
 
     return (
-        <div className="h-screen flex flex-col bg-gray-50 overflow-hidden">
+        <div className="h-screen flex flex-col bg-secondary-50 overflow-hidden">
             {/* Header */}
-            <div className="px-8 py-6 bg-white/80 backdrop-blur-md border-b border-gray-200 z-10">
+            <div className="px-8 py-6 bg-white/80 backdrop-blur-md border-b border-secondary-200 z-10">
                 <div className="flex justify-between items-center max-w-7xl mx-auto w-full">
                     <div>
-                        <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                        <h1 className="text-2xl font-bold bg-gradient-to-r from-secondary-900 to-secondary-700 bg-clip-text text-transparent">
                             File Management
                         </h1>
-                        <p className="text-sm text-gray-500 mt-1 font-medium">Browse and manage your valuation reports</p>
+                        <p className="text-sm text-secondary-500 mt-1 font-medium">Browse and manage your valuation reports</p>
                     </div>
                 </div>
             </div>
 
             <div className="flex-1 flex max-w-7xl mx-auto w-full overflow-hidden p-6 gap-6">
                 {/* Sidebar */}
-                <div className="w-80 flex flex-col bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden h-full">
-                    <div className="p-4 border-b border-gray-100 bg-gray-50/50">
+                <div className="w-80 flex flex-col bg-white rounded-2xl border border-secondary-200 shadow-sm overflow-hidden h-full">
+                    <div className="p-4 border-b border-secondary-100 bg-secondary-50/50">
                         <div className="relative group">
-                            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+                            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary-400 group-focus-within:text-brand-500 transition-colors" />
                             <input
                                 type="text"
                                 placeholder="Search folders..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-9 pr-3 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all shadow-sm"
+                                className="w-full pl-9 pr-3 py-2.5 bg-white border border-secondary-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all shadow-sm"
                             />
                         </div>
                     </div>
@@ -412,14 +465,14 @@ export default function FileManagement({ fileTree, reports, onDownload, onUpload
                 </div>
 
                 {/* Main Content */}
-                <div className="flex-1 flex flex-col bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden h-full">
+                <div className="flex-1 flex flex-col bg-white rounded-2xl border border-secondary-200 shadow-sm overflow-hidden h-full">
                     {/* Toolbar */}
-                    <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/30">
+                    <div className="p-4 border-b border-secondary-100 flex items-center justify-between bg-secondary-50/30">
                         <div>
-                            <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                            <h2 className="text-lg font-semibold text-secondary-900 flex items-center gap-2">
                                 {selectedNode ? (
                                     <>
-                                        {selectedNode.type === 'folder' ? <Folder className="text-amber-400" size={20} fill="currentColor" fillOpacity={0.2} /> : <FileText className="text-blue-500" size={20} />}
+                                        {selectedNode.type === 'folder' ? <Folder className="text-amber-400" size={20} fill="currentColor" fillOpacity={0.2} /> : <FileText className="text-brand-500" size={20} />}
                                         {selectedNode.name}
                                     </>
                                 ) : (
@@ -427,33 +480,33 @@ export default function FileManagement({ fileTree, reports, onDownload, onUpload
                                 )}
                             </h2>
                             {selectedNode && (
-                                <p className="text-xs text-gray-500 mt-0.5 ml-7">
+                                <p className="text-xs text-secondary-500 mt-0.5 ml-7">
                                     {selectedFiles.length} item{selectedFiles.length !== 1 ? 's' : ''}
                                 </p>
                             )}
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-lg mr-2">
+                            <div className="flex items-center gap-1 bg-secondary-100 p-1 rounded-lg mr-2">
                                 <button
                                     onClick={() => setViewMode('grid')}
-                                    className={`p-1.5 rounded-md transition-all ${viewMode === 'grid' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+                                    className={`p-1.5 rounded-md transition-all ${viewMode === 'grid' ? 'bg-white shadow-sm text-brand-600' : 'text-secondary-500 hover:text-secondary-700'}`}
                                 >
                                     <Grid size={18} />
                                 </button>
                                 <button
                                     onClick={() => setViewMode('list')}
-                                    className={`p-1.5 rounded-md transition-all ${viewMode === 'list' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+                                    className={`p-1.5 rounded-md transition-all ${viewMode === 'list' ? 'bg-white shadow-sm text-brand-600' : 'text-secondary-500 hover:text-secondary-700'}`}
                                 >
                                     <ListIcon size={18} />
                                 </button>
                             </div>
-                            <button className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors shadow-sm">
+                            <button className="flex items-center gap-2 px-3 py-2 bg-white border border-secondary-200 rounded-lg text-sm font-medium text-secondary-700 hover:bg-secondary-50 transition-colors shadow-sm">
                                 <Filter size={16} />
                                 <span>Filter</span>
                             </button>
                             <button
                                 onClick={() => setShowUploadModal(true)}
-                                className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm"
+                                className="flex items-center gap-2 px-3 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 transition-colors shadow-sm"
                             >
                                 <Upload size={16} />
                                 <span>Upload</span>
@@ -462,14 +515,14 @@ export default function FileManagement({ fileTree, reports, onDownload, onUpload
                     </div>
 
                     {/* Files Area */}
-                    <div className="p-6 overflow-y-auto flex-1 custom-scrollbar bg-gray-50/30">
+                    <div className="p-6 overflow-y-auto flex-1 custom-scrollbar bg-secondary-50/30 relative">
                         {selectedFiles.length === 0 ? (
-                            <div className="h-full flex flex-col items-center justify-center text-center p-8 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50/50">
-                                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                                    <FolderOpen size={32} className="text-gray-400" />
+                            <div className="h-full flex flex-col items-center justify-center text-center p-8 border-2 border-dashed border-secondary-200 rounded-xl bg-secondary-50/50">
+                                <div className="w-16 h-16 bg-secondary-100 rounded-full flex items-center justify-center mb-4">
+                                    <FolderOpen size={32} className="text-secondary-400" />
                                 </div>
-                                <h3 className="text-lg font-medium text-gray-900 mb-1">No files found</h3>
-                                <p className="text-gray-500 max-w-sm">Select a folder from the sidebar to view its contents, or try searching for a different term.</p>
+                                <h3 className="text-lg font-medium text-secondary-900 mb-1">No files found</h3>
+                                <p className="text-secondary-500 max-w-sm">Select a folder from the sidebar to view its contents, or try searching for a different term.</p>
                             </div>
                         ) : (
                             <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" : "flex flex-col gap-3"}>
@@ -478,15 +531,15 @@ export default function FileManagement({ fileTree, reports, onDownload, onUpload
                                     return (
                                         <div
                                             key={file.id}
-                                            className={`group relative bg-white border border-gray-200 rounded-xl hover:border-blue-300 hover:shadow-md transition-all duration-300 ${viewMode === 'grid' ? 'p-5 flex flex-col' : 'p-4 flex items-center gap-4'
+                                            className={`group relative bg-white border border-secondary-200 rounded-xl hover:border-brand-300 hover:shadow-md transition-all duration-300 ${viewMode === 'grid' ? 'p-5 flex flex-col' : 'p-4 flex items-center gap-4'
                                                 }`}
                                         >
 
                                             {viewMode === 'grid' ? (
                                                 <>
                                                     <div className="flex items-start justify-between mb-4">
-                                                        <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
-                                                            <FileText className="text-blue-600" size={24} />
+                                                        <div className="w-12 h-12 bg-brand-50 rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+                                                            <FileText className="text-brand-600" size={24} />
                                                         </div>
                                                         <span className={`text-[10px] items-center text-center font-bold px-2 py-1 rounded-full border ${getFileTypeColor(file.type)} uppercase tracking-wider`}>
                                                             {getFileTypeLabel(file.type)}
@@ -494,8 +547,8 @@ export default function FileManagement({ fileTree, reports, onDownload, onUpload
                                                     </div>
 
                                                     <div className="flex-1 min-w-0">
-                                                        <h4 className="font-semibold text-gray-900 truncate mb-1" title={file.name}>{file.name}</h4>
-                                                        <div className="flex items-center text-xs text-gray-500 gap-2">
+                                                        <h4 className="font-semibold text-secondary-900 truncate mb-1" title={file.name}>{file.name}</h4>
+                                                        <div className="flex items-center text-xs text-secondary-500 gap-2">
                                                             <span>{file.size}</span>
                                                             {viewMode === 'grid' && <span>•</span>}
                                                             <span>{formatDate(file.uploadedAt, 'short')}</span>
@@ -601,7 +654,7 @@ export default function FileManagement({ fileTree, reports, onDownload, onUpload
             >
                 <div className="h-[80vh] flex flex-col">
                     {previewFile && (
-                        <div className="flex-1 bg-gray-100 rounded-xl flex items-center justify-center border border-gray-200 overflow-hidden">
+                        <div className="flex-1 bg-secondary-100 rounded-xl flex items-center justify-center border border-secondary-200 overflow-hidden">
                             {previewBlobUrl ? (
                                 <iframe
                                     src={`${previewBlobUrl}#view=FitH`}
@@ -609,16 +662,16 @@ export default function FileManagement({ fileTree, reports, onDownload, onUpload
                                     title={previewFile.name}
                                 />
                             ) : (
-                                <div className="text-center p-8 bg-white rounded-2xl shadow-sm border border-gray-100 m-4 max-w-md w-full">
-                                    <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <FileText size={32} className="text-gray-400" />
+                                <div className="text-center p-8 bg-white rounded-2xl shadow-sm border border-secondary-100 m-4 max-w-md w-full">
+                                    <div className="w-16 h-16 bg-secondary-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <FileText size={32} className="text-secondary-400" />
                                     </div>
-                                    <h3 className="text-lg font-medium text-gray-900 mb-2">{previewFile.name}</h3>
-                                    <p className="text-gray-500 mb-6 text-sm">
+                                    <h3 className="text-lg font-medium text-secondary-900 mb-2">{previewFile.name}</h3>
+                                    <p className="text-secondary-500 mb-6 text-sm">
                                         {/* This file was uploaded on {formatDate(previewFile.uploadedAt || new Date())}. */}
                                         Preview not available
                                     </p>
-                                    <div className="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg inline-flex items-center gap-2 text-sm font-medium">
+                                    <div className="bg-brand-50 text-brand-700 px-4 py-2 rounded-lg inline-flex items-center gap-2 text-sm font-medium">
                                         <AlertCircle size={16} />
                                         Preview not available
                                     </div>
@@ -646,17 +699,17 @@ export default function FileManagement({ fileTree, reports, onDownload, onUpload
                         onDragLeave={handleDragLeave}
                         onDrop={handleDrop}
                         className={`border-2 border-dashed rounded-xl p-10 text-center transition-all duration-200 ${isDragging
-                            ? 'border-blue-500 bg-blue-50/50 scale-[1.01]'
-                            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50/50'
+                            ? 'border-brand-500 bg-brand-50/50 scale-[1.01]'
+                            : 'border-secondary-200 hover:border-secondary-300 hover:bg-secondary-50/50'
                             }`}
                     >
-                        <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Upload size={32} className="text-blue-500" />
+                        <div className="w-16 h-16 bg-brand-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Upload size={32} className="text-brand-500" />
                         </div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                        <h3 className="text-lg font-semibold text-secondary-900 mb-2">
                             Upload your files
                         </h3>
-                        <p className="text-gray-500 mb-6 max-w-sm mx-auto">
+                        <p className="text-secondary-500 mb-6 max-w-sm mx-auto">
                             Drag and drop your files here, or click to browse from your computer.
                         </p>
 
@@ -669,7 +722,7 @@ export default function FileManagement({ fileTree, reports, onDownload, onUpload
                         />
                         <button
                             onClick={() => fileInputRef.current?.click()}
-                            className="px-6 py-2.5 bg-gray-900 text-white font-medium rounded-xl hover:bg-gray-800 transition-all shadow-lg shadow-gray-900/10 active:scale-95"
+                            className="px-6 py-2.5 bg-secondary-900 text-white font-medium rounded-xl hover:bg-secondary-800 transition-all shadow-lg shadow-secondary-900/10 active:scale-95"
                         >
                             Browse Files
                         </button>
@@ -691,14 +744,14 @@ export default function FileManagement({ fileTree, reports, onDownload, onUpload
                                         className="flex items-center justify-between p-3 bg-white rounded-xl border border-gray-100 shadow-sm"
                                     >
                                         <div className="flex items-center gap-3 flex-1 min-w-0">
-                                            <div className="w-10 h-10 bg-gray-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                                                <FileIcon size={20} className="text-gray-500" />
+                                            <div className="w-10 h-10 bg-secondary-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                                                <FileIcon size={20} className="text-secondary-500" />
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-medium text-gray-900 truncate">
+                                                <p className="text-sm font-medium text-secondary-900 truncate">
                                                     {uploadFile.file.name}
                                                 </p>
-                                                <p className="text-xs text-gray-500">
+                                                <p className="text-xs text-secondary-500">
                                                     {(uploadFile.file.size / 1024 / 1024).toFixed(2)} MB
                                                 </p>
                                             </div>
@@ -714,9 +767,9 @@ export default function FileManagement({ fileTree, reports, onDownload, onUpload
                                             )}
                                             {uploadFile.status === 'uploading' && (
                                                 <div className="w-24">
-                                                    <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                                    <div className="h-1.5 bg-secondary-100 rounded-full overflow-hidden">
                                                         <div
-                                                            className="bg-blue-600 h-full rounded-full transition-all duration-300"
+                                                            className="bg-brand-600 h-full rounded-full transition-all duration-300"
                                                             style={{ width: `${uploadFile.progress}%` }}
                                                         />
                                                     </div>
@@ -742,14 +795,14 @@ export default function FileManagement({ fileTree, reports, onDownload, onUpload
                                 setShowUploadModal(false);
                                 setUploadFiles([]);
                             }}
-                            className="px-5 py-2.5 text-gray-700 font-medium hover:bg-gray-50 rounded-xl transition-colors"
+                            className="px-5 py-2.5 text-secondary-700 font-medium hover:bg-secondary-50 rounded-xl transition-colors"
                         >
                             Cancel
                         </button>
                         <button
                             onClick={handleUpload}
                             disabled={uploadFiles.length === 0 || uploadFiles.every(f => f.status !== 'pending')}
-                            className="px-6 py-2.5 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none active:scale-95"
+                            className="px-6 py-2.5 bg-brand-600 text-white font-medium rounded-xl hover:bg-brand-700 transition-all shadow-lg shadow-brand-600/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none active:scale-95"
                         >
                             Upload Files
                         </button>
