@@ -1,4 +1,3 @@
-import { useState, useMemo } from 'react';
 import { FolderOpen, ArrowRight, Building2 } from 'lucide-react';
 import { ProjectReport } from './types';
 import { useQuery } from '@tanstack/react-query';
@@ -14,6 +13,34 @@ interface ProjectNameStepProps {
     recentProjects: ProjectReport[];
 }
 
+const INDIAN_BANKS = [
+    "State Bank of India (SBI)",
+    "HDFC Bank",
+    "ICICI Bank",
+    "Axis Bank",
+    "Kotak Mahindra Bank",
+    "Punjab National Bank (PNB)",
+    "Bank of Baroda",
+    "Canara Bank",
+    "Union Bank of India",
+    "Bank of India",
+    "Indian Bank",
+    "Central Bank of India",
+    "Indian Overseas Bank",
+    "UCO Bank",
+    "Bank of Maharashtra",
+    "Punjab & Sind Bank",
+    "IDBI Bank",
+    "Federal Bank",
+    "IDFC First Bank",
+    "South Indian Bank",
+    "Karur Vysya Bank",
+    "City Union Bank",
+    "Tamilnad Mercantile Bank",
+    "Karnataka Bank",
+    "Dhanlaxmi Bank"
+];
+
 export default function ProjectNameStep({
     projectName,
     setProjectName,
@@ -22,13 +49,6 @@ export default function ProjectNameStep({
     onNext,
     recentProjects
 }: ProjectNameStepProps) {
-    const [showBankSuggestions, setShowBankSuggestions] = useState(false);
-
-    const { data: banks } = useQuery({
-        queryKey: ['banks'],
-        queryFn: banksApi.getBanks,
-    });
-
     const handleProjectNameSubmit = () => {
         if (projectName.trim() && bankName.trim()) {
             onNext();
@@ -109,33 +129,6 @@ export default function ProjectNameStep({
                             className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-lg transition-all shadow-sm hover:border-gray-400"
                             autoFocus
                         />
-
-                        {/* Custom Dropdown */}
-                        {showBankSuggestions && (
-                            <div className="absolute z-50 w-full mt-1 bg-white rounded-lg shadow-xl border border-gray-100 max-h-60 overflow-auto scrollbar-thin scrollbar-thumb-gray-200">
-                                {suggestions.length > 0 ? (
-                                    suggestions.map((bank, index) => (
-                                        <div
-                                            key={`${bank}-${index}`}
-                                            className="px-4 py-3 hover:bg-blue-50 cursor-pointer text-gray-700 hover:text-blue-700 transition-colors border-b border-gray-50 last:border-0 flex items-center gap-3"
-                                            onClick={() => {
-                                                setBankName(bank);
-                                                setShowBankSuggestions(false);
-                                            }}
-                                        >
-                                            <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
-                                                <Building2 size={16} />
-                                            </div>
-                                            <span className="font-medium">{bank}</span>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <div className="px-4 py-3 text-gray-400 italic text-sm">
-                                        No matching banks found
-                                    </div>
-                                )}
-                            </div>
-                        )}
                     </div>
                 </div>
 

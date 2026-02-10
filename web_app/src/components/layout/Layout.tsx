@@ -25,9 +25,8 @@ interface NavItem {
 const navItems: NavItem[] = [
   { path: '/', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
   { path: '/upload', label: 'Upload & Process', icon: <Upload size={20} /> },
-  { path: '/files', label: 'File Management', icon: <FolderTree size={20} />, roles: ['admin'] },
-  { path: '/banks', label: 'Bank Management', icon: <Building2 size={20} />, roles: ['admin'] },
-  { path: '/users', label: 'Users', icon: <Users size={20} />, roles: ['admin'] },
+  { path: '/files', label: 'File Management', icon: <FolderTree size={20} /> },
+  { path: '/users', label: 'Users', icon: <Users size={20} /> },
 ];
 
 export default function Layout() {
@@ -58,19 +57,6 @@ export default function Layout() {
   const handleLogoutClick = () => {
     setLogoutModalOpen(true);
   };
-
-  if (isLoadingUser) {
-    return (
-      <div className="h-screen flex items-center justify-center bg-secondary-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-600"></div>
-      </div>
-    );
-  }
-
-  const filteredNavItems = navItems.filter((item) => {
-    if (!item.roles) return true;
-    return item.roles.some((role) => user?.roles?.includes(role));
-  });
 
   return (
     <div className="flex h-screen bg-secondary-50">
