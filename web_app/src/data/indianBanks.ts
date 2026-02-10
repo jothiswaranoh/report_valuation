@@ -1,0 +1,76 @@
+export const INDIAN_BANKS = [
+    // Public Sector Banks
+    "State Bank of India",
+    "Bank of Baroda",
+    "Bank of India",
+    "Bank of Maharashtra",
+    "Canara Bank",
+    "Central Bank of India",
+    "Indian Bank",
+    "Indian Overseas Bank",
+    "Punjab & Sind Bank",
+    "Punjab National Bank",
+    "UCO Bank",
+    "Union Bank of India",
+
+    // Private Sector Banks
+    "Axis Bank",
+    "Bandhan Bank",
+    "CSB Bank",
+    "City Union Bank",
+    "DCB Bank",
+    "Dhanlaxmi Bank",
+    "Federal Bank",
+    "HDFC Bank",
+    "ICICI Bank",
+    "IDBI Bank",
+    "IDFC First Bank",
+    "IndusInd Bank",
+    "Jammu & Kashmir Bank",
+    "Karnataka Bank",
+    "Karur Vysya Bank",
+    "Kotak Mahindra Bank",
+    "Nainital Bank",
+    "RBL Bank",
+    "South Indian Bank",
+    "Tamilnad Mercantile Bank",
+    "YES Bank",
+
+    // Small Finance Banks
+    "AU Small Finance Bank",
+    "Capital Small Finance Bank",
+    "Equitas Small Finance Bank",
+    "ESAF Small Finance Bank",
+    "Fincare Small Finance Bank",
+    "Jana Small Finance Bank",
+    "North East Small Finance Bank",
+    "Shivalik Small Finance Bank",
+    "Suryoday Small Finance Bank",
+    "Ujjivan Small Finance Bank",
+    "Unity Small Finance Bank",
+    "Utkarsh Small Finance Bank",
+
+    // Payments Banks
+    "Airtel Payments Bank",
+    "India Post Payments Bank",
+    "Fino Payments Bank",
+    "Jio Payments Bank",
+    "NSDL Payments Bank",
+    "Paytm Payments Bank",
+
+    // Foreign Banks (Major ones operating in India)
+    "Standard Chartered Bank",
+    "Citibank",
+    "HSBC",
+    "Deutsche Bank",
+    "DBS Bank",
+    "Barclays Bank",
+    "Bank of America",
+    "J.P. Morgan Chase Bank",
+
+    // Regional Rural Banks (Selected major ones)
+    "Kerala Gramin Bank",
+    "Karnataka Vikas Grameena Bank",
+    "Andhra Pradesh Grameena Vikas Bank",
+    "Tamil Nadu Grama Bank"
+].sort();

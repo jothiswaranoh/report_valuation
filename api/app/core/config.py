@@ -28,7 +28,12 @@ class Config:
     # JWT
     JWT_SECRET_KEY = os.getenv("JWT_SECRET")
     JWT_ALGORITHM = "HS256"
+    JWT_SECRET_KEY = os.getenv("JWT_SECRET")
+    JWT_ALGORITHM = "HS256"
     JWT_EXPIRE_MINUTES = 120
+    
+    # Uploads
+    UPLOAD_DIR = os.getenv("UPLOAD_DIR", "/app/uploads")
     
     def validate(self):
         """Validate required configuration"""

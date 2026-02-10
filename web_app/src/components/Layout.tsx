@@ -1,9 +1,9 @@
 import { ReactNode, useState } from 'react';
-import { 
-  LayoutDashboard, 
-  Upload, 
-  FolderTree, 
-  FileEdit, 
+import {
+  LayoutDashboard,
+  Upload,
+  FolderTree,
+  FileEdit,
   CheckCircle,
   ChevronLeft,
   ChevronRight,
@@ -45,7 +45,7 @@ export default function Layout({ children, currentPage, onNavigate }: LayoutProp
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-secondary-50">
       {/* Mobile Menu Button */}
       <button
         onClick={toggleMobileMenu}
@@ -56,27 +56,27 @@ export default function Layout({ children, currentPage, onNavigate }: LayoutProp
 
       {/* Sidebar for Desktop & Mobile */}
       <aside className={`
-        ${sidebarOpen ? 'w-64' : 'w-20'} 
-        bg-white border-r border-gray-200 flex flex-col
-        fixed lg:static h-full z-40 transition-all duration-300
+        ${sidebarOpen ? 'w-72' : 'w-20'} 
+        bg-secondary-900 border-r border-secondary-800 flex flex-col
+        fixed lg:static h-full z-40 transition-all duration-300 shadow-xl
         ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         {/* Header with Toggle Button */}
-        <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+        <div className="h-16 flex items-center justify-between px-4 border-b border-secondary-800">
           {sidebarOpen ? (
             <div className="flex-1">
-              <h1 className="text-xl font-bold text-gray-900 truncate">Valuation System</h1>
-              <p className="text-sm text-gray-500 mt-1 truncate">AI-Powered Reports</p>
+              <h1 className="text-xl font-bold text-white tracking-tight truncate">Valuation<span className="text-brand-400">System</span></h1>
+              <p className="text-xs text-secondary-400 mt-0.5 truncate uppercase tracking-wider font-semibold">AI-Powered Reports</p>
             </div>
           ) : (
             <div className="mx-auto">
-              <h1 className="text-xl font-bold text-gray-900">VS</h1>
+              <h1 className="text-xl font-bold text-white">VS</h1>
             </div>
           )}
-          
+
           <button
             onClick={toggleSidebar}
-            className="p-1.5 rounded-md hover:bg-gray-100 ml-2"
+            className="p-1.5 rounded-md hover:bg-secondary-800 text-secondary-400 hover:text-white transition-colors ml-2"
             title={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
           >
             {sidebarOpen ? (
@@ -97,10 +97,10 @@ export default function Layout({ children, currentPage, onNavigate }: LayoutProp
                 setMobileMenuOpen(false); // Close mobile menu on navigation
               }}
               className={`
-                w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-colors
+                w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-all duration-200 group
                 ${currentPage === item.id
-                  ? 'bg-blue-50 text-blue-700 font-medium'
-                  : 'text-gray-700 hover:bg-gray-50'
+                  ? 'bg-brand-600 text-white shadow-soft font-semibold'
+                  : 'text-secondary-400 hover:bg-secondary-800 hover:text-white'
                 }
                 ${!sidebarOpen ? 'justify-center' : ''}
               `}
@@ -118,17 +118,17 @@ export default function Layout({ children, currentPage, onNavigate }: LayoutProp
 
         {/* User Profile */}
         <div className={`
-          p-4 border-t border-gray-200
+          p-4 border-t border-secondary-800
           ${!sidebarOpen ? 'flex justify-center' : ''}
         `}>
           <div className={`flex items-center gap-3 ${!sidebarOpen ? 'flex-col' : ''}`}>
-            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-medium flex-shrink-0">
+            <div className="w-10 h-10 rounded-full bg-secondary-700 flex items-center justify-center text-white font-medium flex-shrink-0 shadow-sm border border-secondary-600">
               RK
             </div>
             {sidebarOpen && (
               <div className="min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">Kannapan</p>
-                <p className="text-xs text-gray-500 truncate">Senior Valuator</p>
+                <p className="text-sm font-semibold text-white truncate">Kannapan</p>
+                <p className="text-xs text-secondary-400 truncate">Senior Valuator</p>
               </div>
             )}
           </div>
@@ -145,7 +145,7 @@ export default function Layout({ children, currentPage, onNavigate }: LayoutProp
 
       {/* Main Content */}
       <main className={`
-        flex-1 overflow-auto transition-all duration-300
+        flex-1 overflow-auto transition-all duration-300 bg-secondary-50
         ${sidebarOpen ? 'lg:ml-0' : 'lg:ml-20'}
       `}>
         {/* Desktop Toggle Button when sidebar is collapsed */}

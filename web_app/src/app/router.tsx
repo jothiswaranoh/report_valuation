@@ -10,6 +10,7 @@ import ReviewApprovalPage from "../pages/ReviewApprovalPage";
 import UsersPage from "../pages/UsersPage";
 import LoginPage from "../pages/LoginPage";
 import SignupPage from "../pages/SignupPage";
+import BankManagementPage from "../pages/BankManagementPage";
 
 const router = createBrowserRouter([
   {
@@ -30,6 +31,7 @@ const router = createBrowserRouter([
       { path: "reports/:id/edit", element: <ReportEditorPage /> },
       { path: "reports/:id/review", element: <ReviewApprovalPage /> },
       { path: "users", element: <UsersPage /> },
+      { path: "banks", element: <BankManagementPage /> },
     ],
   },
 ]);

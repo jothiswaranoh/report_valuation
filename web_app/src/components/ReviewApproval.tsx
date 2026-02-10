@@ -25,13 +25,13 @@ export default function ReviewApproval({ report, onBack, onStatusChange, onExpor
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'draft':
-        return 'bg-amber-100 text-amber-800 border-amber-200';
+        return 'bg-amber-50 text-amber-800 border-amber-200';
       case 'review':
-        return 'bg-orange-100 text-orange-800 border-orange-200';
+        return 'bg-orange-50 text-orange-800 border-orange-200';
       case 'approved':
-        return 'bg-green-100 text-green-800 border-green-200';
+        return 'bg-emerald-50 text-emerald-800 border-emerald-200';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return 'bg-secondary-50 text-secondary-800 border-secondary-200';
     }
   };
 
@@ -43,7 +43,7 @@ export default function ReviewApproval({ report, onBack, onStatusChange, onExpor
 
   return (
     <div className="h-screen flex flex-col">
-      <div className="bg-white border-b border-gray-200 px-8 py-4">
+      <div className="bg-white border-b border-secondary-200 px-8 py-4 shadow-sm">
         <div className="flex items-center justify-between mb-4">
           <button
             onClick={onBack}
@@ -79,8 +79,8 @@ export default function ReviewApproval({ report, onBack, onStatusChange, onExpor
           </div>
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{report.customerName}</h1>
-          <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
+          <h1 className="text-2xl font-bold text-secondary-900">{report.customerName}</h1>
+          <div className="flex items-center gap-4 mt-2 text-sm text-secondary-600">
             <span>{report.bankName}</span>
             <span>•</span>
             <span>{report.propertyType}</span>
@@ -91,20 +91,19 @@ export default function ReviewApproval({ report, onBack, onStatusChange, onExpor
       </div>
 
       <div className="flex-1 flex overflow-hidden">
-        <div className="flex-1 overflow-auto bg-gray-50">
+        <div className="flex-1 overflow-auto bg-secondary-50">
           <div className="max-w-4xl mx-auto p-8">
-            <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Report Status</h2>
+            <div className="bg-white border border-secondary-200 rounded-lg p-6 mb-6 shadow-sm">
+              <h2 className="text-lg font-semibold text-secondary-900 mb-4">Report Status</h2>
               <div className="flex items-center justify-between mb-6">
                 {statusWorkflow.map((item, index) => (
                   <div key={item.status} className="flex items-center flex-1">
                     <button
                       onClick={() => onStatusChange(report.id, item.status)}
-                      className={`flex items-center gap-2 px-4 py-2 border-2 rounded-lg transition-colors ${
-                        report.status === item.status
+                      className={`flex items-center gap-2 px-4 py-2 border-2 rounded-lg transition-colors ${report.status === item.status
                           ? getStatusColor(item.status)
                           : 'border-gray-200 text-gray-600 hover:border-gray-300'
-                      }`}
+                        }`}
                     >
                       {item.icon}
                       <span className="font-medium">{item.label}</span>
@@ -115,7 +114,7 @@ export default function ReviewApproval({ report, onBack, onStatusChange, onExpor
                   </div>
                 ))}
               </div>
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-secondary-600">
                 <p>
                   <strong>Created:</strong>{' '}
                   {new Intl.DateTimeFormat('en-IN', {
@@ -139,50 +138,50 @@ export default function ReviewApproval({ report, onBack, onStatusChange, onExpor
               </div>
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Summary</h2>
-              <div className="prose max-w-none text-gray-700 whitespace-pre-wrap">{report.content.summary}</div>
+            <div className="bg-white border border-secondary-200 rounded-lg p-6 mb-6 shadow-sm">
+              <h2 className="text-lg font-semibold text-secondary-900 mb-4">Summary</h2>
+              <div className="prose max-w-none text-secondary-700 whitespace-pre-wrap">{report.content.summary}</div>
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Property Details</h2>
-              <div className="prose max-w-none text-gray-700 whitespace-pre-wrap">{report.content.propertyDetails}</div>
+            <div className="bg-white border border-secondary-200 rounded-lg p-6 mb-6 shadow-sm">
+              <h2 className="text-lg font-semibold text-secondary-900 mb-4">Property Details</h2>
+              <div className="prose max-w-none text-secondary-700 whitespace-pre-wrap">{report.content.propertyDetails}</div>
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Valuation Method</h2>
-              <div className="prose max-w-none text-gray-700 whitespace-pre-wrap">{report.content.valuationMethod}</div>
+            <div className="bg-white border border-secondary-200 rounded-lg p-6 mb-6 shadow-sm">
+              <h2 className="text-lg font-semibold text-secondary-900 mb-4">Valuation Method</h2>
+              <div className="prose max-w-none text-secondary-700 whitespace-pre-wrap">{report.content.valuationMethod}</div>
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-lg p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Final Valuation</h2>
-              <div className="prose max-w-none text-gray-700 whitespace-pre-wrap">{report.content.finalValuation}</div>
+            <div className="bg-white border border-secondary-200 rounded-lg p-6 shadow-sm">
+              <h2 className="text-lg font-semibold text-secondary-900 mb-4">Final Valuation</h2>
+              <div className="prose max-w-none text-secondary-700 whitespace-pre-wrap">{report.content.finalValuation}</div>
             </div>
           </div>
         </div>
 
-        <div className="w-96 bg-white border-l border-gray-200 overflow-auto">
+        <div className="w-96 bg-white border-l border-secondary-200 overflow-auto">
           {!showAuditTrail ? (
             <div>
-              <div className="p-4 border-b border-gray-200">
-                <h3 className="font-semibold text-gray-900">Comments</h3>
+              <div className="p-4 border-b border-secondary-200">
+                <h3 className="font-semibold text-secondary-900">Comments</h3>
               </div>
               <div className="p-4 space-y-4">
                 {report.comments.length === 0 ? (
-                  <p className="text-sm text-gray-600 text-center py-8">No comments yet</p>
+                  <p className="text-sm text-secondary-600 text-center py-8">No comments yet</p>
                 ) : (
                   report.comments.map((comment) => (
-                    <div key={comment.id} className="bg-gray-50 rounded-lg p-3">
+                    <div key={comment.id} className="bg-secondary-50 rounded-lg p-3">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="font-medium text-sm text-gray-900">{comment.user}</span>
+                        <span className="font-medium text-sm text-secondary-900">{comment.user}</span>
                         {comment.resolved ? (
-                          <CheckCircle size={16} className="text-green-600" />
+                          <CheckCircle size={16} className="text-emerald-600" />
                         ) : (
-                          <XCircle size={16} className="text-gray-400" />
+                          <XCircle size={16} className="text-secondary-400" />
                         )}
                       </div>
-                      <p className="text-sm text-gray-700">{comment.text}</p>
-                      <p className="text-xs text-gray-500 mt-2">
+                      <p className="text-sm text-secondary-700">{comment.text}</p>
+                      <p className="text-xs text-secondary-500 mt-2">
                         {new Intl.DateTimeFormat('en-IN', {
                           day: 'numeric',
                           month: 'short',
@@ -196,10 +195,10 @@ export default function ReviewApproval({ report, onBack, onStatusChange, onExpor
                 <div className="pt-4 border-t border-gray-200">
                   <textarea
                     placeholder="Add a comment..."
-                    className="w-full p-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                    className="w-full p-3 border border-secondary-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none resize-none"
                     rows={3}
                   />
-                  <button className="w-full mt-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
+                  <button className="w-full mt-2 bg-brand-600 text-white px-4 py-2 rounded-lg hover:bg-brand-700 transition-colors text-sm font-medium shadow-sm">
                     Post Comment
                   </button>
                 </div>
@@ -219,10 +218,10 @@ export default function ReviewApproval({ report, onBack, onStatusChange, onExpor
                         <div className="absolute left-2 top-8 bottom-0 w-0.5 bg-gray-200" />
                       )}
                       <div className="flex gap-3">
-                        <div className="w-4 h-4 rounded-full bg-blue-600 mt-1 relative z-10" />
+                        <div className="w-4 h-4 rounded-full bg-brand-600 mt-1 relative z-10" />
                         <div className="flex-1">
-                          <p className="font-medium text-sm text-gray-900">{entry.action}</p>
-                          <p className="text-xs text-gray-600 mt-0.5">{entry.user}</p>
+                          <p className="font-medium text-sm text-secondary-900">{entry.action}</p>
+                          <p className="text-xs text-secondary-600 mt-0.5">{entry.user}</p>
                           <p className="text-xs text-gray-500 mt-1">{entry.details}</p>
                           <p className="text-xs text-gray-400 mt-2">
                             {new Intl.DateTimeFormat('en-IN', {

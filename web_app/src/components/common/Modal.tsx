@@ -74,14 +74,14 @@ export function Modal({
                 >
                     {/* Header */}
                     {(title || showCloseButton) && (
-                        <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                        <div className="flex items-center justify-between p-4 border-b border-secondary-200">
                             {title && (
-                                <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+                                <h3 className="text-lg font-semibold text-secondary-900">{title}</h3>
                             )}
                             {showCloseButton && (
                                 <button
                                     onClick={onClose}
-                                    className="p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                                    className="p-1 rounded-md text-secondary-400 hover:text-secondary-600 hover:bg-secondary-100 transition-colors"
                                 >
                                     <X size={20} />
                                 </button>
@@ -94,7 +94,7 @@ export function Modal({
 
                     {/* Footer */}
                     {footer && (
-                        <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-200">
+                        <div className="flex items-center justify-end gap-3 p-4 border-t border-secondary-200">
                             {footer}
                         </div>
                     )}

@@ -41,9 +41,9 @@ export default function SignupPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="min-h-screen flex items-center justify-center bg-secondary-100">
             <div className="w-full max-w-md bg-white rounded-lg shadow-md p-8">
-                <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+                <h1 className="text-2xl font-bold text-secondary-900 mb-6 text-center">
                     Create Account
                 </h1>
 
@@ -56,7 +56,7 @@ export default function SignupPage() {
                                 required
                                 value={firstName}
                                 onChange={e => setFirstName(e.target.value)}
-                                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-500"
                             />
                         </div>
                         <div>
@@ -66,7 +66,7 @@ export default function SignupPage() {
                                 required
                                 value={lastName}
                                 onChange={e => setLastName(e.target.value)}
-                                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-500"
                             />
                         </div>
                     </div>
@@ -78,7 +78,7 @@ export default function SignupPage() {
                             required
                             value={email}
                             onChange={e => setEmail(e.target.value)}
-                            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-500"
                         />
                     </div>
 
@@ -91,12 +91,12 @@ export default function SignupPage() {
                                 minLength={6}
                                 value={password}
                                 onChange={e => setPassword(e.target.value)}
-                                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 pr-10"
+                                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-500 pr-10"
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary-400 hover:text-secondary-600 transition-colors"
                             >
                                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                             </button>
@@ -112,12 +112,12 @@ export default function SignupPage() {
                                 minLength={6}
                                 value={confirmPassword}
                                 onChange={e => setConfirmPassword(e.target.value)}
-                                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 pr-10"
+                                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-500 pr-10"
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-secondary-400 hover:text-secondary-600 transition-colors"
                             >
                                 {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                             </button>
@@ -127,15 +127,15 @@ export default function SignupPage() {
                     <button
                         type="submit"
                         disabled={loginLoading}
-                        className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 disabled:opacity-50"
+                        className="w-full bg-brand-600 text-white py-2 rounded-lg hover:bg-brand-700 disabled:opacity-50"
                     >
                         {loginLoading ? 'Creating Account...' : 'Sign Up'}
                     </button>
                 </form>
 
-                <p className="text-sm text-gray-600 text-center mt-6">
+                <p className="text-sm text-secondary-600 text-center mt-6">
                     Already have an account?{' '}
-                    <Link to="/login" className="text-blue-600 hover:underline">
+                    <Link to="/login" className="text-brand-600 hover:underline">
                         Sign In
                     </Link>
                 </p>

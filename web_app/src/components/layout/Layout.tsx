@@ -8,7 +8,8 @@ import {
   LogOut,
   Menu,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Building2
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import Modal from '../common/Modal';
@@ -25,6 +26,7 @@ const navItems: NavItem[] = [
   { path: '/', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
   { path: '/upload', label: 'Upload & Process', icon: <Upload size={20} /> },
   { path: '/files', label: 'File Management', icon: <FolderTree size={20} />, roles: ['admin'] },
+  { path: '/banks', label: 'Bank Management', icon: <Building2 size={20} />, roles: ['admin'] },
   { path: '/users', label: 'Users', icon: <Users size={20} />, roles: ['admin'] },
 ];
 
@@ -59,8 +61,8 @@ export default function Layout() {
 
   if (isLoadingUser) {
     return (
-      <div className="h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="h-screen flex items-center justify-center bg-secondary-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-600"></div>
       </div>
     );
   }
@@ -71,7 +73,7 @@ export default function Layout() {
   });
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-secondary-50">
       {/* Mobile Menu Button */}
       <button
         onClick={() => setMobileMenuOpen(true)}
@@ -93,16 +95,16 @@ export default function Layout() {
         <div className="p-4 border-b flex items-center justify-between">
           {sidebarOpen ? (
             <div>
-              <h1 className="text-xl font-bold">Valuation System</h1>
-              <p className="text-sm text-gray-500">AI-Powered Reports</p>
+              <h1 className="text-xl font-bold text-secondary-900">Valuation System</h1>
+              <p className="text-sm text-secondary-500">AI-Powered Reports</p>
             </div>
           ) : (
-            <h1 className="text-xl font-bold mx-auto">VS</h1>
+            <h1 className="text-xl font-bold mx-auto text-secondary-900">VS</h1>
           )}
 
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-1.5 rounded-md hover:bg-gray-100"
+            className="p-1.5 rounded-md hover:bg-secondary-100 text-secondary-600"
           >
             {sidebarOpen ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
           </button>
@@ -119,8 +121,8 @@ export default function Layout() {
                 `
                 w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-colors
                 ${isActive
-                  ? 'bg-blue-50 text-blue-700 font-medium'
-                  : 'text-gray-700 hover:bg-gray-50'}
+                  ? 'bg-brand-50 text-brand-700 font-medium'
+                  : 'text-secondary-700 hover:bg-secondary-50'}
                 ${!sidebarOpen ? 'justify-center' : ''}
               `
               }
@@ -134,7 +136,7 @@ export default function Layout() {
         {/* User Profile + Logout */}
         <div className={`p-4 border-t ${!sidebarOpen ? 'flex justify-center' : ''}`}>
           <div className={`flex items-center gap-3 ${!sidebarOpen ? 'flex-col' : ''}`}>
-            <div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-medium">
+            <div className="w-10 h-10 rounded-full bg-brand-600 text-white flex items-center justify-center font-medium shadow-sm">
               {initials}
             </div>
 
@@ -143,7 +145,7 @@ export default function Layout() {
                 <p className="text-sm font-medium truncate">
                   {user?.first_name} {user?.last_name}
                 </p>
-                <p className="text-xs text-gray-500 truncate">
+                <p className="text-xs text-secondary-500 truncate">
                   {user?.email}
                 </p>
               </div>
@@ -154,7 +156,7 @@ export default function Layout() {
                 onClick={handleLogoutClick}
                 disabled={loginLoading}
                 title="Logout"
-                className="p-2 rounded-md hover:bg-gray-100 text-gray-600 disabled:opacity-50"
+                className="p-2 rounded-md hover:bg-secondary-100 text-secondary-600 disabled:opacity-50"
               >
                 <LogOut size={18} />
               </button>
@@ -187,7 +189,7 @@ export default function Layout() {
           </>
         }
       >
-        <p className="text-gray-600">
+        <p className="text-secondary-600">
           Are you sure you want to log out?
         </p>
       </Modal>

@@ -24,6 +24,7 @@ reports = db["reports"]
 original_files = db["original_files"]
 ai_extracted_content = db["ai_extracted_content"]
 final_reports = db["final_reports"]
+banks = db["banks"]
 
 # Legacy collection names (for backward compatibility)
 og_files = db["original_files"]

@@ -7,6 +7,7 @@ from app.core.config import config
 from app.api.v1.auth import router as auth_router
 from app.api.v1.documents import router as documents_router
 from app.api.v1.reports import router as reports_router
+from app.api.v1.banks import router as banks_router
 
 # Configure logging
 logging.basicConfig(
@@ -30,6 +31,7 @@ app = FastAPI(
 app.include_router(auth_router)
 app.include_router(documents_router)
 app.include_router(reports_router)
+app.include_router(banks_router)
 
 # CORS - Use configuration
 app.add_middleware(

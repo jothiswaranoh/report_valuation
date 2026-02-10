@@ -12,8 +12,19 @@ services:
     depends_on:
       - mongodb
     volumes:
+      - ./api:/app
       - ./uploads:/app/uploads
     restart: always
+
+  frontend:
+    build:
+      context: ./web_app
+    container_name: report_frontend
+    ports:
+      - "3000:80"
+    restart: always
+    depends_on:
+      - backend
 
   mongodb:
     image: mongo:6

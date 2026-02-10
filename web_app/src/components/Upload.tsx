@@ -55,11 +55,12 @@ export default function Upload() {
           const mappedFiles = reportFilesList.map((f: any) => ({
             id: f.id,
             file: new File([], f.file_name, { type: f.file_type || 'application/pdf' }),
-            status: 'pending',
-            progress: 0,
+            // Mark as completed since they are from server
+            status: 'completed' as const,
+            progress: 100,
             uploadDate: new Date(f.created_at || Date.now()),
             fileSize: f.file_size_mb ? `${f.file_size_mb.toFixed(2)} MB` : '0 Bytes',
-            // adding extra props if needed or keeping it clean
+            serverFileId: f.id // Keep track of server ID
           }));
           setFiles(mappedFiles);
           setSelectedFiles(mappedFiles.map((f: any) => f.id));
@@ -131,20 +132,24 @@ export default function Upload() {
     try {
       const filesToUpload = files
         .filter(f => selectedFiles.includes(f.id))
-        // Skip files that are size 0 (likely restored dummy files which are already on server)
-        .filter(f => f.file.size > 0)
+        // Skip files that are already completed/uploaded
+        .filter(f => f.status !== 'completed' && f.file.size > 0)
         .map(f => f.file);
 
       // Only perform upload if we actually have new files
       if (filesToUpload.length > 0) {
+        // We use processMultipleDocuments for "new" files if any (though logic suggests they should be uploaded by now)
+        // But if we switched to immediate upload, this might be redundant for normal flow,
+        // but kept as fallback for files added in other ways (e.g. if we add "add more" in step 3 that doesn't auto-upload)
+        // However, we'll try to ensure everything is uploaded before this step.
+
+        // If we implement immediate upload, this block might be empty most times.
         await processMultipleMutation.mutateAsync({
           files: filesToUpload,
           clientName: projectName,
           reportId: reportId
         });
       } else {
-        // If no files to upload, we assume they are already on the server.
-        // We can proceed to analysis.
         console.log("No new files to upload. Proceeding with existing server files.");
       }
 
@@ -192,9 +197,7 @@ export default function Upload() {
     navigate('/upload');
   };
 
-  const handleCreateProject = () => {
-    handleFinish();
-  };
+
 
 
   const startNewProject = () => {
@@ -222,13 +225,107 @@ export default function Upload() {
     }
   };
 
+  // Immediate upload handler for Step 2
+  const handleFileUpload = async (newFiles: File[]) => {
+    if (!reportId) {
+      alert("Report ID missing. Please restart project.");
+      return;
+    }
+
+    // optimizing: add to UI first
+    const tempFiles: UploadedFile[] = newFiles.map(file => ({
+      id: Math.random().toString(36).substr(2, 9),
+      file,
+      status: 'uploading',
+      progress: 0,
+      uploadDate: new Date(),
+      fileSize: `${(file.size / (1024 * 1024)).toFixed(2)} MB`
+    }));
+
+    setFiles(prev => [...prev, ...tempFiles]);
+
+    try {
+      // simulate progress
+      setFiles(prev => prev.map(f =>
+        tempFiles.find(tf => tf.id === f.id)
+          ? { ...f, progress: 50 }
+          : f
+      ));
+
+      // Actual Upload
+      const response = await reportsApi.uploadFiles(reportId, newFiles);
+
+      if (response && (response.success || (response as any).files)) { // check response structure
+        // Reload report to get server IDs and correct state? 
+        // Or just mark as success.
+        // Better to mark as success and rely on server IDs later or reload.
+        // For now, mark success.
+
+        setFiles(prev => prev.map(f =>
+          tempFiles.find(tf => tf.id === f.id)
+            ? { ...f, status: 'completed', progress: 100 }
+            : f
+        ));
+
+        // Also select them by default
+        setSelectedFiles(prev => [...prev, ...tempFiles.map(f => f.id)]);
+      }
+    } catch (error) {
+      console.error("Immediate upload failed", error);
+      setFiles(prev => prev.map(f =>
+        tempFiles.find(tf => tf.id === f.id)
+          ? { ...f, status: 'error', error: 'Upload failed' }
+          : f
+      ));
+    }
+  };
+
+  const handleDownloadFile = async (file: UploadedFile) => {
+    // We need a server file ID. 
+    // If we have serverFileId (from restore) use it.
+    // If we just uploaded, we might not have it unless we re-fetched.
+    // But typically for freshly uploaded files we might need to rely on the 'response' mapping.
+    // For now, try 'id' if it looks like a server ID (UUID) or use 'serverFileId'.
+
+    // If file has status 'completed' and we restored it, it has 'id' as server ID.
+    // If we just uploaded it, 'id' is random string.
+
+    const targetId = (file as any).serverFileId || file.id;
+
+    try {
+      const blob = await reportsApi.downloadFile(targetId);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = file.file.name;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (e) {
+      console.error("File download failed", e);
+      // alert("Could not download file. It might not be saved on server yet.");
+      // Fallback: if it's a local file object (freshly added), we can download it from memory
+      if (file.file) {
+        const url = window.URL.createObjectURL(file.file);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = file.file.name;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      }
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-secondary-50">
       <div className="p-6 max-w-7xl mx-auto">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">Document Analysis Platform</h1>
-            <p className="text-gray-600">Process Tamil land documents with intelligent analysis</p>
+            <h1 className="text-4xl font-bold text-secondary-900 mb-2 tracking-tight">Document Analysis Platform</h1>
+            <p className="text-secondary-500">Process Tamil land documents with intelligent analysis</p>
           </div>
 
           {/* View Mode Toggle */}
@@ -236,8 +333,8 @@ export default function Upload() {
             <button
               onClick={() => setViewMode('upload')}
               className={`px-6 py-3 rounded-xl font-semibold transition-all flex items-center gap-2 ${viewMode === 'upload'
-                ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
-                : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-blue-300'
+                ? 'bg-brand-600 text-white shadow-lg hover:bg-brand-700'
+                : 'bg-white text-secondary-600 border border-secondary-200 hover:border-brand-300 hover:text-brand-600'
                 }`}
             >
               Upload New
@@ -245,8 +342,8 @@ export default function Upload() {
             <button
               onClick={() => setViewMode('browse')}
               className={`px-6 py-3 rounded-xl font-semibold transition-all flex items-center gap-2 ${viewMode === 'browse'
-                ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
-                : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-blue-300'
+                ? 'bg-brand-600 text-white shadow-lg hover:bg-brand-700'
+                : 'bg-white text-secondary-600 border border-secondary-200 hover:border-brand-300 hover:text-brand-600'
                 }`}
             >
               <FolderOpen size={20} />
@@ -260,7 +357,7 @@ export default function Upload() {
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden" style={{ height: 'calc(100vh - 220px)' }}>
             <div className="grid grid-cols-12 h-full">
               {/* Left Sidebar - Reports List */}
-              <div className="col-span-4 border-r border-gray-200 overflow-hidden">
+              <div className="col-span-4 border-r border-secondary-200 overflow-hidden">
                 <ReportsSidebar
                   selectedReportId={selectedBrowseReportId}
                   onReportSelect={handleReportSelect}
@@ -283,14 +380,14 @@ export default function Upload() {
               <div className="flex h-[60vh] items-center justify-center">
                 <div className="text-center space-y-6">
                   <div className="relative inline-block">
-                    <div className="w-24 h-24 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin shadow-lg"></div>
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-blue-600">
+                    <div className="w-24 h-24 border-4 border-brand-100 border-t-brand-600 rounded-full animate-spin shadow-lg"></div>
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-brand-600">
                       <FolderOpen size={32} />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <h3 className="text-2xl font-bold text-gray-800 animate-pulse">Loading Project...</h3>
-                    <p className="text-gray-500 text-lg">Retrieving your documents and analysis</p>
+                    <h3 className="text-2xl font-bold text-secondary-800 animate-pulse">Loading Project...</h3>
+                    <p className="text-secondary-500 text-lg">Retrieving your documents and analysis</p>
                   </div>
                 </div>
               </div>
@@ -299,64 +396,66 @@ export default function Upload() {
             {!isLoadingReport && (
               <>
                 {currentStep === 1 && (
-                  <ProjectNameStep
-                    projectName={projectName}
-                    setProjectName={setProjectName}
-                    bankName={bankName}
-                    setBankName={setBankName}
-                    onNext={handleCreateReport}
-                    recentProjects={recentProjects}
-                  />
+                  <div className="animate-slide-up">
+                    <ProjectNameStep
+                      projectName={projectName}
+                      setProjectName={setProjectName}
+                      bankName={bankName}
+                      setBankName={setBankName}
+                      onNext={handleCreateReport}
+                      recentProjects={recentProjects}
+                    />
+                  </div>
                 )}
 
                 {currentStep === 2 && (
-                  <UploadStep
-                    projectName={projectName}
-                    files={files}
-                    onFilesChange={(newFilesList) => {
-                      if (newFilesList.length > files.length) {
-                        // Files added
-                        const addedFiles = newFilesList.filter(
-                          (nf) => !files.find((of) => of.id === nf.id)
-                        );
-                        setFiles(newFilesList);
-                        setSelectedFiles((prev) => [...prev, ...addedFiles.map((f) => f.id)]);
-                      } else {
-                        // Files removed (or same)
-                        setFiles(newFilesList);
-                        // Cleanup selectedFiles
-                        const newIds = new Set(newFilesList.map((f) => f.id));
-                        setSelectedFiles((prev) => prev.filter((id) => newIds.has(id)));
-                      }
-                    }}
-                    onNext={() => setCurrentStep(3)}
-                    onBack={() => setCurrentStep(1)}
-                  />
+                  <div className="animate-slide-up">
+                    <UploadStep
+                      projectName={projectName}
+                      files={files}
+                      onUpload={handleFileUpload}
+                      onFilesChange={(newFiles) => {
+                        // Fallback or for removals
+                        setFiles(newFiles);
+                      }}
+                      onNext={() => setCurrentStep(3)}
+                      onBack={() => setCurrentStep(1)}
+                      onDownload={handleDownloadFile}
+                    />
+                  </div>
                 )}
 
                 {currentStep === 3 && (
-                  <FileSelectionStep
-                    files={files}
-                    selectedFiles={selectedFiles}
-                    setSelectedFiles={setSelectedFiles}
-                    onFilesChange={setFiles}
-                    onBack={() => setCurrentStep(2)}
-                    onNext={handleImportAndAnalyze}
-                  />
+                  <div className="animate-slide-up">
+                    <FileSelectionStep
+                      files={files}
+                      selectedFiles={selectedFiles}
+                      setSelectedFiles={setSelectedFiles}
+                      onFilesChange={setFiles}
+                      onUpload={handleFileUpload}
+                      onBack={() => setCurrentStep(2)}
+                      onNext={handleImportAndAnalyze}
+                      onDownload={handleDownloadFile}
+                    />
+                  </div>
                 )}
 
                 {currentStep === 4 && (
-                  <ProcessingStep files={files} selectedFiles={selectedFiles} />
+                  <div className="animate-slide-up">
+                    <ProcessingStep files={files} selectedFiles={selectedFiles} />
+                  </div>
                 )}
 
                 {currentStep === 5 && (
-                  <CompletionStep
-                    files={files}
-                    selectedFiles={selectedFiles}
-                    analysisResult={analysisResult}
-                    onSave={handleSaveReport}
-                    onRestart={startNewProject}
-                  />
+                  <div className="animate-slide-up">
+                    <CompletionStep
+                      files={files}
+                      selectedFiles={selectedFiles}
+                      analysisResult={analysisResult}
+                      onSave={handleSaveReport}
+                      onRestart={startNewProject}
+                    />
+                  </div>
                 )}
               </>
             )}

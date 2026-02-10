@@ -11,10 +11,14 @@ export default function ReportsPage() {
     const navigate = useNavigate();
 
     // Fetch reports from API
-    const { data: response, isLoading, refetch } = useQuery({
+    const { data: response, isLoading, refetch, isFetching } = useQuery({
         queryKey: ['reports'],
         queryFn: reportsApi.getReports,
     });
+
+    // ... (rest of the component)
+
+
 
     // Access check
     if (user && !user.roles.includes('admin')) {
@@ -145,7 +149,7 @@ export default function ReportsPage() {
     const handleUpload = async (reportId: string, files: File[]) => {
         try {
             await reportsApi.uploadFiles(reportId, files);
-            refetch();
+            await refetch();
         } catch (error) {
             console.error('Upload failed', error);
             throw error;
@@ -179,8 +183,8 @@ export default function ReportsPage() {
 
     if (isLoading) {
         return (
-            <div className="h-screen flex items-center justify-center bg-gray-50">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <div className="h-screen flex items-center justify-center bg-secondary-50">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-600"></div>
             </div>
         );
     }
@@ -199,6 +203,7 @@ export default function ReportsPage() {
             onDownload={handleDownload}
             onUpload={handleUpload}
             onDelete={handleDelete}
+            isRefreshing={isFetching}
         />
     );
 }
