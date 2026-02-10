@@ -20,7 +20,8 @@ export interface LoginResponse {
 export interface RegisterRequest {
   email: string;
   password: string;
-  name: string;
+  first_name: string;
+  last_name: string;
 }
 
 export const authApi = {

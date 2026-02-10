@@ -14,10 +14,10 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantStyles: Record<ButtonVariant, string> = {
-    primary: 'bg-blue-600 hover:bg-blue-700 text-white border-transparent',
-    secondary: 'bg-gray-100 hover:bg-gray-200 text-gray-900 border-transparent',
-    outline: 'bg-white hover:bg-gray-50 text-gray-700 border-gray-300',
-    ghost: 'bg-transparent hover:bg-gray-100 text-gray-700 border-transparent',
+    primary: 'bg-brand-600 hover:bg-brand-700 text-white shadow-soft transition-all active:scale-[0.98]',
+    secondary: 'bg-white hover:bg-secondary-50 text-secondary-700 border border-secondary-200 shadow-sm hover:shadow-md transition-all',
+    outline: 'bg-transparent border border-brand-600 text-brand-600 hover:bg-brand-50 hover:border-brand-700 transition-all',
+    ghost: 'bg-transparent hover:bg-secondary-100 text-secondary-600 hover:text-brand-700',
     danger: 'bg-red-600 hover:bg-red-700 text-white border-transparent',
 };
 
@@ -39,7 +39,7 @@ export function Button({
     children,
     ...props
 }: ButtonProps) {
-    const baseStyles = 'inline-flex items-center justify-center gap-2 font-medium rounded-lg border transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+    const baseStyles = 'inline-flex items-center justify-center gap-2 font-medium rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
 
     return (
         <button

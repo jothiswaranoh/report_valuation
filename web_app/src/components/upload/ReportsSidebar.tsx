@@ -11,7 +11,9 @@ export default function ReportsSidebar({ selectedReportId, onReportSelect }: Rep
     const { data: reportsData, isLoading } = useReports();
 
     const formatDate = (dateString: string) => {
+        if (!dateString) return 'N/A';
         const date = new Date(dateString);
+        if (isNaN(date.getTime())) return 'N/A';
         return date.toLocaleDateString('en-US', {
             month: 'short',
             day: 'numeric',
@@ -22,7 +24,7 @@ export default function ReportsSidebar({ selectedReportId, onReportSelect }: Rep
     if (isLoading) {
         return (
             <div className="flex items-center justify-center h-full">
-                <Loader2 className="animate-spin text-indigo-600" size={32} />
+                <Loader2 className="animate-spin text-brand-600" size={32} />
             </div>
         );
     }
@@ -30,14 +32,14 @@ export default function ReportsSidebar({ selectedReportId, onReportSelect }: Rep
     const reports = reportsData?.reports || [];
 
     return (
-        <div className="h-full bg-white border-r border-gray-200 flex flex-col">
+        <div className="h-full bg-white border-r border-secondary-200 flex flex-col">
             {/* Header */}
-            <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-indigo-600 to-purple-600">
-                <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                    <FileText size={24} />
+            <div className="p-6 border-b border-secondary-800 bg-secondary-900">
+                <h2 className="text-xl font-bold text-white flex items-center gap-2 tracking-tight">
+                    <FileText size={24} className="text-brand-400" />
                     All Reports
                 </h2>
-                <p className="text-indigo-100 text-sm mt-1">
+                <p className="text-secondary-400 text-sm mt-1 font-medium">
                     {reports.length} {reports.length === 1 ? 'report' : 'reports'} available
                 </p>
             </div>
@@ -56,46 +58,46 @@ export default function ReportsSidebar({ selectedReportId, onReportSelect }: Rep
                             <button
                                 key={report.id}
                                 onClick={() => onReportSelect(report.id)}
-                                className={`w-full text-left p-4 rounded-xl border-2 transition-all group hover:shadow-md ${selectedReportId === report.id
-                                    ? 'border-indigo-500 bg-indigo-50 shadow-md'
-                                    : 'border-gray-200 hover:border-indigo-300 bg-white'
+                                className={`w-full text-left p-4 rounded-xl border transition-all group hover:shadow-soft ${selectedReportId === report.id
+                                    ? 'border-brand-500 bg-brand-50 shadow-sm'
+                                    : 'border-secondary-100 hover:border-brand-300 bg-white'
                                     }`}
                             >
                                 <div className="flex items-start justify-between gap-2">
                                     <div className="flex-1 min-w-0">
                                         <h3 className={`font-semibold truncate ${selectedReportId === report.id
-                                            ? 'text-indigo-900'
-                                            : 'text-gray-900 group-hover:text-indigo-900'
+                                            ? 'text-brand-900'
+                                            : 'text-secondary-900 group-hover:text-brand-800'
                                             }`}>
                                             {report.name}
                                         </h3>
                                         {report.bank_name && (
-                                            <p className="text-sm text-gray-600 mt-1 truncate">
+                                            <p className="text-sm text-secondary-500 mt-1 truncate">
                                                 {report.bank_name}
                                             </p>
                                         )}
                                         <div className="flex items-center gap-2 mt-2">
-                                            <Calendar size={14} className="text-gray-500" />
-                                            <span className="text-xs text-gray-600">
+                                            <Calendar size={14} className="text-secondary-400" />
+                                            <span className="text-xs text-secondary-500">
                                                 {formatDate(report.created_at)}
                                             </span>
                                         </div>
                                         <div className="mt-2">
-                                            <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${report.status === 'approved'
-                                                ? 'bg-green-100 text-green-800'
+                                            <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-medium ${report.status === 'approved'
+                                                ? 'bg-emerald-100 text-emerald-800'
                                                 : report.status === 'review'
-                                                    ? 'bg-yellow-100 text-yellow-800'
-                                                    : 'bg-gray-100 text-gray-800'
+                                                    ? 'bg-orange-100 text-orange-800'
+                                                    : 'bg-secondary-100 text-secondary-800'
                                                 }`}>
-                                                {report?.status?.charAt(0)?.toUpperCase() + report.status?.slice(1)}
+                                                {(report.status || 'draft').charAt(0).toUpperCase() + (report.status || 'draft').slice(1)}
                                             </span>
                                         </div>
                                     </div>
                                     <ChevronRight
                                         size={20}
                                         className={`flex-shrink-0 transition-transform ${selectedReportId === report.id
-                                            ? 'text-indigo-600 translate-x-1'
-                                            : 'text-gray-400 group-hover:text-indigo-600 group-hover:translate-x-1'
+                                            ? 'text-brand-600 translate-x-1'
+                                            : 'text-secondary-300 group-hover:text-brand-500 group-hover:translate-x-1'
                                             }`}
                                     />
                                 </div>

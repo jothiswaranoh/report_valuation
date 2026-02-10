@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
 import { FolderOpen, ArrowRight, Building2 } from 'lucide-react';
 import { ProjectReport } from './types';
+import { useQuery } from '@tanstack/react-query';
+import { banksApi } from '../../apis/bank.api';
+import { INDIAN_BANKS } from '../../data/indianBanks';
 
 interface ProjectNameStepProps {
     projectName: string;
@@ -47,7 +49,6 @@ export default function ProjectNameStep({
     onNext,
     recentProjects
 }: ProjectNameStepProps) {
-    const [showBankSuggestions, setShowBankSuggestions] = useState(false);
     const handleProjectNameSubmit = () => {
         if (projectName.trim() && bankName.trim()) {
             onNext();
@@ -62,14 +63,50 @@ export default function ProjectNameStep({
         });
     };
 
+    const suggestions = useMemo(() => {
+        const normalizedInput = bankName.toLowerCase();
+        if (!normalizedInput && !showBankSuggestions) return [];
+
+        const dynamicNames = banks?.map(b => b.name) || [];
+
+        // Use a Set for case-insensitive tracking, but preserve original casing from INDIAN_BANKS first
+        const seen = new Set<string>();
+        const uniqueNames: string[] = [];
+
+        // Add static banks first
+        INDIAN_BANKS.forEach(name => {
+            const lower = name.toLowerCase();
+            if (!seen.has(lower)) {
+                seen.add(lower);
+                uniqueNames.push(name);
+            }
+        });
+
+        // Add dynamic banks if not present
+        dynamicNames.forEach(name => {
+            const lower = name.toLowerCase();
+            if (!seen.has(lower)) {
+                seen.add(lower); // assuming dynamic name casing is acceptable if unique
+                uniqueNames.push(name);
+            }
+        });
+
+        return uniqueNames
+            .filter(name => name.toLowerCase().includes(normalizedInput))
+            .sort();
+    }, [banks, bankName, showBankSuggestions]);
+
     return (
-        <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8 max-w-2xl mx-auto">
-            <div className="text-center mb-8">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <FolderOpen size={32} className="text-blue-600" />
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 max-w-2xl mx-auto overflow-hidden relative">
+            {/* Background Decoration */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full blur-3xl -translate-y-32 translate-x-32 pointer-events-none" />
+
+            <div className="text-center mb-10 relative z-10">
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg transform rotate-3 hover:rotate-6 transition-transform">
+                    <FolderOpen size={36} className="text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Create New Report</h2>
-                <p className="text-gray-600">Enter details for your document analysis report</p>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">Create New Report</h2>
+                <p className="text-gray-500 text-lg">Enter details for your document analysis report</p>
             </div>
 
             <div className="space-y-6">
@@ -92,29 +129,6 @@ export default function ProjectNameStep({
                             className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-lg transition-all shadow-sm hover:border-gray-400"
                             autoFocus
                         />
-
-                        {/* Custom Dropdown */}
-                        {showBankSuggestions && (
-                            <div className="absolute z-50 w-full mt-1 bg-white rounded-lg shadow-xl border border-gray-100 max-h-60 overflow-auto scrollbar-thin scrollbar-thumb-gray-200">
-                                {INDIAN_BANKS.filter(b => b.toLowerCase().includes(bankName.toLowerCase())).map((bank) => (
-                                    <div
-                                        key={bank}
-                                        className="px-4 py-3 hover:bg-blue-50 cursor-pointer text-gray-700 hover:text-blue-700 transition-colors border-b border-gray-50 last:border-0"
-                                        onClick={() => {
-                                            setBankName(bank);
-                                            setShowBankSuggestions(false);
-                                        }}
-                                    >
-                                        {bank}
-                                    </div>
-                                ))}
-                                {INDIAN_BANKS.filter(b => b.toLowerCase().includes(bankName.toLowerCase())).length === 0 && (
-                                    <div className="px-4 py-3 text-gray-400 italic text-sm">
-                                        No matching banks found
-                                    </div>
-                                )}
-                            </div>
-                        )}
                     </div>
                 </div>
 
@@ -133,29 +147,31 @@ export default function ProjectNameStep({
                 <button
                     onClick={handleProjectNameSubmit}
                     disabled={!projectName.trim() || !bankName.trim()}
-                    className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-6 py-4 rounded-lg font-semibold text-lg flex items-center justify-center gap-2 transition-colors"
+                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-300 disabled:to-gray-300 disabled:cursor-not-allowed text-white px-6 py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                 >
                     Continue to Upload
-                    <ArrowRight size={20} />
+                    <ArrowRight size={24} />
                 </button>
             </div>
 
             {recentProjects.length > 0 && (
-                <div className="mt-8 pt-8 border-t border-gray-200">
-                    <h3 className="text-sm font-medium text-gray-700 mb-4">Recent Reports</h3>
-                    <div className="space-y-2">
+                <div className="mt-10 pt-8 border-t border-gray-100 relative z-10">
+                    <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Recent Reports</h3>
+                    <div className="space-y-3">
                         {recentProjects.slice(0, 3).map((project) => (
                             <div
                                 key={project.id}
-                                className="p-3 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors cursor-pointer flex items-center justify-between"
+                                className="group p-4 border border-gray-100 rounded-xl hover:border-blue-200 hover:bg-blue-50/50 transition-all cursor-pointer flex items-center justify-between"
                             >
                                 <div>
-                                    <p className="font-medium text-gray-900 text-sm">{project.name}</p>
-                                    <p className="text-xs text-gray-600">
-                                        {formatDate(project.createdAt)} • {project.fileCount} files
+                                    <p className="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">{project.name}</p>
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        {formatDate(project.createdAt)} • {project.fileCount} {project.fileCount === 1 ? 'file' : 'files'}
                                     </p>
                                 </div>
-                                <ArrowRight size={16} className="text-gray-400" />
+                                <div className="w-8 h-8 rounded-full bg-gray-50 group-hover:bg-white flex items-center justify-center transition-colors">
+                                    <ArrowRight size={16} className="text-gray-400 group-hover:text-blue-600" />
+                                </div>
                             </div>
                         ))}
                     </div>

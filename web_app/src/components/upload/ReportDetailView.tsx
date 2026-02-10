@@ -45,7 +45,9 @@ export default function ReportDetailView({ reportId }: ReportDetailViewProps) {
     };
 
     const formatDate = (dateString: string) => {
+        if (!dateString) return 'N/A';
         const date = new Date(dateString);
+        if (isNaN(date.getTime())) return 'N/A';
         return date.toLocaleDateString('en-US', {
             weekday: 'long',
             year: 'numeric',
@@ -149,12 +151,12 @@ export default function ReportDetailView({ reportId }: ReportDetailViewProps) {
                             </div>
                         </div>
                         <span className={`px-4 py-2 rounded-full text-sm font-semibold ${reportData.status === 'approved'
-                                ? 'bg-green-500 text-white'
-                                : reportData.status === 'review'
-                                    ? 'bg-yellow-500 text-white'
-                                    : 'bg-gray-500 text-white'
+                            ? 'bg-green-500 text-white'
+                            : reportData.status === 'review'
+                                ? 'bg-yellow-500 text-white'
+                                : 'bg-gray-500 text-white'
                             }`}>
-                            {reportData.status.charAt(0).toUpperCase() + reportData.status.slice(1)}
+                            {(reportData.status || 'draft').charAt(0).toUpperCase() + (reportData.status || 'draft').slice(1)}
                         </span>
                     </div>
 
@@ -233,10 +235,28 @@ export default function ReportDetailView({ reportId }: ReportDetailViewProps) {
                                         )}
                                     </button>
                                     <button
+                                        onClick={async () => {
+                                            if (reportId) {
+                                                try {
+                                                    const blob = await reportsApi.downloadReport(reportId);
+                                                    const url = window.URL.createObjectURL(blob);
+                                                    const a = document.createElement('a');
+                                                    a.href = url;
+                                                    a.download = `${reportData?.name || 'report'}.pdf`;
+                                                    document.body.appendChild(a);
+                                                    a.click();
+                                                    window.URL.revokeObjectURL(url);
+                                                    document.body.removeChild(a);
+                                                } catch (error) {
+                                                    console.error('Download failed', error);
+                                                    alert('Failed to download report');
+                                                }
+                                            }
+                                        }}
                                         className="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg transition-colors backdrop-blur"
                                     >
                                         <Download size={18} />
-                                        <span className="text-sm font-medium">Export</span>
+                                        <span className="text-sm font-medium">Export PDF</span>
                                     </button>
                                 </div>
                             </div>

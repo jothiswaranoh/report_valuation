@@ -1,12 +1,13 @@
 export interface UploadedFile {
     id: string;
     file: File;
-    status: 'pending' | 'processing' | 'completed' | 'error';
+    status: 'pending' | 'uploading' | 'processing' | 'completed' | 'error';
     progress: number;
     uploadDate: Date;
     fileSize: string;
     pages?: number;
     language?: string;
+    serverFileId?: string; // ID from the server
 }
 
 export interface ProjectReport {

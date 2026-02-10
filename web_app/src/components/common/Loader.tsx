@@ -23,10 +23,10 @@ export function Loader({
         <div className={`flex flex-col items-center justify-center gap-3 ${className}`}>
             <Loader2
                 size={sizeMap[size]}
-                className="text-blue-600 animate-spin"
+                className="text-brand-600 animate-spin"
             />
             {text && (
-                <p className="text-sm text-gray-600">{text}</p>
+                <p className="text-sm text-secondary-600">{text}</p>
             )}
         </div>
     );

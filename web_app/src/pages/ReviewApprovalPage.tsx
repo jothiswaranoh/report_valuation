@@ -1,10 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
-  Download,
   FileText,
   CheckCircle,
-  XCircle,
   Clock,
   ChevronLeft,
   History,
@@ -49,8 +47,8 @@ export default function ReviewApprovalPage() {
   if (!report) {
     return (
       <div className="p-8">
-        <div className="bg-white border rounded-lg p-12 text-center">
-          <p className="text-gray-600">Report not found</p>
+        <div className="bg-white border border-secondary-200 rounded-lg p-12 text-center">
+          <p className="text-secondary-600">Report not found</p>
         </div>
       </div>
     );
@@ -65,7 +63,7 @@ export default function ReviewApprovalPage() {
       case 'approved':
         return 'bg-green-100 text-green-800 border-green-200';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return 'bg-secondary-100 text-secondary-800 border-secondary-200';
     }
   };
 
@@ -78,11 +76,11 @@ export default function ReviewApprovalPage() {
   return (
     <div className="h-screen flex flex-col">
       {/* Header */}
-      <div className="bg-white border-b px-8 py-4">
+      <div className="bg-white border-b border-secondary-200 px-8 py-4">
         <div className="flex items-center justify-between mb-4">
           <button
             onClick={handleBack}
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
+            className="flex items-center gap-2 text-secondary-600 hover:text-secondary-900"
           >
             <ChevronLeft size={20} />
             <span className="font-medium">Back</span>
@@ -91,7 +89,7 @@ export default function ReviewApprovalPage() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => setShowAuditTrail(!showAuditTrail)}
-              className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-50"
+              className="flex items-center gap-2 px-4 py-2 border border-secondary-200 rounded-lg hover:bg-secondary-50 transition-colors"
             >
               <History size={18} />
               Audit Trail
@@ -99,21 +97,21 @@ export default function ReviewApprovalPage() {
 
             <button
               onClick={() => handleExport(report.id, 'pdf')}
-              className="px-4 py-2 border rounded-lg hover:bg-gray-50"
+              className="px-4 py-2 border border-secondary-200 rounded-lg hover:bg-secondary-50 transition-colors"
             >
               PDF
             </button>
             <button
               onClick={() => handleExport(report.id, 'docx')}
-              className="px-4 py-2 border rounded-lg hover:bg-gray-50"
+              className="px-4 py-2 border border-secondary-200 rounded-lg hover:bg-secondary-50 transition-colors"
             >
               DOCX
             </button>
           </div>
         </div>
 
-        <h1 className="text-2xl font-bold">{report.customerName}</h1>
-        <div className="flex gap-4 mt-2 text-sm text-gray-600">
+        <h1 className="text-2xl font-bold text-secondary-900">{report.customerName}</h1>
+        <div className="flex gap-4 mt-2 text-sm text-secondary-600">
           <span>{report.bankName}</span>
           <span>•</span>
           <span>{report.propertyType}</span>
@@ -124,32 +122,32 @@ export default function ReviewApprovalPage() {
 
       {/* Body */}
       <div className="flex-1 flex overflow-hidden">
-        <div className="flex-1 overflow-auto bg-gray-50 p-8">
-          <div className="bg-white border rounded-lg p-6 mb-6">
-            <h2 className="text-lg font-semibold mb-4">Report Status</h2>
+        <div className="flex-1 overflow-auto bg-secondary-50 p-8">
+          <div className="bg-white border border-secondary-200 rounded-lg p-6 mb-6">
+            <h2 className="text-lg font-semibold text-secondary-900 mb-4">Report Status</h2>
 
             <div className="flex justify-between mb-6">
               {statusWorkflow.map((item, index) => (
                 <div key={item.status} className="flex items-center flex-1">
                   <button
                     onClick={() => handleStatusChange(report.id, item.status)}
-                    className={`flex items-center gap-2 px-4 py-2 border-2 rounded-lg
+                    className={`flex items-center gap-2 px-4 py-2 border-2 rounded-lg transition-all
                       ${report.status === item.status
                         ? getStatusColor(item.status)
-                        : 'border-gray-200 text-gray-600'
+                        : 'border-secondary-200 text-secondary-600 hover:bg-secondary-50'
                       }`}
                   >
                     {item.icon}
                     {item.label}
                   </button>
                   {index < statusWorkflow.length - 1 && (
-                    <div className="flex-1 h-0.5 bg-gray-200 mx-2" />
+                    <div className="flex-1 h-0.5 bg-secondary-200 mx-2" />
                   )}
                 </div>
               ))}
             </div>
 
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-secondary-600">
               <strong>Updated:</strong> {formatDate(report.updatedAt, 'long')}
             </p>
           </div>

@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Plus, Trash2, FileText, ChevronUp, ChevronDown, X, BarChart3, ArrowRight } from 'lucide-react';
+import { Plus, Trash2, FileText, ChevronUp, ChevronDown, X, BarChart3, ArrowRight, Download } from 'lucide-react';
 import { UploadedFile } from './types';
 
 interface FileSelectionStepProps {
@@ -9,6 +9,8 @@ interface FileSelectionStepProps {
     onFilesChange: (files: UploadedFile[]) => void; // needed for Add More
     onBack: () => void;
     onNext: () => void;
+    onUpload: (files: File[]) => void;
+    onDownload: (file: UploadedFile) => void;
 }
 
 export default function FileSelectionStep({
@@ -17,7 +19,9 @@ export default function FileSelectionStep({
     setSelectedFiles,
     onFilesChange,
     onBack,
-    onNext
+    onNext,
+    onUpload,
+    onDownload
 }: FileSelectionStepProps) {
     const [expandedFile, setExpandedFile] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -30,13 +34,7 @@ export default function FileSelectionStep({
         });
     };
 
-    const formatFileSize = (bytes: number) => {
-        if (bytes === 0) return '0 Bytes';
-        const k = 1024;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-    };
+
 
     const toggleFileSelection = (id: string) => {
         setSelectedFiles(
@@ -66,41 +64,39 @@ export default function FileSelectionStep({
     const handleAddMore = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
             const newFiles = Array.from(e.target.files)
-                .filter(file => file.type === 'application/pdf')
-                .map(file => ({
-                    id: Math.random().toString(36).substr(2, 9),
-                    file,
-                    status: 'pending' as const,
-                    progress: 0,
-                    uploadDate: new Date(),
-                    fileSize: formatFileSize(file.size)
-                }));
+                .filter(file => file.type === 'application/pdf');
 
-            onFilesChange([...files, ...newFiles]);
-            // Auto select new files
-            setSelectedFiles([...selectedFiles, ...newFiles.map(f => f.id)]);
+            // Trigger upload
+            onUpload(newFiles);
+
+            // We should auto-select these files when they appear in the list.
+            // Since we don't have their IDs yet (generated in parent), we rely on parent to update 'selectedFiles'.
+
             e.target.value = '';
         }
     }
 
     return (
-        <div className="max-w-4xl mx-auto">
-            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
-                <div className="flex items-center justify-between mb-6">
+        <div className="max-w-4xl mx-auto space-y-8">
+            <div className="bg-white rounded-2xl shadow-xl border border-secondary-100 p-8 overflow-hidden relative">
+                {/* Background Decoration */}
+                <div className="absolute top-0 right-0 w-64 h-64 bg-brand-50 rounded-full blur-3xl -translate-y-32 translate-x-32 pointer-events-none" />
+
+                <div className="flex items-center justify-between mb-8 relative z-10">
                     <div>
-                        <h2 className="text-2xl font-bold text-gray-900">Select Files to Process</h2>
-                        <p className="text-gray-600 mt-1">Choose which documents to analyze</p>
+                        <h2 className="text-2xl font-bold text-secondary-900">Select Files to Process</h2>
+                        <p className="text-secondary-500 mt-1">Choose which documents to analyze</p>
                     </div>
                     <div className="flex items-center gap-3">
                         <button
                             onClick={onBack}
-                            className="text-gray-600 hover:text-gray-900 px-4 py-2 rounded-lg font-medium"
+                            className="text-secondary-500 hover:text-secondary-700 px-4 py-2 rounded-xl font-medium transition-colors hover:bg-secondary-50"
                         >
                             Back
                         </button>
                         <button
                             onClick={() => fileInputRef.current?.click()}
-                            className="border border-gray-300 hover:border-gray-400 text-gray-700 px-4 py-2 rounded-lg font-medium flex items-center gap-2"
+                            className="bg-white border border-secondary-200 hover:border-brand-300 hover:text-brand-600 text-secondary-700 px-4 py-2 rounded-xl font-medium flex items-center gap-2 transition-all shadow-sm hover:shadow"
                         >
                             <Plus size={18} />
                             Add More
@@ -116,18 +112,18 @@ export default function FileSelectionStep({
                     </div>
                 </div>
 
-                <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-between">
+                <div className="mb-6 p-4 bg-brand-50 border border-brand-200 rounded-lg flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <label className="flex items-center gap-2 cursor-pointer">
                             <input
                                 type="checkbox"
                                 checked={selectedFiles.length === files.length && files.length > 0}
                                 onChange={selectAllFiles}
-                                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-5 h-5"
+                                className="rounded border-secondary-300 text-brand-600 focus:ring-brand-500 w-5 h-5"
                             />
-                            <span className="font-medium text-gray-900">Select All Files</span>
+                            <span className="font-medium text-secondary-900">Select All Files</span>
                         </label>
-                        <span className="text-sm text-gray-600">
+                        <span className="text-sm text-secondary-600">
                             ({selectedFiles.length} of {files.length} selected)
                         </span>
                     </div>
@@ -140,13 +136,13 @@ export default function FileSelectionStep({
                     </button>
                 </div>
 
-                <div className="space-y-3 mb-6 max-h-96 overflow-y-auto">
+                <div className="space-y-3 mb-6 max-h-[500px] overflow-y-auto pr-2 scrollbar-hide">
                     {files.map((file) => (
                         <div
                             key={file.id}
-                            className={`p-4 border-2 rounded-lg transition-all cursor-pointer ${selectedFiles.includes(file.id)
-                                    ? 'border-blue-500 bg-blue-50'
-                                    : 'border-gray-200 hover:border-gray-300'
+                            className={`p-4 border rounded-xl transition-all cursor-pointer group ${selectedFiles.includes(file.id)
+                                ? 'border-brand-500 bg-brand-50/50 shadow-sm'
+                                : 'border-secondary-100 hover:border-brand-200 hover:bg-secondary-50'
                                 }`}
                             onClick={() => toggleFileSelection(file.id)}
                         >
@@ -155,53 +151,82 @@ export default function FileSelectionStep({
                                     type="checkbox"
                                     checked={selectedFiles.includes(file.id)}
                                     onChange={() => { }}
-                                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-5 h-5"
+                                    className="rounded border-secondary-300 text-brand-600 focus:ring-brand-500 w-5 h-5"
                                 />
-                                <FileText size={24} className="text-blue-600" />
+                                <FileText size={24} className="text-brand-600" />
                                 <div className="flex-1">
-                                    <p className="font-medium text-gray-900">{file.file.name}</p>
-                                    <p className="text-sm text-gray-600">
-                                        {file.fileSize} • {formatDate(file.uploadDate)}
-                                    </p>
+                                    <p className="font-medium text-secondary-900">{file.file.name}</p>
+                                    <div className="flex items-center gap-2 text-sm text-secondary-600">
+                                        <span>{file.fileSize} • {formatDate(file.uploadDate)}</span>
+                                        {file.status === 'uploading' && (
+                                            <span className="text-brand-600 font-medium text-xs">Uploading...</span>
+                                        )}
+                                        {file.status === 'error' && (
+                                            <span className="text-red-600 font-medium text-xs">Error</span>
+                                        )}
+                                    </div>
+                                    {/* Progress bar for this file */}
+                                    {file.status === 'uploading' && (
+                                        <div className="w-full h-1 bg-secondary-100 rounded-full mt-1 overflow-hidden">
+                                            <div
+                                                className="h-full bg-brand-600 transition-all duration-300"
+                                                style={{ width: `${file.progress}%` }}
+                                            />
+                                        </div>
+                                    )}
                                 </div>
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setExpandedFile(expandedFile === file.id ? null : file.id);
-                                    }}
-                                    className="text-gray-400 hover:text-gray-600 p-2"
-                                >
-                                    {expandedFile === file.id ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                                </button>
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        removeFile(file.id);
-                                    }}
-                                    className="text-gray-400 hover:text-red-500 p-2"
-                                >
-                                    <X size={20} />
-                                </button>
+                                <div className="flex items-center">
+                                    {(file.status === 'completed' || file.serverFileId) && (
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onDownload(file);
+                                            }}
+                                            className="text-secondary-400 hover:text-brand-600 p-2"
+                                            title="Download"
+                                        >
+                                            <Download size={20} />
+                                        </button>
+                                    )}
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setExpandedFile(expandedFile === file.id ? null : file.id);
+                                        }}
+                                        className="text-secondary-400 hover:text-secondary-600 p-2"
+                                    >
+                                        {expandedFile === file.id ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                                    </button>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            removeFile(file.id);
+                                        }}
+                                        className="text-secondary-400 hover:text-red-500 p-2"
+                                    >
+                                        <X size={20} />
+                                    </button>
+                                </div>
                             </div>
 
                             {expandedFile === file.id && (
-                                <div className="mt-4 pt-4 border-t border-gray-200">
+                                <div className="mt-4 pt-4 border-t border-secondary-200">
                                     <div className="grid grid-cols-2 gap-4 text-sm">
                                         <div>
-                                            <p className="text-gray-500 font-medium">File Name</p>
-                                            <p className="text-gray-900">{file.file.name}</p>
+                                            <p className="text-secondary-500 font-medium">File Name</p>
+                                            <p className="text-secondary-900">{file.file.name}</p>
                                         </div>
                                         <div>
-                                            <p className="text-gray-500 font-medium">Size</p>
-                                            <p className="text-gray-900">{file.fileSize}</p>
+                                            <p className="text-secondary-500 font-medium">Size</p>
+                                            <p className="text-secondary-900">{file.fileSize}</p>
                                         </div>
                                         <div>
-                                            <p className="text-gray-500 font-medium">Upload Date</p>
-                                            <p className="text-gray-900">{formatDate(file.uploadDate)}</p>
+                                            <p className="text-secondary-500 font-medium">Upload Date</p>
+                                            <p className="text-secondary-900">{formatDate(file.uploadDate)}</p>
                                         </div>
                                         <div>
-                                            <p className="text-gray-500 font-medium">Type</p>
-                                            <p className="text-gray-900">PDF Document</p>
+                                            <p className="text-secondary-500 font-medium">Type</p>
+                                            <p className="text-secondary-900">PDF Document</p>
                                         </div>
                                     </div>
                                 </div>
@@ -210,19 +235,19 @@ export default function FileSelectionStep({
                     ))}
                 </div>
 
-                <div className="flex items-center justify-between pt-6 border-t border-gray-200">
-                    <div className="text-sm text-gray-600">
-                        <span className="font-semibold text-gray-900">{selectedFiles.length}</span> files
+                <div className="flex items-center justify-between pt-6 border-t border-secondary-100 relative z-10">
+                    <div className="text-sm text-secondary-500">
+                        <span className="font-bold text-secondary-900">{selectedFiles.length}</span> files
                         selected for processing
                     </div>
                     <button
                         onClick={onNext}
                         disabled={selectedFiles.length === 0}
-                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:from-gray-300 disabled:to-gray-300 disabled:cursor-not-allowed text-white px-8 py-4 rounded-lg font-semibold text-lg flex items-center gap-2 transition-all shadow-lg"
+                        className="bg-gradient-to-r from-brand-600 to-brand-700 hover:from-brand-700 hover:to-brand-800 disabled:from-secondary-300 disabled:to-secondary-300 disabled:cursor-not-allowed text-white px-8 py-4 rounded-xl font-bold text-lg flex items-center gap-3 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                     >
-                        <BarChart3 size={20} />
+                        <BarChart3 size={24} />
                         Import & Analyze Files
-                        <ArrowRight size={20} />
+                        <ArrowRight size={24} />
                     </button>
                 </div>
             </div>

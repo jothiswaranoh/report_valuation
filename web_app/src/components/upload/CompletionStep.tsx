@@ -1,4 +1,4 @@
-import { CheckCircle, FolderOpen, Plus, FileText, Download, Copy, Check } from 'lucide-react';
+import { CheckCircle, Plus, FileText, Download, Copy, Check } from 'lucide-react';
 import { UploadedFile } from './types';
 import { useState } from 'react';
 
@@ -78,37 +78,38 @@ export default function CompletionStep({
     return (
         <div className="max-w-5xl mx-auto space-y-6 pb-8">
             {/* Success Header */}
-            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl shadow-lg border border-green-200 p-8 text-center">
-                <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                    <CheckCircle size={40} className="text-white" />
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl shadow-xl border border-green-100 p-8 text-center relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-green-400 to-emerald-500" />
+
+                <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg transform hover:scale-110 transition-transform duration-300">
+                    <CheckCircle size={48} className="text-white" />
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">Analysis Complete!</h2>
-                <p className="text-gray-600 text-lg">
-                    Successfully processed and analyzed {selectedFiles.length} {selectedFiles.length === 1 ? 'file' : 'files'}
+                <h2 className="text-4xl font-bold text-gray-900 mb-3 tracking-tight">Analysis Complete!</h2>
+                <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+                    Successfully processed and analyzed <span className="font-bold text-gray-900">{selectedFiles.length} {selectedFiles.length === 1 ? 'file' : 'files'}</span>. Your comprehensive report is ready below.
                 </p>
             </div>
 
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200 text-center hover:shadow-lg transition-shadow">
-                    <div className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent mb-2">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl border border-gray-100 text-center transition-all duration-300 transform hover:-translate-y-1">
+                    <div className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent mb-2">
                         {selectedFiles.length}
                     </div>
-                    <p className="text-sm font-medium text-gray-600">Files Analyzed</p>
+                    <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Files Analyzed</p>
                 </div>
-                <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200 text-center hover:shadow-lg transition-shadow">
-                    <div className="text-4xl font-bold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent mb-2">
+                <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl border border-gray-100 text-center transition-all duration-300 transform hover:-translate-y-1">
+                    <div className="text-5xl font-bold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent mb-2">
                         {files
                             .filter((f) => selectedFiles.includes(f.id) && f.pages)
                             .reduce((acc, f) => acc + (f.pages || 0), 0)}
                     </div>
-                    <p className="text-sm font-medium text-gray-600">Total Pages</p>
+                    <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Total Pages</p>
                 </div>
-                <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200 text-center hover:shadow-lg transition-shadow">
-                    <div className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent mb-2">
+                <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl border border-gray-100 text-center transition-all duration-300 transform hover:-translate-y-1">
+                    <div className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent mb-2">
                         100%
                     </div>
-                    <p className="text-sm font-medium text-gray-600">Completion</p>
+                    <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Completion</p>
                 </div>
             </div>
 
@@ -132,8 +133,8 @@ export default function CompletionStep({
 
             {/* Analysis Result Section */}
             {analysisResult && (
-                <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-                    <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6">
+                <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden transition-all duration-500 hover:shadow-2xl">
+                    <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-purple-700 p-8">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                                 <div className="p-2 bg-white/20 rounded-lg backdrop-blur">
@@ -183,9 +184,9 @@ export default function CompletionStep({
             )}
 
             {/* Processed Files List */}
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-                <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
-                    <h3 className="text-lg font-semibold text-gray-900">Processed Files</h3>
+            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+                <div className="bg-gray-50/50 px-8 py-6 border-b border-gray-100">
+                    <h3 className="text-lg font-bold text-gray-900">Processed Files</h3>
                 </div>
                 <div className="p-6">
                     <div className="space-y-3">
