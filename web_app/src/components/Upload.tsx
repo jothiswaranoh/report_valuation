@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FolderOpen } from 'lucide-react';
+import { LayoutGrid, Plus, History } from 'lucide-react';
 import StepIndicator from './upload/StepIndicator';
 import ProjectNameStep from './upload/ProjectNameStep';
 import UploadStep from './upload/UploadStep';
@@ -21,76 +21,43 @@ export default function Upload() {
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
   const [analysisResult, setAnalysisResult] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<'upload' | 'browse'>('upload'); // 'upload' or 'browse'
+  const [viewMode, setViewMode] = useState<'upload' | 'browse'>('upload');
   const [selectedBrowseReportId, setSelectedBrowseReportId] = useState<string | null>(null);
-
 
   const [recentProjects] = useState<ProjectReport[]>([]);
   const [reportId, setReportId] = useState<string | null>(null);
   const createReportMutation = useCreateReport();
   const processMultipleMutation = useProcessMultipleDocuments();
 
-  // URL-based state persistence
   const { reportId: urlReportId } = useParams<{ reportId?: string }>();
   const navigate = useNavigate();
   const { data: reportData, isLoading: isLoadingReport } = useReport(urlReportId);
 
-  // Restore state from URL on mount or when report data changes
-  // Restore state from URL on mount or when report data changes
   useEffect(() => {
     if (urlReportId && reportData && !isLoadingReport) {
-      // API Response: { success: true, report: {...}, files: [...] }
-      const response: any = reportData;
-      const actualReport = response.report || response;
-      const reportFilesList = response.files || [];
+      // Restore report details
+      setReportId(reportData.id);
+      setProjectName(reportData.name);
+      setBankName(reportData.bank_name || '');
 
-      if (actualReport?.id) {
-        // 1. Restore Report Details
-        setReportId(actualReport.id);
-        setProjectName(actualReport.report_name || actualReport.name || '');
-        setBankName(actualReport.bank_name || '');
-
-        // 2. Restore Files
-        if (reportFilesList.length > 0) {
-          const mappedFiles = reportFilesList.map((f: any) => ({
-            id: f.id,
-            file: new File([], f.file_name, { type: f.file_type || 'application/pdf' }),
-            // Mark as completed since they are from server
-            status: 'completed' as const,
-            progress: 100,
-            uploadDate: new Date(f.created_at || Date.now()),
-            fileSize: f.file_size_mb ? `${f.file_size_mb.toFixed(2)} MB` : '0 Bytes',
-            serverFileId: f.id // Keep track of server ID
-          }));
-          setFiles(mappedFiles);
-          setSelectedFiles(mappedFiles.map((f: any) => f.id));
-        }
-
-        // 3. Determine Step & Fetch Analysis
-        const fetchAnalysis = async () => {
-          try {
-            const analysisResponse = await reportsApi.analyzeReport(actualReport.id);
-            if (analysisResponse && analysisResponse.analysis) {
-              setAnalysisResult(analysisResponse.analysis);
-              setCurrentStep(5);
-            } else {
-              // No analysis -> Check files to determine step 2 vs 3
-              if (reportFilesList.length > 0) {
-                setCurrentStep(3);
-              } else {
-                setCurrentStep(2);
-              }
-            }
-          } catch (error) {
-            console.log('No analysis found for this report yet');
-            // If checking analysis fails (404 etc), fall back to file check
-            if (reportFilesList.length > 0) {
-              setCurrentStep(3);
-            } else {
-              setCurrentStep(2);
-            }
+      // Fetch analysis results if the report has been processed
+      // This allows users to view completed reports after refresh
+      const fetchAnalysis = async () => {
+        try {
+          const analysisResponse = await reportsApi.analyzeReport(reportData.id);
+          if (analysisResponse && analysisResponse.analysis) {
+            setAnalysisResult(analysisResponse.analysis);
+            setCurrentStep(5); // Go to completion step if analysis exists
+          } else {
+            // No analysis yet, go to upload step
+            setCurrentStep(2);
           }
-        };
+        } catch (error) {
+          // Analysis might not exist yet, that's okay
+          console.log('No analysis found for this report yet');
+          setCurrentStep(2); // Go to upload step
+        }
+      };
 
         fetchAnalysis();
       }
@@ -108,7 +75,6 @@ export default function Upload() {
 
       if (createdReport?.id) {
         setReportId(createdReport.id);
-        // Navigate to URL with report ID for state persistence
         navigate(`/upload/${createdReport.id}`);
         setCurrentStep(2);
       } else {
@@ -121,71 +87,58 @@ export default function Upload() {
   };
 
   const handleImportAndAnalyze = async () => {
-    if (selectedFiles.length === 0) return;
-    if (!reportId) {
-      alert("Report ID is missing. Please restart.");
+    const effectiveReportId = reportId || urlReportId;
+    if (selectedFiles.length === 0) {
+      alert("No files selected.");
       return;
     }
-
+    if (!effectiveReportId) {
+      alert("Report ID is missing. Please restart or check the URL.");
+      return;
+    }
     setCurrentStep(4);
-
     try {
       const filesToUpload = files
         .filter(f => selectedFiles.includes(f.id))
-        // Skip files that are already completed/uploaded
-        .filter(f => f.status !== 'completed' && f.file.size > 0)
         .map(f => f.file);
 
-      // Only perform upload if we actually have new files
-      if (filesToUpload.length > 0) {
-        // We use processMultipleDocuments for "new" files if any (though logic suggests they should be uploaded by now)
-        // But if we switched to immediate upload, this might be redundant for normal flow,
-        // but kept as fallback for files added in other ways (e.g. if we add "add more" in step 3 that doesn't auto-upload)
-        // However, we'll try to ensure everything is uploaded before this step.
-
-        // If we implement immediate upload, this block might be empty most times.
-        await processMultipleMutation.mutateAsync({
-          files: filesToUpload,
-          clientName: projectName,
-          reportId: reportId
-        });
-      } else {
-        console.log("No new files to upload. Proceeding with existing server files.");
+      if (filesToUpload.length === 0) {
+        throw new Error("No files selected for upload.");
       }
+
+      setFiles(prev => prev.map(f =>
+        selectedFiles.includes(f.id) ? { ...f, status: 'processing', progress: 10 } : f
+      ));
+
+      // Import Data (Process Files)
+      await processMultipleMutation.mutateAsync({
+        files: filesToUpload,
+        clientName: projectName,
+        reportId: reportId
+      });
 
       setFiles(prev => prev.map(f =>
         selectedFiles.includes(f.id) ? { ...f, status: 'completed', progress: 100 } : f
       ));
 
-      setCurrentStep(4);
+      await reportsApi.importFiles(effectiveReportId);
+      const analysisResponse = await reportsApi.analyzeReport(effectiveReportId);
 
-      const importResponse = await reportsApi.importFiles(reportId);
-      if (!importResponse.success) {
-        throw new Error("Failed to import files");
-      }
-
-      // Trigger Analysis
-      const analysisResponse = await reportsApi.analyzeReport(reportId);
       if (analysisResponse && analysisResponse.analysis) {
         setAnalysisResult(analysisResponse.analysis);
       }
-
       setCurrentStep(5);
-
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error in import/analyze flow:", error);
-      alert("An error occurred during processing. Please try again.");
+      alert(`Processing error: ${error.message || "Unknown error"}`);
       setFiles(prev => prev.map(f =>
         selectedFiles.includes(f.id) ? { ...f, status: 'error', progress: 0 } : f
       ));
       setCurrentStep(3);
-    } finally {
-      // Finished
     }
   };
 
   const handleFinish = () => {
-    // Reset all state
     setProjectName('');
     setBankName('');
     setFiles([]);
@@ -193,19 +146,57 @@ export default function Upload() {
     setAnalysisResult(null);
     setReportId(null);
     setCurrentStep(1);
-    // Navigate to clean URL for new report
     navigate('/upload');
   };
 
-
-
-
-  const startNewProject = () => {
-    handleFinish();
+  const handleCreateProject = () => {
+    const effectiveReportId = reportId || urlReportId;
+    if (!effectiveReportId) {
+      alert('Report ID is missing. Cannot save report.');
+      return;
+    }
+    navigate(`/reports/${effectiveReportId}/edit`);
   };
 
-  const handleReportSelect = (reportId: string) => {
-    setSelectedBrowseReportId(reportId);
+  const handleUpload = (newFiles: File[]) => {
+    const uploadedFiles: UploadedFile[] = newFiles.map(file => ({
+      id: Math.random().toString(36).substring(7),
+      file,
+      status: 'pending',
+      progress: 0,
+      uploadDate: new Date(),
+      fileSize: (file.size / (1024 * 1024)).toFixed(2) + ' MB'
+    }));
+
+    setFiles(prev => [...prev, ...uploadedFiles]);
+    setSelectedFiles(prev => [...prev, ...uploadedFiles.map(f => f.id)]);
+  };
+
+  const handleDownload = async (file: UploadedFile) => {
+    if (file.file) {
+      const url = URL.createObjectURL(file.file);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = file.file.name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } else if (file.serverFileId) {
+      try {
+        const blob = await reportsApi.downloadFile(file.serverFileId);
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = file.name || 'download';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch (error) {
+        console.error('Failed to download file', error);
+      }
+    }
   };
 
   const handleSaveReport = async () => {
@@ -320,54 +311,62 @@ export default function Upload() {
   };
 
   return (
-    <div className="min-h-screen bg-secondary-50">
-      <div className="p-6 max-w-7xl mx-auto">
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <h1 className="text-4xl font-bold text-secondary-900 mb-2 tracking-tight">Document Analysis Platform</h1>
-            <p className="text-secondary-500">Process Tamil land documents with intelligent analysis</p>
+    <div className="space-y-8">
+      {/* Sticky Header Section */}
+      <div className="sticky top-0 z-40 bg-[#f8fafc]/95 dark:bg-slate-900/95 backdrop-blur-md pb-4 pt-4 md:pt-6 lg:pt-8 -mt-4 md:-mt-6 lg:-mt-8 px-4 md:px-6 lg:px-8 -mx-4 md:-mx-6 lg:-mx-8 transition-all border-b border-transparent data-[stuck=true]:border-gray-200 dark:data-[stuck=true]:border-slate-800">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-6">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 bg-white dark:bg-slate-900 rounded-2xl shadow-xl flex items-center justify-center border border-slate-100 dark:border-slate-800 transform -rotate-2">
+              <Plus className="text-brand-600 dark:text-brand-400" size={28} />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">Generate Analysis</h1>
+              <p className="text-slate-500 dark:text-slate-400 font-medium">Create a new comprehensive valuation report using AI.</p>
+            </div>
           </div>
 
-          {/* View Mode Toggle */}
-          <div className="flex gap-3">
+          <div className="flex bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-inner">
             <button
               onClick={() => setViewMode('upload')}
               className={`px-6 py-3 rounded-xl font-semibold transition-all flex items-center gap-2 ${viewMode === 'upload'
-                ? 'bg-brand-600 text-white shadow-lg hover:bg-brand-700'
-                : 'bg-white text-secondary-600 border border-secondary-200 hover:border-brand-300 hover:text-brand-600'
+                  ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
+                  : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-blue-300'
                 }`}
             >
-              Upload New
+              <LayoutGrid size={18} />
+              Wizard
             </button>
             <button
               onClick={() => setViewMode('browse')}
               className={`px-6 py-3 rounded-xl font-semibold transition-all flex items-center gap-2 ${viewMode === 'browse'
-                ? 'bg-brand-600 text-white shadow-lg hover:bg-brand-700'
-                : 'bg-white text-secondary-600 border border-secondary-200 hover:border-brand-300 hover:text-brand-600'
+                  ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
+                  : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-blue-300'
                 }`}
             >
-              <FolderOpen size={20} />
-              Browse Reports
+              <History size={18} />
+              History
             </button>
           </div>
         </div>
 
-        {viewMode === 'browse' ? (
-          // Reports Browser View
-          <div className="bg-white rounded-2xl shadow-xl overflow-hidden" style={{ height: 'calc(100vh - 220px)' }}>
-            <div className="grid grid-cols-12 h-full">
-              {/* Left Sidebar - Reports List */}
-              <div className="col-span-4 border-r border-secondary-200 overflow-hidden">
-                <ReportsSidebar
-                  selectedReportId={selectedBrowseReportId}
-                  onReportSelect={handleReportSelect}
-                />
-              </div>
+        {viewMode !== 'browse' && (
+          <div className="bg-slate-50/50 dark:bg-slate-900/50 rounded-3xl p-1 shadow-inner border border-slate-100 dark:border-slate-800">
+            <StepIndicator currentStep={currentStep} />
+          </div>
+        )}
+      </div>
 
-              {/* Right Content - Report Details */}
-              <div className="col-span-8 overflow-hidden">
-                <ReportDetailView reportId={selectedBrowseReportId} />
-              </div>
+      <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 pt-6">
+        {viewMode === 'browse' ? (
+          <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-8 h-[calc(100vh-12rem)] min-h-[600px] items-start">
+            <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col h-full">
+              <ReportsSidebar
+                selectedReportId={selectedBrowseReportId}
+                onReportSelect={setSelectedBrowseReportId}
+              />
+            </div>
+            <div className="bg-slate-50 dark:bg-slate-900/50 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden h-full relative">
+              <ReportDetailView reportId={selectedBrowseReportId} />
             </div>
           </div>
         ) : (
@@ -375,89 +374,65 @@ export default function Upload() {
           <>
             <StepIndicator currentStep={currentStep} />
 
-            {/* Show loading spinner if restoring state */}
-            {isLoadingReport && (
-              <div className="flex h-[60vh] items-center justify-center">
-                <div className="text-center space-y-6">
-                  <div className="relative inline-block">
-                    <div className="w-24 h-24 border-4 border-brand-100 border-t-brand-600 rounded-full animate-spin shadow-lg"></div>
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-brand-600">
-                      <FolderOpen size={32} />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <h3 className="text-2xl font-bold text-secondary-800 animate-pulse">Loading Project...</h3>
-                    <p className="text-secondary-500 text-lg">Retrieving your documents and analysis</p>
-                  </div>
-                </div>
-              </div>
+            {currentStep === 1 && (
+              <ProjectNameStep
+                projectName={projectName}
+                setProjectName={setProjectName}
+                bankName={bankName}
+                setBankName={setBankName}
+                onNext={handleCreateReport}
+                recentProjects={recentProjects}
+              />
             )}
 
-            {!isLoadingReport && (
-              <>
-                {currentStep === 1 && (
-                  <div className="animate-slide-up">
-                    <ProjectNameStep
-                      projectName={projectName}
-                      setProjectName={setProjectName}
-                      bankName={bankName}
-                      setBankName={setBankName}
-                      onNext={handleCreateReport}
-                      recentProjects={recentProjects}
-                    />
-                  </div>
-                )}
+            {currentStep === 2 && (
+              <UploadStep
+                projectName={projectName}
+                files={files}
+                onFilesChange={(newFilesList) => {
+                  if (newFilesList.length > files.length) {
+                    // Files added
+                    const addedFiles = newFilesList.filter(
+                      (nf) => !files.find((of) => of.id === nf.id)
+                    );
+                    setFiles(newFilesList);
+                    setSelectedFiles((prev) => [...prev, ...addedFiles.map((f) => f.id)]);
+                  } else {
+                    // Files removed (or same)
+                    setFiles(newFilesList);
+                    // Cleanup selectedFiles
+                    const newIds = new Set(newFilesList.map((f) => f.id));
+                    setSelectedFiles((prev) => prev.filter((id) => newIds.has(id)));
+                  }
+                }}
+                onNext={() => setCurrentStep(3)}
+                onBack={() => setCurrentStep(1)}
+              />
+            )}
 
-                {currentStep === 2 && (
-                  <div className="animate-slide-up">
-                    <UploadStep
-                      projectName={projectName}
-                      files={files}
-                      onUpload={handleFileUpload}
-                      onFilesChange={(newFiles) => {
-                        // Fallback or for removals
-                        setFiles(newFiles);
-                      }}
-                      onNext={() => setCurrentStep(3)}
-                      onBack={() => setCurrentStep(1)}
-                      onDownload={handleDownloadFile}
-                    />
-                  </div>
-                )}
+            {currentStep === 3 && (
+              <FileSelectionStep
+                files={files}
+                selectedFiles={selectedFiles}
+                setSelectedFiles={setSelectedFiles}
+                onFilesChange={setFiles}
+                onBack={() => setCurrentStep(2)}
+                onNext={handleImportAndAnalyze}
+              />
+            )}
 
-                {currentStep === 3 && (
-                  <div className="animate-slide-up">
-                    <FileSelectionStep
-                      files={files}
-                      selectedFiles={selectedFiles}
-                      setSelectedFiles={setSelectedFiles}
-                      onFilesChange={setFiles}
-                      onUpload={handleFileUpload}
-                      onBack={() => setCurrentStep(2)}
-                      onNext={handleImportAndAnalyze}
-                      onDownload={handleDownloadFile}
-                    />
-                  </div>
-                )}
+            {currentStep === 4 && (
+              <ProcessingStep files={files} selectedFiles={selectedFiles} />
+            )}
 
-                {currentStep === 4 && (
-                  <div className="animate-slide-up">
-                    <ProcessingStep files={files} selectedFiles={selectedFiles} />
-                  </div>
-                )}
-
-                {currentStep === 5 && (
-                  <div className="animate-slide-up">
-                    <CompletionStep
-                      files={files}
-                      selectedFiles={selectedFiles}
-                      analysisResult={analysisResult}
-                      onSave={handleSaveReport}
-                      onRestart={startNewProject}
-                    />
-                  </div>
-                )}
-              </>
+            {currentStep === 5 && (
+              <CompletionStep
+                files={files}
+                selectedFiles={selectedFiles}
+                analysisResult={analysisResult}
+                onSave={handleCreateProject}
+                onRestart={startNewProject}
+              />
             )}
           </>
         )}

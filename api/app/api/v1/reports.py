@@ -24,6 +24,8 @@ router = APIRouter(prefix="/api/v1", tags=["Reports"])
 processing_service = DocumentProcessingService()
 llm_service = LLMService()
 
+from typing import List, Optional
+
 # ----------------------
 # Request Models
 # ----------------------
@@ -33,7 +35,8 @@ class CreateReportRequest(BaseModel):
   bank_name: str
 
 class UpdateReportRequest(BaseModel):
-    report_name: str
+    report_name: Optional[str] = None
+    status: Optional[str] = None
 
 class AnalysisRequest(BaseModel):
     report_id: str
@@ -62,6 +65,7 @@ async def create_report(
     return {
         "id": report["id"],
         "report_name": report["report_name"],
+        "status": report.get("status", "draft"),
         "created_at": report.get("created_at", datetime.utcnow().isoformat()),
     }
 
@@ -339,8 +343,7 @@ async def update_report(
     payload: UpdateReportRequest,
     current_user: dict = Depends(get_current_user),
 ):
-    """Update report name"""
-
+    """Update report name or status"""
     report = ReportRepository.get_by_id(report_id)
     if not report:
         raise HTTPException(status_code=404, detail="Report not found")
@@ -351,11 +354,21 @@ async def update_report(
     ):
         raise HTTPException(status_code=403, detail="Access denied")
 
-    updated_report = ReportRepository.update_name(
-        report_id,
-        payload.report_name,
-        current_user["id"],
-    )
+    updated_report = report
+    
+    if payload.report_name:
+        updated_report = ReportRepository.update_name(
+            report_id,
+            payload.report_name,
+            current_user["id"],
+        )
+
+    if payload.status:
+        updated_report = ReportRepository.update_status(
+            report_id,
+            payload.status,
+            current_user["id"],
+        )
 
     if not updated_report:
         raise HTTPException(status_code=500, detail="Failed to update report")
@@ -363,6 +376,7 @@ async def update_report(
     return {
         "id": updated_report["id"],
         "report_name": updated_report["report_name"],
+        "status": updated_report.get("status", "draft"),
         "created_at": updated_report["created_at"],
     }
 
@@ -385,11 +399,15 @@ async def get_report(
         raise HTTPException(status_code=403, detail="Access denied")
 
     files = OriginalFileRepository.get_by_report(report_id)
+    
+    analysis_doc = AIExtractedContentRepository.get_by_report(report_id)
+    analysis = analysis_doc["ai_report_content"] if analysis_doc else None
 
     return {
         "success": True,
         "report": report,
         "files": files,
+        "analysis": analysis
     }
 
 

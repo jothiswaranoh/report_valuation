@@ -4,6 +4,14 @@ import { apiClient } from '../services/apiClient';
    Types
 ========================= */
 
+export interface ApiReportFile {
+  id: string;
+  file_name: string;
+  file_type: string;
+  file_size_mb: number;
+  created_at: string;
+}
+
 export interface ApiReport {
   id: string;
   name: string;
@@ -14,6 +22,7 @@ export interface ApiReport {
   status: 'draft' | 'review' | 'approved';
   created_at: string;
   updated_at: string;
+  files: ApiReportFile[];
 }
 
 export interface GetReportsResponse {
@@ -121,15 +130,18 @@ export const reportsApi = {
 
   /**
    * Upload files to a report
-   * POST /api/v1/reports/{report_id}/files
+   * POST /api/v1/documents/process-multiple
    */
   uploadFiles: (reportId: string, files: File[]) => {
     const formData = new FormData();
     files.forEach((file) => {
       formData.append('files', file);
     });
-    return apiClient.post<{ success: boolean; files: any[] }>(
-      `/api/v1/reports/${reportId}/files`,
+    formData.append('client_name', 'Client'); // Default client name required by backend
+    formData.append('report_id', reportId);
+
+    return apiClient.post<{ success: boolean; documents: any[] }>(
+      `/api/v1/documents/process-multiple`,
       formData
     );
   },

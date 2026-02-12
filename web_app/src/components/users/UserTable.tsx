@@ -54,21 +54,21 @@ export const UserTable: React.FC<UserTableProps> = ({
     }
 
     return (
-        <div className="bg-white rounded-xl border border-secondary-200 overflow-hidden shadow-sm">
+        <div className="bg-white rounded-xl border border-secondary-200 overflow-hidden shadow-md">
             <div className="overflow-x-auto">
                 <table className="w-full">
-                    <thead className="bg-secondary-50 border-b border-secondary-100">
+                    <thead className="bg-secondary-50 border-b border-secondary-200">
                         <tr>
-                            <th className="px-6 py-4 text-left text-xs font-semibold text-secondary-700 uppercase tracking-wider">
+                            <th className="px-6 py-4 text-left text-xs font-black text-secondary-800 uppercase tracking-widest">
                                 User
                             </th>
-                            <th className="px-6 py-4 text-left text-xs font-semibold text-secondary-700 uppercase tracking-wider">
+                            <th className="px-6 py-4 text-left text-xs font-black text-secondary-800 uppercase tracking-widest">
                                 Contact
                             </th>
-                            <th className="px-6 py-4 text-left text-xs font-semibold text-secondary-700 uppercase tracking-wider">
+                            <th className="px-6 py-4 text-left text-xs font-black text-secondary-800 uppercase tracking-widest">
                                 Roles
                             </th>
-                            <th className="px-6 py-4 text-right text-xs font-semibold text-secondary-700 uppercase tracking-wider">
+                            <th className="px-6 py-4 text-right text-xs font-black text-secondary-800 uppercase tracking-widest">
                                 Actions
                             </th>
                         </tr>
@@ -76,27 +76,27 @@ export const UserTable: React.FC<UserTableProps> = ({
 
                     <tbody className="divide-y divide-secondary-100">
                         {users.map((user) => (
-                            <tr key={user.id} className="hover:bg-secondary-50/50 transition-colors">
+                            <tr key={user.id} className="hover:bg-brand-50/10 transition-all duration-300">
                                 <td className="px-6 py-4">
                                     <div className="flex items-center">
-                                        <div className="h-10 w-10 bg-brand-100 rounded-full flex items-center justify-center mr-3">
-                                            <span className="font-medium text-brand-800">
+                                        <div className="h-12 w-12 bg-brand-100 rounded-xl flex items-center justify-center mr-4 shadow-inner">
+                                            <span className="text-lg font-black text-brand-800">
                                                 {user.first_name?.[0]?.toUpperCase()}
                                                 {user.last_name?.[0]?.toUpperCase()}
                                             </span>
                                         </div>
                                         <div>
-                                            <p className="font-medium text-secondary-900">
+                                            <p className="text-base font-bold text-secondary-900 leading-tight">
                                                 {user.first_name} {user.last_name}
                                             </p>
-                                            <p className="text-sm text-secondary-500 font-mono">ID: {user.id.substring(0, 8)}</p>
+                                            <p className="text-xs text-secondary-400 font-mono mt-0.5 opacity-70">ID: {user.id.substring(0, 8)}</p>
                                         </div>
                                     </div>
                                 </td>
                                 <td className="px-6 py-4">
-                                    <div>
-                                        <p className="text-secondary-900">{user.email}</p>
-                                        <p className="text-sm text-secondary-500">System account</p>
+                                    <div className="flex flex-col">
+                                        <p className="text-sm font-bold text-secondary-900 leading-tight">{user.email}</p>
+                                        <p className="text-xs text-secondary-400 mt-0.5 font-medium">System account</p>
                                     </div>
                                 </td>
                                 <td className="px-6 py-4">
@@ -105,11 +105,11 @@ export const UserTable: React.FC<UserTableProps> = ({
                                             user.roles.map((role) => (
                                                 <span
                                                     key={role}
-                                                    className={`px-3 py-1 text-xs font-medium rounded-full ${role === 'admin'
-                                                        ? 'bg-red-100 text-red-800'
+                                                    className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider rounded-lg shadow-sm border ${role === 'admin'
+                                                        ? 'bg-red-50 text-red-700 border-red-100'
                                                         : role === 'editor'
-                                                            ? 'bg-green-100 text-green-800'
-                                                            : 'bg-brand-100 text-brand-800'
+                                                            ? 'bg-green-50 text-green-700 border-green-100'
+                                                            : 'bg-brand-50 text-brand-700 border-brand-100'
                                                         }`}
                                                 >
                                                     {role}
@@ -124,14 +124,14 @@ export const UserTable: React.FC<UserTableProps> = ({
                                     <div className="flex justify-end gap-2">
                                         <button
                                             onClick={() => onEdit(user)}
-                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-brand-600 hover:text-brand-800 hover:bg-brand-50 rounded-lg transition-colors border border-transparent hover:border-brand-100"
+                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-brand-600 hover:text-brand-800 hover:bg-brand-50 rounded-lg transition-all border border-transparent hover:border-brand-200 shadow-sm"
                                         >
                                             <Edit2 size={16} />
                                             Edit
                                         </button>
                                         <button
                                             onClick={() => onDelete(user.id)}
-                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-100"
+                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-all border border-transparent hover:border-red-200 shadow-sm"
                                         >
                                             <Trash2 size={16} />
                                             Delete

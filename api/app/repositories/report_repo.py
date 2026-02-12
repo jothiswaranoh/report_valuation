@@ -25,6 +25,7 @@ class ReportRepository:
             "user_id": ObjectId(user_id),
             "created_by": ObjectId(created_by),
             "updated_by": ObjectId(created_by),
+            "status": "review",  # Default to review when created/analyzed
             "created_at": now,
             "updated_at": now
         }
@@ -39,6 +40,7 @@ class ReportRepository:
             if report:
                 report["id"] = str(report["_id"])
                 report["user_id"] = str(report["user_id"])
+                report["status"] = report.get("status", "draft")
                 if "created_by" in report:
                     report["created_by"] = str(report["created_by"])
                 if "updated_by" in report:
@@ -64,6 +66,7 @@ class ReportRepository:
                 "id": report_id,
                 "report_name": report.get("report_name"),
                 "bank_name": report.get("bank_name"),
+                "status": report.get("status", "draft"),
                 "user_id": str(report.get("user_id")),
                 "created_at": report.get("created_at"),
                 "updated_at": report.get("updated_at"),
@@ -89,6 +92,22 @@ class ReportRepository:
         except:
             return None
     
+    @staticmethod
+    def update_status(report_id: str, status: str, updated_by: str) -> Optional[dict]:
+        """Update report status"""
+        try:
+            reports.update_one(
+                {"_id": ObjectId(report_id)},
+                {"$set": {
+                    "status": status,
+                    "updated_by": ObjectId(updated_by),
+                    "updated_at": datetime.utcnow()
+                }}
+            )
+            return ReportRepository.get_by_id(report_id)
+        except:
+            return None
+
     @staticmethod
     def exists_by_name(report_name: str, user_id: str = None) -> bool:
         """Check if a report name already exists"""

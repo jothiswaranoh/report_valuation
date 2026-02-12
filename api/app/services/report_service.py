@@ -228,6 +228,24 @@ class DocumentProcessingService:
                 }
             )
             
+            # Step 4: Save extracted content to database
+            # Combine all page results into a single text document
+            combined_content = "\n\n".join([
+                f"=== Page {page.page_number} ===\n{page.simple_english}"
+                for page in page_results
+            ])
+            
+            # Update the file_content field in the database
+            try:
+                OriginalFileRepository.update_file_content(
+                    file_id=document_id,
+                    content=combined_content,
+                    updated_by=file_doc.get("created_by", "system")
+                )
+                logger.info(f"Saved extracted content to database for {document_id}")
+            except Exception as e:
+                logger.error(f"Failed to save content to database for {document_id}: {str(e)}")
+            
             logger.info(f"Document processing completed successfully: {document_id}")
             
         except Exception as e:

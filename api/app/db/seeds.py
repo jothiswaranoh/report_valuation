@@ -12,7 +12,7 @@ from app.core.security import hash_password
 
 def seed_roles():
     """Seed the default roles"""
-    default_roles = ["admin", "user"]
+    default_roles = ["admin", "user", "viewer", "editor"]
     
     for role_name in default_roles:
         existing = roles.find_one({"name": role_name})

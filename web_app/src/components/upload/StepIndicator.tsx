@@ -14,33 +14,36 @@ export default function StepIndicator({ currentStep }: StepIndicatorProps) {
     ];
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-secondary-200 p-6 mb-8">
-            <div className="flex items-center justify-between">
+        <div className="bg-white rounded-2xl shadow-sm border border-secondary-100 p-5 mb-8 overflow-hidden relative">
+            <div className="flex items-center justify-between relative z-10">
                 {steps.map((step, idx) => (
-                    <div key={step.num} className="flex items-center flex-1">
-                        <div className="flex flex-col items-center flex-1">
+                    <div key={step.num} className="flex items-center flex-1 last:flex-none">
+                        <div className="flex flex-col items-center group">
                             <div
-                                className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 transition-all ${currentStep > step.num
-                                    ? 'bg-success-500 text-white'
-                                    : currentStep === step.num
-                                        ? 'bg-brand-600 text-white ring-4 ring-brand-100'
-                                        : 'bg-secondary-200 text-secondary-500'
+                                className={`w-9 h-9 rounded-xl flex items-center justify-center mb-2 transition-all duration-300 border-2 ${currentStep > step.num
+                                        ? 'bg-emerald-500 border-emerald-500 text-white shadow-lg shadow-emerald-100'
+                                        : currentStep === step.num
+                                            ? 'bg-brand-600 border-brand-600 text-white shadow-lg shadow-brand-100 ring-4 ring-brand-50'
+                                            : 'bg-secondary-50 border-secondary-100 text-secondary-400'
                                     }`}
                             >
-                                {currentStep > step.num ? <CheckCircle size={24} /> : <step.icon size={24} />}
+                                {currentStep > step.num ? <CheckCircle size={18} /> : <step.icon size={18} />}
                             </div>
                             <span
-                                className={`text-sm font-medium ${currentStep >= step.num ? 'text-secondary-900' : 'text-secondary-500'
+                                className={`text-[10px] font-bold uppercase tracking-wider transition-colors duration-300 ${currentStep >= step.num ? 'text-secondary-900' : 'text-secondary-400'
                                     }`}
                             >
                                 {step.label}
                             </span>
                         </div>
-                        {idx < 4 && (
-                            <div
-                                className={`h-1 flex-1 mx-2 mb-8 rounded transition-all ${currentStep > step.num ? 'bg-success-500' : 'bg-secondary-200'
-                                    }`}
-                            />
+                        {idx < steps.length - 1 && (
+                            <div className="flex-1 mx-4 h-[2px] mb-6 relative">
+                                <div className="absolute inset-0 bg-secondary-100 rounded-full" />
+                                <div
+                                    className="absolute inset-0 bg-emerald-500 rounded-full transition-all duration-700 ease-in-out"
+                                    style={{ width: currentStep > step.num ? '100%' : '0%' }}
+                                />
+                            </div>
                         )}
                     </div>
                 ))}

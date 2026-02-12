@@ -76,55 +76,57 @@ export default function CompletionStep({
     };
 
     return (
-        <div className="max-w-5xl mx-auto space-y-6 pb-8">
+        <div className="max-w-4xl mx-auto space-y-4 pb-6">
             {/* Success Header */}
-            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl shadow-xl border border-green-100 p-8 text-center relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-green-400 to-emerald-500" />
+            {/* Success Header */}
+            <div className="bg-white rounded-2xl shadow-xl border border-secondary-100 p-6 text-center relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-green-500 to-emerald-500" />
+                <div className="absolute top-0 right-0 w-32 h-32 bg-green-50 rounded-full blur-3xl -translate-y-16 translate-x-16 pointer-events-none" />
 
-                <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg transform hover:scale-110 transition-transform duration-300">
-                    <CheckCircle size={48} className="text-white" />
+                <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg transform hover:scale-105 transition-transform duration-300 border-2 border-white">
+                    <CheckCircle size={28} className="text-white" />
                 </div>
-                <h2 className="text-4xl font-bold text-gray-900 mb-3 tracking-tight">Analysis Complete!</h2>
-                <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-                    Successfully processed and analyzed <span className="font-bold text-gray-900">{selectedFiles.length} {selectedFiles.length === 1 ? 'file' : 'files'}</span>. Your comprehensive report is ready below.
+                <h2 className="text-2xl font-bold text-secondary-900 mb-2 tracking-tight uppercase">Analysis Complete!</h2>
+                <p className="text-secondary-600 text-sm max-w-2xl mx-auto font-semibold leading-relaxed">
+                    Successfully processed and analyzed <span className="font-bold text-brand-700 underline decoration-brand-200 decoration-4 underline-offset-4">{selectedFiles.length} {selectedFiles.length === 1 ? 'file' : 'files'}</span>. Your comprehensive report is ready below.
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl border border-gray-100 text-center transition-all duration-300 transform hover:-translate-y-1">
-                    <div className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent mb-2">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-white p-4 rounded-xl shadow-md hover:shadow-xl border border-secondary-100 text-center transition-all duration-300 transform hover:-translate-y-1 border-b-4 border-b-brand-500">
+                    <div className="text-3xl font-extrabold bg-gradient-to-br from-brand-600 to-brand-800 bg-clip-text text-transparent mb-1 tracking-tighter">
                         {selectedFiles.length}
                     </div>
-                    <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Files Analyzed</p>
+                    <p className="text-[10px] font-bold text-secondary-400 uppercase tracking-[0.2em]">Files Analyzed</p>
                 </div>
-                <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl border border-gray-100 text-center transition-all duration-300 transform hover:-translate-y-1">
-                    <div className="text-5xl font-bold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent mb-2">
+                <div className="bg-white p-4 rounded-xl shadow-md hover:shadow-xl border border-secondary-100 text-center transition-all duration-300 transform hover:-translate-y-1 border-b-4 border-b-emerald-500">
+                    <div className="text-3xl font-extrabold bg-gradient-to-br from-emerald-600 to-emerald-800 bg-clip-text text-transparent mb-1 tracking-tighter">
                         {files
                             .filter((f) => selectedFiles.includes(f.id) && f.pages)
                             .reduce((acc, f) => acc + (f.pages || 0), 0)}
                     </div>
-                    <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Total Pages</p>
+                    <p className="text-[10px] font-bold text-secondary-400 uppercase tracking-[0.2em]">Total Pages</p>
                 </div>
-                <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl border border-gray-100 text-center transition-all duration-300 transform hover:-translate-y-1">
-                    <div className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent mb-2">
+                <div className="bg-white p-4 rounded-xl shadow-md hover:shadow-xl border border-secondary-100 text-center transition-all duration-300 transform hover:-translate-y-1 border-b-4 border-b-indigo-500">
+                    <div className="text-3xl font-extrabold bg-gradient-to-br from-indigo-600 to-indigo-800 bg-clip-text text-transparent mb-1 tracking-tighter">
                         100%
                     </div>
-                    <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Completion</p>
+                    <p className="text-[10px] font-bold text-secondary-400 uppercase tracking-[0.2em]">Accuracy</p>
                 </div>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-4">
                 <button
                     onClick={onSave}
-                    className="w-full sm:w-auto bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-8 py-4 rounded-xl font-semibold text-lg flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                    className="w-full sm:w-auto bg-gradient-to-br from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-8 py-3 rounded-2xl font-bold text-base flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 uppercase tracking-wider"
                 >
                     <Download size={20} />
                     Save Report
                 </button>
                 <button
                     onClick={onRestart}
-                    className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl font-semibold text-lg flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                    className="w-full sm:w-auto bg-gradient-to-br from-brand-600 to-brand-700 hover:from-brand-700 hover:to-brand-800 text-white px-8 py-3 rounded-2xl font-bold text-base flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 uppercase tracking-wider"
                 >
                     <Plus size={20} />
                     Start New Analysis
@@ -134,27 +136,27 @@ export default function CompletionStep({
             {/* Analysis Result Section */}
             {analysisResult && (
                 <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden transition-all duration-500 hover:shadow-2xl">
-                    <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-purple-700 p-8">
+                    <div className="bg-gradient-to-r from-brand-600 to-brand-700 p-6">
                         <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 bg-white/20 rounded-lg backdrop-blur">
+                            <div className="flex items-center gap-4">
+                                <div className="p-3 bg-white/20 rounded-xl backdrop-blur border border-white/10">
                                     <FileText className="text-white" size={24} />
                                 </div>
-                                <h3 className="text-xl font-bold text-white">Analysis Report</h3>
+                                <h3 className="text-xl font-bold text-white uppercase tracking-tight">Analysis Report</h3>
                             </div>
                             <button
                                 onClick={handleCopy}
-                                className="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg transition-colors backdrop-blur"
+                                className="flex items-center gap-3 bg-white/20 hover:bg-white/30 text-white px-5 py-2 rounded-xl transition-colors backdrop-blur border border-white/10"
                             >
                                 {copied ? (
                                     <>
                                         <Check size={18} />
-                                        <span className="text-sm font-medium">Copied!</span>
+                                        <span className="text-sm font-bold uppercase tracking-wider">Copied!</span>
                                     </>
                                 ) : (
                                     <>
                                         <Copy size={18} />
-                                        <span className="text-sm font-medium">Copy</span>
+                                        <span className="text-sm font-bold uppercase tracking-wider">Copy</span>
                                     </>
                                 )}
                             </button>
@@ -163,18 +165,18 @@ export default function CompletionStep({
 
                     <div className="p-8">
                         <div
-                            className="prose prose-lg prose-indigo max-w-none
-                                [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:text-gray-900 [&_h1]:mt-8 [&_h1]:mb-4
-                                [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-gray-900 [&_h2]:mt-6 [&_h2]:mb-3
-                                [&_h3]:text-lg [&_h3]:font-bold [&_h3]:text-gray-900 [&_h3]:mt-4 [&_h3]:mb-2
-                                [&_p]:text-gray-700 [&_p]:leading-relaxed [&_p]:mb-4
-                                [&_ul]:list-disc [&_ul]:list-inside [&_ul]:mb-4 [&_ul]:space-y-2
-                                [&_ol]:list-decimal [&_ol]:list-inside [&_ol]:mb-4 [&_ol]:space-y-2
-                                [&_li]:text-gray-700 [&_li]:ml-4
-                                [&_strong]:font-semibold [&_strong]:text-gray-900
-                                [&_code]:bg-gray-200 [&_code]:text-gray-800 [&_code]:px-2 [&_code]:py-1 [&_code]:rounded [&_code]:text-sm [&_code]:font-mono
-                                [&_pre]:bg-gray-900 [&_pre]:text-gray-100 [&_pre]:p-4 [&_pre]:rounded-lg [&_pre]:overflow-x-auto [&_pre]:my-4
-                                [&_a]:text-blue-600 [&_a]:hover:text-blue-800 [&_a]:underline"
+                            className="prose prose-md prose-brand max-w-none
+                                [&_h1]:text-3xl [&_h1]:font-bold [&_h1]:text-secondary-900 [&_h1]:mt-8 [&_h1]:mb-4 [&_h1]:uppercase [&_h1]:tracking-tight
+                                [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-secondary-900 [&_h2]:mt-6 [&_h2]:mb-3 [&_h2]:tracking-tight
+                                [&_h3]:text-xl [&_h3]:font-bold [&_h3]:text-secondary-900 [&_h3]:mt-5 [&_h3]:mb-2 [&_h3]:tracking-tight
+                                [&_p]:text-secondary-600 [&_p]:leading-relaxed [&_p]:mb-4 [&_p]:text-lg [&_p]:font-medium
+                                [&_ul]:list-disc [&_ul]:list-inside [&_ul]:mb-4 [&_ul]:space-y-2 [&_ul]:text-secondary-600 [&_ul]:text-lg
+                                [&_ol]:list-decimal [&_ol]:list-inside [&_ol]:mb-4 [&_ol]:space-y-2 [&_ol]:text-secondary-600 [&_ol]:text-lg
+                                [&_li]:text-secondary-600 [&_li]:ml-6
+                                [&_strong]:font-bold [&_strong]:text-secondary-900
+                                [&_code]:bg-secondary-50 [&_code]:text-brand-700 [&_code]:px-2 [&_code]:py-1 [&_code]:rounded [&_code]:text-xs [&_code]:font-mono border-brand-100
+                                [&_pre]:bg-secondary-900 [&_pre]:text-white [&_pre]:p-6 [&_pre]:rounded-2xl [&_pre]:overflow-x-auto [&_pre]:my-6 [&_pre]:shadow-inner
+                                [&_a]:text-brand-600 [&_a]:hover:text-brand-700 [&_a]:underline font-bold"
                             dangerouslySetInnerHTML={{
                                 __html: formatMarkdown(analysisResult)
                             }}
@@ -185,38 +187,38 @@ export default function CompletionStep({
 
             {/* Processed Files List */}
             <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-                <div className="bg-gray-50/50 px-8 py-6 border-b border-gray-100">
-                    <h3 className="text-lg font-bold text-gray-900">Processed Files</h3>
+                <div className="bg-gray-50/50 px-6 py-4 border-b border-gray-100">
+                    <h3 className="text-sm font-bold text-secondary-900 uppercase tracking-widest">Processed Files</h3>
                 </div>
-                <div className="p-6">
-                    <div className="space-y-3">
+                <div className="p-4">
+                    <div className="space-y-2">
                         {files
                             .filter((f) => selectedFiles.includes(f.id))
                             .map((file, index) => (
                                 <div
                                     key={file.id}
-                                    className="flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:border-green-300 hover:bg-green-50/30 transition-all"
+                                    className="flex items-center justify-between p-3 border border-secondary-100 rounded-xl hover:border-brand-400 hover:bg-brand-50/30 transition-all shadow-sm group"
                                     style={{
                                         animationDelay: `${index * 50}ms`,
                                         animation: 'fadeInUp 0.3s ease-out forwards'
                                     }}
                                 >
                                     <div className="flex items-center gap-4 flex-1 min-w-0">
-                                        <div className="flex-shrink-0">
-                                            <CheckCircle size={24} className="text-green-500" />
+                                        <div className="p-3 bg-brand-50 rounded-xl group-hover:scale-110 transition-transform">
+                                            <CheckCircle size={28} className="text-brand-500" />
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <p className="font-medium text-gray-900 truncate">
-                                                {file.file.name}
+                                            <p className="text-base font-bold text-secondary-900 truncate uppercase tracking-tight">
+                                                {file.name || file.file?.name}
                                             </p>
-                                            <p className="text-sm text-gray-600">
+                                            <p className="text-xs text-secondary-500 font-bold uppercase tracking-widest mt-1">
                                                 {file.pages} {file.pages === 1 ? 'page' : 'pages'}
                                                 {file.language && ` • ${file.language}`}
                                             </p>
                                         </div>
                                     </div>
-                                    <span className="px-4 py-1.5 bg-green-100 text-green-800 rounded-full text-xs font-semibold whitespace-nowrap">
-                                        ✓ Completed
+                                    <span className="px-5 py-2 bg-brand-50 text-brand-700 rounded-xl text-xs font-bold uppercase tracking-widest border border-brand-100 shadow-sm">
+                                        ✓ Verified
                                     </span>
                                 </div>
                             ))}

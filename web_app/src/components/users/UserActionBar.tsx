@@ -13,14 +13,14 @@ export const UserActionBar: React.FC<UserActionBarProps> = ({
     onAddClick,
 }) => {
     return (
-        <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6 shadow-sm">
+        <div className="bg-white rounded-xl border border-secondary-200 p-5 mb-6 shadow-sm">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="relative flex-1 max-w-md">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <div className="relative flex-1 max-w-lg">
+                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-secondary-400" />
                     <input
                         type="text"
                         placeholder="Search users by name or email..."
-                        className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                        className="w-full pl-12 pr-6 py-3 border border-secondary-200 rounded-xl focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 outline-none transition-all text-base font-medium bg-secondary-50/20"
                         value={searchTerm}
                         onChange={(e) => onSearchChange(e.target.value)}
                     />
@@ -28,7 +28,7 @@ export const UserActionBar: React.FC<UserActionBarProps> = ({
 
                 <button
                     onClick={onAddClick}
-                    className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-5 py-2.5 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-medium shadow-sm hover:shadow"
+                    className="flex items-center gap-2 bg-brand-600 text-white px-6 py-3 rounded-xl hover:bg-brand-700 transition-all duration-300 font-bold text-base shadow-lg shadow-brand-100 transform hover:-translate-y-0.5"
                 >
                     <Plus size={20} />
                     Add New User

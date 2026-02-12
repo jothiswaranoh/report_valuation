@@ -3,7 +3,7 @@ import { FolderOpen, ArrowRight, Building2 } from 'lucide-react';
 import { ProjectReport } from './types';
 import { useQuery } from '@tanstack/react-query';
 import { banksApi } from '../../apis/bank.api';
-import { INDIAN_BANKS } from '../../data/indianBanks';
+
 
 interface ProjectNameStepProps {
     projectName: string;
@@ -14,6 +14,34 @@ interface ProjectNameStepProps {
     recentProjects: ProjectReport[];
 }
 
+const INDIAN_BANKS = [
+    "State Bank of India (SBI)",
+    "HDFC Bank",
+    "ICICI Bank",
+    "Axis Bank",
+    "Kotak Mahindra Bank",
+    "Punjab National Bank (PNB)",
+    "Bank of Baroda",
+    "Canara Bank",
+    "Union Bank of India",
+    "Bank of India",
+    "Indian Bank",
+    "Central Bank of India",
+    "Indian Overseas Bank",
+    "UCO Bank",
+    "Bank of Maharashtra",
+    "Punjab & Sind Bank",
+    "IDBI Bank",
+    "Federal Bank",
+    "IDFC First Bank",
+    "South Indian Bank",
+    "Karur Vysya Bank",
+    "City Union Bank",
+    "Tamilnad Mercantile Bank",
+    "Karnataka Bank",
+    "Dhanlaxmi Bank"
+];
+
 export default function ProjectNameStep({
     projectName,
     setProjectName,
@@ -22,15 +50,8 @@ export default function ProjectNameStep({
     onNext,
     recentProjects
 }: ProjectNameStepProps) {
-    const [showBankSuggestions, setShowBankSuggestions] = useState(false);
-
-    const { data: banks } = useQuery({
-        queryKey: ['banks'],
-        queryFn: banksApi.getBanks,
-    });
-
     const handleProjectNameSubmit = () => {
-        if (projectName.trim() && bankName.trim()) {
+        if (projectName?.trim() && bankName?.trim()) {
             onNext();
         }
     };
@@ -44,7 +65,7 @@ export default function ProjectNameStep({
     };
 
     const suggestions = useMemo(() => {
-        const normalizedInput = bankName.toLowerCase();
+        const normalizedInput = (bankName || '').toLowerCase();
         if (!normalizedInput && !showBankSuggestions) return [];
 
         const dynamicNames = banks?.map(b => b.name) || [];
@@ -77,28 +98,28 @@ export default function ProjectNameStep({
     }, [banks, bankName, showBankSuggestions]);
 
     return (
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 max-w-2xl mx-auto overflow-hidden relative">
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 max-w-xl mx-auto overflow-hidden relative">
             {/* Background Decoration */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full blur-3xl -translate-y-32 translate-x-32 pointer-events-none" />
+            <div className="absolute top-0 right-0 w-48 h-48 bg-blue-50 rounded-full blur-3xl -translate-y-24 translate-x-24 pointer-events-none" />
 
             <div className="text-center mb-10 relative z-10">
-                <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg transform rotate-3 hover:rotate-6 transition-transform">
+                <div className="w-20 h-20 bg-gradient-to-br from-brand-600 to-brand-700 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl transform rotate-3 hover:rotate-6 transition-transform">
                     <FolderOpen size={36} className="text-white" />
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">Create New Report</h2>
-                <p className="text-gray-500 text-lg">Enter details for your document analysis report</p>
+                <h2 className="text-3xl font-bold text-secondary-900 mb-2 tracking-tight uppercase">Create New Report</h2>
+                <p className="text-secondary-600 text-base font-semibold opacity-80">Enter details for your document analysis report</p>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-4">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Bank Name *</label>
+                    <label className="block text-sm font-bold text-secondary-700 mb-2 uppercase tracking-[0.15em] ml-1">Bank Name *</label>
                     <div className="relative group">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <Building2 size={20} className="text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <Building2 size={20} className="text-secondary-400 group-focus-within:text-brand-500 transition-colors" />
                         </div>
                         <input
                             type="text"
-                            value={bankName}
+                            value={bankName || ''}
                             onChange={(e) => {
                                 setBankName(e.target.value);
                                 setShowBankSuggestions(true);
@@ -106,58 +127,31 @@ export default function ProjectNameStep({
                             onFocus={() => setShowBankSuggestions(true)}
                             onBlur={() => setTimeout(() => setShowBankSuggestions(false), 200)}
                             placeholder="e.g., HDFC Bank, SBI"
-                            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-lg transition-all shadow-sm hover:border-gray-400"
+                            className="w-full pl-12 pr-4 py-3.5 border border-secondary-200 rounded-2xl focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 outline-none text-base font-bold transition-all shadow-sm hover:border-secondary-300 placeholder-secondary-300"
                             autoFocus
                         />
-
-                        {/* Custom Dropdown */}
-                        {showBankSuggestions && (
-                            <div className="absolute z-50 w-full mt-1 bg-white rounded-lg shadow-xl border border-gray-100 max-h-60 overflow-auto scrollbar-thin scrollbar-thumb-gray-200">
-                                {suggestions.length > 0 ? (
-                                    suggestions.map((bank, index) => (
-                                        <div
-                                            key={`${bank}-${index}`}
-                                            className="px-4 py-3 hover:bg-blue-50 cursor-pointer text-gray-700 hover:text-blue-700 transition-colors border-b border-gray-50 last:border-0 flex items-center gap-3"
-                                            onClick={() => {
-                                                setBankName(bank);
-                                                setShowBankSuggestions(false);
-                                            }}
-                                        >
-                                            <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
-                                                <Building2 size={16} />
-                                            </div>
-                                            <span className="font-medium">{bank}</span>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <div className="px-4 py-3 text-gray-400 italic text-sm">
-                                        No matching banks found
-                                    </div>
-                                )}
-                            </div>
-                        )}
                     </div>
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Report Name *</label>
+                    <label className="block text-sm font-bold text-secondary-700 mb-2 uppercase tracking-[0.15em] ml-1">Report Name *</label>
                     <input
                         type="text"
-                        value={projectName}
+                        value={projectName || ''}
                         onChange={(e) => setProjectName(e.target.value)}
                         onKeyPress={(e) => e.key === 'Enter' && handleProjectNameSubmit()}
                         placeholder="e.g., Tamil Land Documents - January 2024"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-lg"
+                        className="w-full px-5 py-3.5 border border-secondary-200 rounded-2xl focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 outline-none text-base font-bold placeholder-secondary-300 shadow-sm transition-all hover:border-secondary-300"
                     />
                 </div>
 
                 <button
                     onClick={handleProjectNameSubmit}
-                    disabled={!projectName.trim() || !bankName.trim()}
-                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-300 disabled:to-gray-300 disabled:cursor-not-allowed text-white px-6 py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                    disabled={!projectName?.trim() || !bankName?.trim()}
+                    className="w-full bg-gradient-to-br from-brand-600 to-brand-700 hover:from-brand-700 hover:to-brand-800 disabled:from-secondary-200 disabled:to-secondary-200 disabled:cursor-not-allowed text-white px-8 py-4 rounded-2xl font-bold text-base flex items-center justify-center gap-3 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 mt-6 uppercase tracking-wider"
                 >
                     Continue to Upload
-                    <ArrowRight size={24} />
+                    <ArrowRight size={20} />
                 </button>
             </div>
 
