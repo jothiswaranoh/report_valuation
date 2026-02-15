@@ -1,0 +1,23 @@
+services:
+  backend:
+    restart: always
+
+  mongodb:
+    restart: always
+
+  redis:
+    restart: always
+
+  celery_worker:
+    restart: always
+
+  frontend:
+    build:
+      context: ./web_app
+      dockerfile: Dockerfile.prod
+    container_name: report_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: always

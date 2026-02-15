@@ -178,8 +178,7 @@ export default function Layout() {
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
         {/* Top Header Bar */}
         <header className={`
-          h-16 flex items-center justify-between px-6 transition-all duration-300 z-30
-          ${scrolled ? 'bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm' : 'bg-transparent'}
+          h-16 flex items-center justify-between px-6 transition-all duration-300 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm
         `}>
           <div className="flex items-center gap-4">
             <button
@@ -188,7 +187,7 @@ export default function Layout() {
             >
               <Menu size={20} className="dark:text-white" />
             </button>
-            {scrolled && (
+            {(
               <span className="font-bold text-slate-900 dark:text-white animate-in fade-in slide-in-from-left-2 duration-300">
                 Valuation System AI
               </span>
@@ -220,7 +219,7 @@ export default function Layout() {
         {/* Content Wrapper */}
         <main
           id="main-content"
-          className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 custom-scrollbar"
+          className="flex-1 overflow-y-auto md:p-2"
         >
           <div className="max-w-[1600px] mx-auto animate-in fade-in duration-500">
             <Outlet />

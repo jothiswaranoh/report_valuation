@@ -1,0 +1,38 @@
+services:
+  backend:
+    volumes:
+      - ./api:/app
+    restart: unless-stopped
+    command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+  mongodb:
+    restart: unless-stopped
+
+  redis:
+    restart: unless-stopped
+
+  celery_worker:
+    volumes:
+      - ./api:/app
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+    restart: unless-stopped
+    # Optional: Use watchmedo or similar for hot reload, 
+    # but for now standard restart is okay or user can restart container.
+
+
+  frontend:
+    image: node:20-alpine
+    container_name: report_frontend
+    working_dir: /app
+    command: /bin/sh -c "npm install && npm run dev -- --host"
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./web_app:/app
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - backend
+    restart: unless-stopped
