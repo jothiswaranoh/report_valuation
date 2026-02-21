@@ -23,6 +23,7 @@ class ReportRepository:
             "report_name": report_name,
             "bank_name": bank_name,
             "user_id": ObjectId(user_id),
+            "report_status": ReportStatus.INITIALISING.value,
             "created_by": ObjectId(created_by),
             "updated_by": ObjectId(created_by),
             "created_at": now,
@@ -64,6 +65,7 @@ class ReportRepository:
                 "id": report_id,
                 "report_name": report.get("report_name"),
                 "bank_name": report.get("bank_name"),
+                "report_status": report.get("report_status"),
                 "user_id": str(report.get("user_id")),
                 "created_at": report.get("created_at"),
                 "updated_at": report.get("updated_at"),
@@ -109,7 +111,17 @@ class ReportRepository:
         # Delete report
         result = reports.delete_one({"_id": oid})
         return result.deleted_count > 0
-
+        
+    @staticmethod
+    def update_status(report_id: str, status: str) -> bool:
+        result = reports.update_one(
+            {"_id": ObjectId(report_id)},
+            {"$set": {
+                "report_status": status,
+                "updated_at": datetime.utcnow()
+            }}
+        )
+        return result.modified_count > 0
 
 class OriginalFileRepository:
     

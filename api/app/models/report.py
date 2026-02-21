@@ -24,6 +24,13 @@ class ProcessingStatus(str, Enum):
     FAILED = "failed"
 
 
+class ReportStatus(str, Enum):
+    INITIALISING = "initialising"
+    UPLOAD_FILES = "upload_files"
+    IMPORTING = "importing"
+    ANALYSING = "analysing"
+    COMPLETED = "completed"
+
 # ----------------------
 # Report Models
 # ----------------------
@@ -36,6 +43,7 @@ class ReportResponse(BaseModel):
     id: str
     report_name: str
     user_id: str
+    report_status: ReportStatus
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
