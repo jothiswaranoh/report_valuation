@@ -48,5 +48,15 @@ services:
       - backend
     restart: always
 
+  fastmcp:
+    build:
+      context: ./fastmcp
+    container_name: report_fastmcp
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./fastmcp:/app
+    restart: always
+
 volumes:
   mongo_data:
