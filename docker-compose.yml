@@ -139,6 +139,22 @@ services:
       - backend
     restart: always
 
+
+  # ============================================================
+  # FastMCP
+  # ============================================================
+
+  fastmcp:
+    build:
+      context: ./fast_mcp
+    container_name: report_fastmcp
+    command: fastmcp run server.py --transport http --host 0.0.0.0 --port 8001
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./fast_mcp:/app
+    restart: always
+
 # ============================================================
 # Volumes
 # ============================================================
