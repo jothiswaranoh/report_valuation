@@ -76,27 +76,29 @@ export default function Layout() {
   };
 
   return (
-    <div className="flex h-screen bg-[#f8fafc]">
+    <div className="flex h-screen bg-brand-100 dark:bg-night-950 transition-colors duration-200">
       {/* Sidebar */}
       <aside
         className={`
           flex flex-col h-full z-40 transition-all duration-300 ease-in-out
-          border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-[4px_0_24px_rgba(0,0,0,0.02)]
+          border-r border-brand-700/30 dark:border-night-700
+          bg-gradient-to-b from-brand-800 via-brand-900 to-brand-950 dark:bg-gradient-to-b dark:from-night-900 dark:to-night-950
+          shadow-xl shadow-brand-900/20 dark:shadow-none
           fixed lg:static
           ${sidebarOpen ? 'w-64' : 'w-20'}
           ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}
       >
         {/* Logo Section */}
-        <div className="h-16 flex items-center px-5 border-b border-slate-100 dark:border-slate-800 flex-shrink-0">
+        <div className="h-16 flex items-center px-5 border-b border-brand-700/40 dark:border-night-700 flex-shrink-0">
           <div className="flex items-center gap-3 overflow-hidden">
-            <div className="w-9 h-9 bg-gradient-to-br from-brand-600 to-brand-800 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-brand-100">
-              <span className="text-white font-bold text-lg">V</span>
+            <div className="w-9 h-9 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg border border-white/20">
+              <span className="text-white font-black text-lg">V</span>
             </div>
             {sidebarOpen && (
               <div className="flex flex-col">
-                <span className="font-bold text-slate-900 dark:text-white leading-none">Valuation</span>
-                <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest mt-0.5">Systems AI</span>
+                <span className="font-black text-white leading-none">Valuation</span>
+                <span className="text-[10px] text-brand-300 dark:text-night-500 font-bold uppercase tracking-widest mt-0.5">Systems AI</span>
               </div>
             )}
           </div>
@@ -105,7 +107,7 @@ export default function Layout() {
         {/* Navigation */}
         <nav className="flex-1 p-3 space-y-1.5 overflow-y-auto overflow-x-hidden custom-scrollbar mt-4">
           <div className={`px-3 mb-2 ${!sidebarOpen ? 'hidden' : ''}`}>
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Menu</span>
+            <span className="text-[10px] font-bold text-brand-300/70 dark:text-night-500 uppercase tracking-[0.2em]">Menu</span>
           </div>
           {filteredNavItems.map((item) => {
             const isActive = location.pathname === item.path || (item.path !== '/' && location.pathname.startsWith(item.path));
@@ -116,8 +118,8 @@ export default function Layout() {
                 className={`
                   flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative
                   ${isActive
-                    ? 'bg-slate-900 dark:bg-brand-600 text-white shadow-xl shadow-slate-200 dark:shadow-brand-900/20 translate-x-1'
-                    : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
+                    ? 'bg-white/15 backdrop-blur-sm text-white shadow-lg shadow-brand-950/20 border border-white/20 translate-x-1 dark:bg-brand-600 dark:border-brand-500/50'
+                    : 'text-brand-200/70 dark:text-night-300 hover:bg-white/10 dark:hover:bg-night-800 hover:text-white dark:hover:text-white'
                   }
                   ${!sidebarOpen ? 'justify-center px-0' : ''}
                 `}
@@ -130,7 +132,7 @@ export default function Layout() {
                 </div>
                 {sidebarOpen && <span className="text-sm font-semibold truncate">{item.label}</span>}
                 {isActive && sidebarOpen && (
-                  <div className="absolute right-2 w-1.5 h-1.5 bg-brand-400 rounded-full shadow-[0_0_8px_rgba(56,189,248,0.8)]" />
+                  <div className="absolute right-2 w-1.5 h-1.5 bg-brand-300 dark:bg-brand-400 rounded-full shadow-[0_0_8px_rgba(147,197,253,0.8)]" />
                 )}
               </NavLink>
             );
@@ -138,26 +140,26 @@ export default function Layout() {
         </nav>
 
         {/* Footer Sidebar */}
-        <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+        <div className="p-4 border-t border-brand-700/40 dark:border-night-700 bg-brand-950/30 dark:bg-night-900/80">
           <div className={`flex items-center gap-3 ${!sidebarOpen ? 'flex-col' : ''}`}>
             <div className="relative group cursor-pointer">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-800 flex items-center justify-center font-bold text-slate-700 dark:text-slate-300 transition-all group-hover:shadow-md">
+              <div className="w-10 h-10 rounded-xl bg-white/15 dark:bg-gradient-to-b dark:from-night-700 dark:to-night-800 flex items-center justify-center font-bold text-white dark:text-night-300 transition-all group-hover:shadow-md border border-white/20 dark:border-transparent">
                 {initials}
               </div>
-              <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full" />
+              <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-400 border-2 border-brand-900 dark:border-night-900 rounded-full" />
             </div>
 
             {sidebarOpen && (
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold text-slate-900 dark:text-white truncate tracking-tight">{user?.first_name} {user?.last_name}</p>
-                <p className="text-[10px] text-slate-400 dark:text-slate-500 truncate mt-0.5 font-medium">{user?.email}</p>
+                <p className="text-xs font-bold text-white dark:text-white truncate tracking-tight">{user?.first_name} {user?.last_name}</p>
+                <p className="text-[10px] text-brand-300/70 dark:text-night-500 truncate mt-0.5 font-medium">{user?.email}</p>
               </div>
             )}
 
             {sidebarOpen && (
               <button
                 onClick={() => setLogoutModalOpen(true)}
-                className="p-1.5 text-slate-400 hover:text-red-500 transition-colors bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-100 dark:border-slate-700 hover:border-red-100 dark:hover:border-red-900"
+                className="p-1.5 text-brand-300/70 hover:text-red-300 transition-colors bg-white/10 dark:bg-night-800 rounded-lg border border-white/10 dark:border-night-700 hover:bg-red-500/10 dark:hover:border-red-900"
               >
                 <LogOut size={16} />
               </button>
@@ -168,7 +170,7 @@ export default function Layout() {
         {/* Toggle Button */}
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="lg:flex hidden absolute -right-3 top-20 w-6 h-6 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full items-center justify-center shadow-md text-slate-400 hover:text-brand-600 transition-all z-50 hover:scale-110"
+          className="lg:flex hidden absolute -right-3 top-20 w-6 h-6 bg-white dark:bg-night-800 border border-brand-100 dark:border-night-700 rounded-full items-center justify-center shadow-md text-brand-600 dark:text-slate-300 hover:text-brand-700 transition-all z-50 hover:scale-110"
         >
           {sidebarOpen ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
         </button>
@@ -178,17 +180,21 @@ export default function Layout() {
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
         {/* Top Header Bar */}
         <header className={`
-          h-16 flex items-center justify-between px-6 transition-all duration-300 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm
+          h-16 flex items-center justify-between px-6 transition-all duration-300 z-30
+          bg-gradient-to-r from-brand-800 via-brand-900 to-brand-950
+          dark:bg-night-900 dark:[background-image:none] backdrop-blur-md
+          border-b border-brand-700 dark:border-night-700
+          shadow-sm shadow-brand-900/50 dark:shadow-none
         `}>
           <div className="flex items-center gap-4">
             <button
               onClick={() => setMobileMenuOpen(true)}
-              className="lg:hidden p-2 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700"
+              className="lg:hidden p-2 rounded-xl bg-white/10 dark:bg-slate-800 shadow-sm border border-white/20 dark:border-slate-700"
             >
-              <Menu size={20} className="dark:text-white" />
+              <Menu size={20} className="text-white dark:text-white" />
             </button>
             {(
-              <span className="font-bold text-slate-900 dark:text-white animate-in fade-in slide-in-from-left-2 duration-300">
+              <span className="font-bold text-white dark:text-white animate-in fade-in slide-in-from-left-2 duration-300">
                 Valuation System AI
               </span>
             )}
@@ -197,19 +203,33 @@ export default function Layout() {
           <div className="flex items-center gap-3">
             <button
               onClick={toggleTheme}
-              className="p-2 text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 transition-all bg-white dark:bg-slate-800 hover:bg-brand-50 dark:hover:bg-slate-700 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700"
+              className="flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-300 bg-white/10 dark:bg-slate-800 hover:bg-white/20 dark:hover:bg-slate-700 border border-white/20 dark:border-slate-700 text-white dark:text-slate-300 hover:text-white dark:hover:text-brand-400 shadow-sm hover:shadow-md group"
               title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
             >
-              {theme === 'light' ? <Moon size={20} /> : <Sun size={20} className="text-brand-400" />}
+              <span className="relative w-5 h-5 flex-shrink-0">
+                <Moon
+                  size={18}
+                  className={`absolute inset-0 transition-all duration-300 ${theme === 'light' ? 'opacity-100 scale-100 rotate-0' : 'opacity-0 scale-75 rotate-90'
+                    }`}
+                />
+                <Sun
+                  size={18}
+                  className={`absolute inset-0 transition-all duration-300 ${theme === 'dark' ? 'opacity-100 scale-100 rotate-0 text-brand-400' : 'opacity-0 scale-75 -rotate-90'
+                    }`}
+                />
+              </span>
+              <span className="text-xs font-bold hidden sm:block">
+                {theme === 'light' ? 'Dark' : 'Light'}
+              </span>
             </button>
 
-            <button className="p-2 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors relative">
+            <button className="p-2 text-white/60 hover:text-white dark:text-slate-400 dark:hover:text-white transition-colors relative">
               <Bell size={20} />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-brand-500 rounded-full border-2 border-white dark:border-slate-900" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-brand-400 rounded-full border-2 border-brand-900 dark:border-slate-900" />
             </button>
-            <div className="h-4 w-[1px] bg-slate-200 dark:bg-slate-700 mx-1" />
+            <div className="h-4 w-[1px] bg-white/20 dark:bg-slate-700 mx-1" />
             <div className="flex items-center gap-2 pl-2">
-              <div className="w-8 h-8 rounded-full bg-brand-50 dark:bg-brand-900/30 text-brand-700 dark:text-brand-400 flex items-center justify-center font-bold text-xs">
+              <div className="w-8 h-8 rounded-full bg-white/20 dark:bg-brand-900/30 text-white dark:text-brand-400 flex items-center justify-center font-bold text-xs">
                 {initials}
               </div>
             </div>
@@ -219,9 +239,9 @@ export default function Layout() {
         {/* Content Wrapper */}
         <main
           id="main-content"
-          className="flex-1 overflow-y-auto md:p-2"
+          className="flex-1 overflow-y-auto bg-brand-100 dark:bg-night-950 md:p-2"
         >
-          <div className="max-w-[1600px] mx-auto animate-in fade-in duration-500">
+          <div className="max-w-[1600px] mx-auto animate-in fade-in duration-500 p-4 md:p-6">
             <Outlet />
           </div>
         </main>
@@ -271,22 +291,7 @@ export default function Layout() {
         </div>
       </Modal>
 
-      <style>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 5px;
-          height: 5px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #e2e8f0;
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #cbd5e1;
-        }
-      `}</style>
+
     </div>
   );
 }
