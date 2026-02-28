@@ -373,7 +373,7 @@ export default function Upload() {
                   setProjectName={setProjectName}
                   bankName={bankName}
                   setBankName={setBankName}
-                  onNext={handleCreateReport}
+                  onNext={handleCreateReport}  
                   recentProjects={recentProjects}
                 />
               )}
