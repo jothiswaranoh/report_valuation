@@ -80,15 +80,11 @@ async def get_reports(current_user: dict = Depends(get_current_user)):
 
 @router.get("/reports/check")
 async def check_report_name(
-    report_name: str = Query(..., min_length=1),
-    current_user: dict = Depends(get_current_user),
+    report_name: str = Query(..., min_length=1)
 ):
     """Check if report name already exists"""
 
-    exists = ReportRepository.exists_by_name(
-        report_name,
-        user_id=current_user["id"],
-    )
+    exists = ReportRepository.exists_by_name(report_name)
 
     return {"exists": exists}
 

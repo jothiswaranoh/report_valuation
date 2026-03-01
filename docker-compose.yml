@@ -60,8 +60,8 @@ services:
       redis:
         condition: service_healthy
     volumes:
-      - shared_uploads:/app/uploads # shared with workers
       - ./api:/app # live-reload in dev
+      - shared_uploads:/app/uploads # shared with workers
     restart: always
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]

@@ -48,7 +48,7 @@ class ReportRepository:
                 del report["_id"]
             return report
         except:
-            return None
+            return None 
     
     @staticmethod
     def get_all(user_id: str = None) -> list:
@@ -93,13 +93,11 @@ class ReportRepository:
             return None
     
     @staticmethod
-    def exists_by_name(report_name: str, user_id: str = None) -> bool:
-        """Check if a report name already exists"""
-        query = {"report_name": report_name}
-        if user_id:
-            query["user_id"] = ObjectId(user_id)
-
-        return reports.count_documents(query) > 0
+    def exists_by_name(report_name: str, user_id: str) -> bool:
+        return reports.find_one({
+            "report_name": report_name,
+            "user_id": ObjectId(user_id)
+        }) is not None
 
     @staticmethod
     def delete(report_id: str) -> bool:
