@@ -1,7 +1,7 @@
 // User Management Types (admin-managed system users)
 export * from './User';
 
-export type ReportStatus = 'draft' | 'review' | 'approved';
+export type ReportStatus = 'draft' | 'process' | 'review' | 'approved';
 
 export type PropertyType = 'Residential' | 'Commercial' | 'Industrial' | 'Land' | 'Mixed Use';
 
@@ -82,6 +82,7 @@ export interface FileNode {
 export interface DashboardStats {
   totalReports: number;
   draftReports: number;
+  processReports: number;
   reviewReports: number;
   approvedReports: number;
   recentUploads: number;

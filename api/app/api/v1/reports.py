@@ -146,6 +146,9 @@ async def upload_files_to_report(
         )
         saved_files.append({"id": file_record["id"], "file_name": upload_file.filename})
 
+    # Update state to process now that a file has been uploaded
+    ReportRepository.update_status(report_id, "process")
+
     return {"success": True, "files": saved_files}
 
 
@@ -321,6 +324,9 @@ async def analyze_and_summarize(
             content=summarized_content,
             created_by=current_user["id"]
         )
+
+        # Update state to review now that it has been analyzed
+        ReportRepository.update_status(report["id"], "review")
 
         return {
             "id": report["id"],

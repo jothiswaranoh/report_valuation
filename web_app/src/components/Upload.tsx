@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { LayoutGrid, Plus, History } from 'lucide-react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { LayoutGrid, Plus, History, ChevronRight, Copy, Home } from 'lucide-react';
 import { config } from '../config/config';
 
 // Components
@@ -107,6 +107,7 @@ export default function Upload() {
 
   const { reportId: urlReportId } = useParams<{ reportId?: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const { currentUploadReportId: reportId, setCurrentUploadReportId: setReportId } = useAppStore();
   const { data: reportData, isLoading: isLoadingReport } = useReport(urlReportId);
@@ -156,7 +157,18 @@ export default function Upload() {
     }
 
     try {
-      const statusData = await reportsApi.getReportStatus(effectiveReportId);
+      const requestedStep = searchParams.get('step');
+      if (requestedStep === 'upload') {
+        setCurrentStep(2);
+        return;
+      }
+      if (requestedStep === 'select') {
+        setCurrentStep(3);
+        return;
+      }
+
+      // Check processing status to determine which step to resume
+      const statusData = await reportsApi.getReportStatus(reportId);
 
       if (statusData.status === 'completed' || statusData.has_analysis) {
         try {

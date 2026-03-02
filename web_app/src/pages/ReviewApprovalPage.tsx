@@ -10,39 +10,46 @@ import {
 
 import { ValuationReport, ReportStatus } from '../types';
 import { formatDate } from '../utils/formatDate';
-import { mockReports } from '../data/mockData';
+import { useReport, useUpdateReport } from '../hooks/useReports';
+import { mapApiReportToValuation } from '../utils/reportMapper';
+import Loader from '../components/common/Loader';
 
 export default function ReviewApprovalPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
 
-  const [reports, setReports] = useState<ValuationReport[]>(mockReports);
   const [showAuditTrail, setShowAuditTrail] = useState(false);
 
-  const report = id
-    ? reports.find(r => r.id === id) || null
-    : null;
+  const { data: apiData, isLoading, error } = useReport(id);
+  const updateReportMutation = useUpdateReport();
+
+  const report = apiData ? mapApiReportToValuation(apiData) : null;
 
   const handleBack = () => {
     navigate('/');
   };
 
-  const handleStatusChange = (reportId: string, status: ReportStatus) => {
-    setReports(prev =>
-      prev.map(r =>
-        r.id === reportId
-          ? { ...r, status, updatedAt: new Date() }
-          : r
-      )
-    );
+  const handleStatusChange = async (reportId: string, status: ReportStatus) => {
+    try {
+      await updateReportMutation.mutateAsync({
+        reportId,
+        data: { report_status: status }
+      });
+    } catch (e) {
+      console.error("Failed to update status", e);
+      alert("Failed to update report status.");
+    }
   };
 
   const handleExport = (reportId: string, format: 'pdf' | 'docx') => {
-    const r = reports.find(rep => rep.id === reportId);
-    if (r) {
-      alert(`Exporting ${r.customerName}'s report as ${format.toUpperCase()}`);
+    if (report) {
+      alert(`Exporting ${report.customerName}'s report as ${format.toUpperCase()}`);
     }
   };
+
+  if (isLoading) {
+    return <Loader />;
+  }
 
   if (!report) {
     return (
