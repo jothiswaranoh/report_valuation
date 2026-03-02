@@ -12,6 +12,7 @@ import BankManagementPage from "../pages/BankManagementPage";
 import LoginPage from "../pages/LoginPage";
 import SignupPage from "../pages/SignupPage";
 import ProcessingPage from "../pages/ProcessingPage";
+import ReportListPage from "../pages/ReportListPage";
 
 // Placeholder components for missing files
 const ErrorBoundary = () => (
@@ -55,6 +56,7 @@ const router = createBrowserRouter([
       { path: "reports/:id/review", element: <ReviewApprovalPage /> },
       { path: "users", element: <UsersPage /> },
       { path: "banks", element: <BankManagementPage /> },
+      { path: "list", element: <ReportListPage /> },
       { path: "*", element: <NotFound /> }, // Catch-all 404 route
     ],
   },

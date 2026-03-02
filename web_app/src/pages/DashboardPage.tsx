@@ -21,6 +21,25 @@ export default function DashboardPage() {
     const { data: reportsData, isLoading } = useReports();
     const navigate = useNavigate();
 
+    const handleReportClick = (report: ValuationReport) => {
+        switch (report.status) {
+            case 'draft':
+                navigate(`/upload/${report.id}?step=upload`);
+                break;
+            case 'process':
+                navigate(`/upload/${report.id}?step=select`);
+                break;
+            case 'review':
+                navigate(`/reports/${report.id}/edit`);
+                break;
+            case 'approved':
+                navigate(`/reports/${report.id}/review`);
+                break;
+            default:
+                navigate(`/upload/${report.id}`);
+        }
+    };
+
     // Stats calculation based on real data
     const stats: DashboardStats = useMemo(() => {
         if (!reportsData?.reports) return mockDashboardStats;
@@ -28,9 +47,10 @@ export default function DashboardPage() {
         const reports = reportsData.reports;
         return {
             totalReports: reports.length,
-            draftReports: reports.filter(r => r.status === 'draft').length,
-            reviewReports: reports.filter(r => r.status === 'review').length,
-            approvedReports: reports.filter(r => r.status === 'approved').length,
+            draftReports: reports.filter(r => (r.report_status || r.status) === 'draft').length,
+            processReports: reports.filter(r => (r.report_status || r.status) === 'process').length,
+            reviewReports: reports.filter(r => (r.report_status || r.status) === 'review').length,
+            approvedReports: reports.filter(r => (r.report_status || r.status) === 'approved').length,
             recentUploads: reports.filter(r => {
                 const diff = new Date().getTime() - new Date(r.created_at).getTime();
                 return diff < 7 * 24 * 60 * 60 * 1000;
@@ -45,11 +65,11 @@ export default function DashboardPage() {
             .slice(0, 5) // Show only latest 5
             .map((r: ApiReport) => ({
                 id: r.id,
-                customerName: r.customer_name || r.name || (r as any).property_owner || r.bank_name || 'Untitled Report',
+                customerName: (r as any).report_name || r.customer_name || r.name || (r as any).property_owner || r.bank_name || 'Untitled Report',
                 bankName: r.bank_name || 'Unknown Bank',
                 propertyType: (r.property_type as PropertyType) || 'Residential',
                 location: r.location || 'Unknown Location',
-                status: (r.status as ReportStatus) || 'draft',
+                status: ((r.report_status || r.status) as ReportStatus) || 'draft',
                 createdAt: new Date(r.created_at),
                 updatedAt: new Date(r.updated_at),
                 year: new Date(r.created_at).getFullYear().toString(),
@@ -72,7 +92,8 @@ export default function DashboardPage() {
             border: 'border-brand-200 dark:border-brand-400/20',
             circleBg: 'bg-brand-300 dark:bg-brand-400/10',
             trendColor: 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400',
-            trend: '+12%'
+            trend: '+12%',
+            path: '/list'
         },
         {
             label: 'Draft',
@@ -83,7 +104,20 @@ export default function DashboardPage() {
             border: 'border-amber-200 dark:border-amber-400/20',
             circleBg: 'bg-amber-300 dark:bg-amber-400/10',
             trendColor: 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400',
-            trend: '+5%'
+            trend: '+5%',
+            path: '/list?status=draft'
+        },
+        {
+            label: 'Process',
+            value: stats.processReports,
+            icon: <TrendingUp size={20} />,
+            color: 'text-blue-500 dark:text-blue-400',
+            bg: 'bg-blue-100 dark:bg-blue-400/10',
+            border: 'border-blue-200 dark:border-blue-400/20',
+            circleBg: 'bg-blue-300 dark:bg-blue-400/10',
+            trendColor: 'bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400',
+            trend: 'In Progress',
+            path: '/list?status=process'
         },
         {
             label: 'In Review',
@@ -94,7 +128,8 @@ export default function DashboardPage() {
             border: 'border-orange-200 dark:border-orange-400/20',
             circleBg: 'bg-orange-300 dark:bg-orange-400/10',
             trendColor: 'bg-orange-100 dark:bg-orange-500/10 text-orange-700 dark:text-orange-400',
-            trend: 'Pending'
+            trend: 'Pending',
+            path: '/list?status=review'
         },
         {
             label: 'Approved',
@@ -105,7 +140,8 @@ export default function DashboardPage() {
             border: 'border-emerald-200 dark:border-emerald-400/20',
             circleBg: 'bg-emerald-300 dark:bg-emerald-400/10',
             trendColor: 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400',
-            trend: 'Verified'
+            trend: 'Verified',
+            path: '/list?status=approved'
         },
     ];
 
@@ -157,11 +193,12 @@ export default function DashboardPage() {
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                 {statCards.map((card, index) => (
                     <div
                         key={card.label}
-                        className="group bg-white dark:bg-night-900 rounded-2xl border border-brand-100 dark:border-night-800 p-6 shadow-lg hover:shadow-2xl hover:shadow-brand-200/40 dark:shadow-none dark:hover:shadow-brand-900/10 transition-all duration-500 relative overflow-hidden hover:border-brand-200 dark:hover:border-slate-700 isolate"
+                        onClick={() => navigate(card.path)}
+                        className="cursor-pointer group bg-white dark:bg-night-900 rounded-2xl border border-brand-100 dark:border-night-800 p-6 shadow-lg hover:shadow-2xl hover:shadow-brand-200/40 dark:shadow-none dark:hover:shadow-brand-900/10 transition-all duration-500 relative overflow-hidden hover:border-brand-200 dark:hover:border-slate-700 isolate"
                         style={{ animationDelay: `${index * 100}ms` }}
                     >
                         <div className="flex items-start justify-between relative z-10">
@@ -197,7 +234,7 @@ export default function DashboardPage() {
                             <p className="text-sm text-slate-500 dark:text-slate-300 font-semibold mt-1">Track your latest generated reports and their status.</p>
                         </div>
                         <button
-                            onClick={() => navigate('files')}
+                            onClick={() => navigate('/list')}
                             className="text-sm font-bold text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 bg-brand-50 dark:bg-brand-900/20 hover:bg-brand-100 dark:hover:bg-brand-900/30 px-6 py-2.5 rounded-xl transition-all border border-brand-100 dark:border-brand-900/30 active:scale-95"
                         >
                             View Full History
@@ -229,7 +266,7 @@ export default function DashboardPage() {
                                     <tr
                                         key={report.id}
                                         className="hover:bg-brand-50/30 dark:hover:bg-night-800/50 cursor-pointer transition-all group"
-                                        onClick={() => navigate(`/upload/${report.id}`)}
+                                        onClick={() => handleReportClick(report)}
                                     >
                                         <td className="px-8 py-6">
                                             <div className="flex items-center gap-4">
@@ -272,7 +309,7 @@ export default function DashboardPage() {
                     {/* Empty state footer or more reports hint */}
                     <div className="px-6 py-4 bg-slate-50/20 dark:bg-night-800/10 border-t border-slate-50 dark:border-night-800 flex justify-center">
                         <button
-                            onClick={() => navigate('files')}
+                            onClick={() => navigate('/list')}
                             className="text-slate-400 dark:text-slate-400 text-xs font-bold uppercase tracking-widest hover:text-slate-600 dark:hover:text-slate-300 transition-colors flex items-center gap-2"
                         >
                             Load More Reports <ArrowRight size={14} />

@@ -24,7 +24,7 @@ class ReportRepository:
             "report_name": report_name,
             "bank_name": bank_name,
             "user_id": ObjectId(user_id),
-            "report_status": ReportStatus.INITIALISING.value,
+            "report_status": ReportStatus.DRAFT.value,
             "created_by": ObjectId(created_by),
             "updated_by": ObjectId(created_by),
             "created_at": now,

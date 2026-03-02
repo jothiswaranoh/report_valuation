@@ -155,6 +155,8 @@ async def process_document(
       current_user["id"]
     )
 
+    ReportRepository.update_status(report_id, "process")
+
     return {
       "success": True,
       "document_id": document_id,
@@ -287,6 +289,8 @@ async def process_multiple_documents(
                 "file_path": file_path,
                 "sse_endpoint": f"/api/v1/stream/{document_id}"
             })
+
+        ReportRepository.update_status(report_id, "process")
 
         return {
             "success": True,

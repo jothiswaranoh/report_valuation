@@ -25,11 +25,10 @@ class ProcessingStatus(str, Enum):
 
 
 class ReportStatus(str, Enum):
-    INITIALISING = "initialising"
-    UPLOAD_FILES = "upload_files"
-    IMPORTING = "importing"
-    ANALYSING = "analysing"
-    COMPLETED = "completed"
+    DRAFT = "draft"
+    PROCESS = "process"
+    REVIEW = "review"
+    APPROVED = "approved"
 
 # ----------------------
 # Report Models

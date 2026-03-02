@@ -21,7 +21,7 @@ export interface ApiReport {
   property_type?: string;
   location?: string;
   report_status?: string;   // actual backend field (e.g. "initialising", "completed")
-  status?: 'draft' | 'review' | 'approved'; // alias fallback
+  status?: 'draft' | 'process' | 'review' | 'approved'; // alias fallback
   created_at: string;
   updated_at: string;
   files: ApiReportFile[];

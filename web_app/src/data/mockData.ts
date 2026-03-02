@@ -119,6 +119,7 @@ export const mockReports: ValuationReport[] = [
 export const mockDashboardStats: DashboardStats = {
   totalReports: 24,
   draftReports: 5,
+  processReports: 0,
   reviewReports: 8,
   approvedReports: 11,
   recentUploads: 3,
