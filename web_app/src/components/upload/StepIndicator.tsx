@@ -17,11 +17,11 @@ export default function StepIndicator({ currentStep }: StepIndicatorProps) {
         <div className="w-full max-w-3xl mx-auto px-4">
             <div className="relative flex items-center justify-between">
                 {/* Connecting Line - Background */}
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-0.5 bg-slate-200 dark:bg-slate-700 -z-10" />
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-0.5 bg-slate-200 -z-10" />
 
                 {/* Connecting Line - Progress */}
                 <div
-                    className="absolute left-0 top-1/2 -translate-y-1/2 h-0.5 bg-blue-600 dark:bg-blue-500 transition-all duration-500 -z-10"
+                    className="absolute left-0 top-1/2 -translate-y-1/2 h-0.5 bg-blue-600 transition-all duration-500 -z-10"
                     style={{ width: `${((currentStep - 1) / (steps.length - 1)) * 100}%` }}
                 />
 
@@ -31,15 +31,15 @@ export default function StepIndicator({ currentStep }: StepIndicatorProps) {
                     const isCurrent = currentStep === step.num;
 
                     return (
-                        <div key={step.num} className="flex flex-col items-center gap-2 bg-white dark:bg-slate-900 px-2">
+                        <div key={step.num} className="flex flex-col items-center gap-2 bg-white px-2">
                             <div
                                 className={`
                                     w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 border-2
                                     ${isCompleted
                                         ? 'bg-blue-600 border-blue-600 text-white'
                                         : isCurrent
-                                            ? 'bg-white dark:bg-slate-800 border-blue-600 text-blue-600 scale-110 shadow-lg shadow-blue-500/20'
-                                            : 'bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-400'
+                                            ? 'bg-white border-blue-600 text-blue-600 scale-110 shadow-lg shadow-blue-500/20'
+                                            : 'bg-white border-slate-300 text-slate-400'
                                     }
                                 `}
                             >
@@ -48,7 +48,7 @@ export default function StepIndicator({ currentStep }: StepIndicatorProps) {
                             <span
                                 className={`
                                     text-xs font-medium transition-colors duration-300 absolute -bottom-6 w-20 text-center
-                                    ${isActive ? 'text-slate-900 dark:text-slate-100' : 'text-slate-400'}
+                                    ${isActive ? 'text-slate-900' : 'text-slate-400'}
                                 `}
                             >
                                 {step.label}

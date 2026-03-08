@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { LayoutGrid, Plus, History, ChevronRight, Copy, Home } from 'lucide-react';
+import { LayoutGrid, History } from 'lucide-react';
 import { config } from '../config/config';
 
 // Components
@@ -18,7 +18,6 @@ import { UploadedFile, ProjectReport } from './upload/types';
 
 // Hooks & APIs
 import { useCreateReport, useReport } from '../hooks/useReports';
-import { useProcessMultipleDocuments } from '../hooks/useDocuments';
 import { reportsApi } from '../apis/report.api';
 import { useAppStore } from '../store/useAppStore';
 
@@ -35,7 +34,6 @@ export default function Upload() {
 
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
-  const [analysisResult, setAnalysisResult] = useState<string | null>(null);
   const [processingProgress, setProcessingProgress] = useState({
     completed: 0,
     total: 0,
@@ -112,7 +110,6 @@ export default function Upload() {
   const { currentUploadReportId: reportId, setCurrentUploadReportId: setReportId } = useAppStore();
   const { data: reportData, isLoading: isLoadingReport } = useReport(urlReportId);
   const createReportMutation = useCreateReport();
-  const processMultipleMutation = useProcessMultipleDocuments(); // (kept, even if unused here)
 
   // ==================== EFFECTS ====================
 
@@ -168,15 +165,9 @@ export default function Upload() {
       }
 
       // Check processing status to determine which step to resume
-      const statusData = await reportsApi.getReportStatus(reportId);
+      const statusData = await reportsApi.getReportStatus(effectiveReportId);
 
       if (statusData.status === 'completed' || statusData.has_analysis) {
-        try {
-          const analysisResponse = await reportsApi.getReportAnalysis(effectiveReportId);
-          if (analysisResponse?.analysis) {
-            setAnalysisResult(analysisResponse.analysis);
-          }
-        } catch (_) { }
         setCurrentStep(5);
       } else if (statusData.status === 'processing') {
         setProcessingProgress(statusData.progress);
@@ -186,15 +177,8 @@ export default function Upload() {
         setCurrentStep(2);
       }
     } catch (error) {
-      try {
-        const analysisResponse = await reportsApi.getReportAnalysis(effectiveReportId);
-        if (analysisResponse?.analysis) {
-          setAnalysisResult(analysisResponse.analysis);
-          setCurrentStep(5);
-          return;
-        }
-      } catch (_) { }
-      setCurrentStep(2);
+      setCurrentStep(5);
+      return;
     }
   };
 
@@ -217,11 +201,6 @@ export default function Upload() {
 
         if (statusData.status === 'completed') {
           if (pollingRef.current) clearInterval(pollingRef.current);
-
-          try {
-            const analysisResponse = await reportsApi.getReportAnalysis(effectiveReportId);
-            if (analysisResponse?.analysis) setAnalysisResult(analysisResponse.analysis);
-          } catch (_) { }
 
           setCurrentStep(5);
         }
@@ -410,7 +389,6 @@ export default function Upload() {
     setBankName('');
     setFiles([]);
     setSelectedFiles([]);
-    setAnalysisResult(null);
     setReportId(null);
     setCurrentStep(1);
   };
@@ -418,67 +396,62 @@ export default function Upload() {
   // ==================== RENDER ====================
 
   return (
-    <div className="h-full">
-      <div className="bg-white dark:bg-night-900 rounded-2xl border border-brand-100 dark:border-night-800 shadow-lg dark:shadow-none overflow-hidden">
+    <div className="flex-1 flex flex-col min-h-0">
+      <div className="flex-1 min-h-0 flex flex-col bg-white rounded-2xl border border-brand-100 shadow-lg overflow-hidden">
         {/* Header */}
-        <header className="sticky top-0 z-40 bg-white dark:bg-night-900/95 backdrop-blur-xl border-b border-slate-100 dark:border-night-700">
-          <div className="w-full mx-auto px-2 sm:px-3 lg:px-4 py-3">
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-              {/* Title */}
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl shadow-lg flex items-center justify-center">
-                  <Plus className="text-white" size={24} />
-                </div>
-                <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-                  New Report
-                </h1>
-              </div>
+        <header className="shrink-0 sticky top-0 z-40 bg-white backdrop-blur-xl border-b border-slate-100">
+          <div className="w-full mx-auto px-2 sm:px-3 lg:px-4 py-4 md:py-6">
+            <div className="flex flex-col lg:grid lg:grid-cols-3 items-center gap-6 lg:gap-0 w-full">
+              {/* Left Placeholder for Grid Alignment */}
+              <div className="hidden lg:block"></div>
 
               {/* Step Indicator */}
-              {viewMode === 'upload' && (
-                <div className="mt-6">
+              <div className="flex items-center justify-center w-full">
+                {viewMode === 'upload' && (
                   <StepIndicator currentStep={currentStep} />
-                </div>
-              )}
+                )}
+              </div>
 
               {/* View Mode Toggle */}
-              <div className="flex gap-2 bg-slate-100 dark:bg-night-800 p-1 rounded-xl">
-                <button
-                  onClick={() => setViewMode('upload')}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${viewMode === 'upload'
-                    ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm'
-                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-200'
-                    }`}
-                >
-                  <LayoutGrid size={16} />
-                  Wizard
-                </button>
-                <button
-                  onClick={() => setViewMode('browse')}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${viewMode === 'browse'
-                    ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm'
-                    : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-200'
-                    }`}
-                >
-                  <History size={16} />
-                  History
-                </button>
+              <div className="flex justify-center lg:justify-end w-full">
+                <div className="flex gap-2 bg-blue-600 p-1 rounded-xl shrink-0">
+                  <button
+                    onClick={() => setViewMode('upload')}
+                    className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${viewMode === 'upload'
+                      ? 'bg-white text-blue-600 shadow-sm'
+                      : 'text-blue-100 hover:text-white'
+                      }`}
+                  >
+                    <LayoutGrid size={16} />
+                    Wizard
+                  </button>
+                  <button
+                    onClick={() => setViewMode('browse')}
+                    className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${viewMode === 'browse'
+                      ? 'bg-white text-blue-600 shadow-sm'
+                      : 'text-blue-100 hover:text-white'
+                      }`}
+                  >
+                    <History size={16} />
+                    History
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </header>
 
         {/* Main Content */}
-        <main className="max-w-7xl mx-auto px-2 sm:px-3 lg:px-4 py-8">
+        <main className="flex-1 min-h-0 overflow-y-auto max-w-7xl w-full mx-auto px-2 sm:px-3 lg:px-4 py-8">
           {viewMode === 'browse' ? (
-            <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-6 h-[calc(100vh-16rem)]">
-              <div className="bg-white dark:bg-night-900 rounded-2xl shadow-lg border border-slate-200 dark:border-night-700 overflow-hidden">
+            <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-6 min-h-full">
+              <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden flex flex-col min-h-0">
                 <ReportsSidebar
                   selectedReportId={selectedBrowseReportId}
                   onReportSelect={setSelectedBrowseReportId}
                 />
               </div>
-              <div className="bg-white dark:bg-night-900 rounded-2xl shadow-lg border border-slate-200 dark:border-night-700 overflow-hidden">
+              <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden flex flex-col min-h-0">
                 <ReportDetailView reportId={selectedBrowseReportId} />
               </div>
             </div>
@@ -539,7 +512,6 @@ export default function Upload() {
                 <CompletionStep
                   files={files}
                   selectedFiles={selectedFiles}
-                  analysisResult={analysisResult}
                   onSave={handleCreateProject}
                   onRestart={handleFinish}
                 />

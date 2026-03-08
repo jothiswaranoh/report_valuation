@@ -111,18 +111,18 @@ export default function ProjectNameStep({
   return (
     <div className="max-w-xl mx-auto">
       <div className="text-center mb-10">
-        <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-3">
+        <h2 className="text-3xl font-bold text-slate-900 mb-3">
           Start New Analysis
         </h2>
-        <p className="text-slate-500 dark:text-slate-400 text-lg">
+        <p className="text-slate-500 text-lg">
           Enter the details below to initialize your report
         </p>
       </div>
 
-      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-8 space-y-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 space-y-6">
         {/* Bank Name Input */}
         <div className="space-y-2">
-          <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+          <label className="text-sm font-semibold text-slate-700">
             Bank Name
           </label>
           <div className="relative group">
@@ -142,7 +142,7 @@ export default function ProjectNameStep({
 
         {/* Report Name Input */}
         <div className="space-y-2">
-          <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+          <label className="text-sm font-semibold text-slate-700">
             Report Name
           </label>
           <div className="relative group">
@@ -155,7 +155,7 @@ export default function ProjectNameStep({
               onChange={(e) => setProjectName(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleProjectNameSubmit()}
               placeholder="e.g. Valuation Report - Jan 2024"
-              className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder-slate-400 dark:text-white"
+              className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder-slate-400"
             />
           </div>
         </div>
@@ -173,11 +173,11 @@ export default function ProjectNameStep({
       {recentProjects.length > 0 && (
         <div className="mt-12">
           <div className="flex items-center gap-4 mb-6">
-            <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800"></div>
+            <div className="h-px flex-1 bg-slate-200"></div>
             <span className="text-sm font-medium text-slate-400 uppercase tracking-wider">
               Recent Reports
             </span>
-            <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800"></div>
+            <div className="h-px flex-1 bg-slate-200"></div>
           </div>
 
           <div className="grid gap-3">
@@ -192,14 +192,14 @@ export default function ProjectNameStep({
                 }}
                 role="button"
                 tabIndex={0}
-                className="group p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl hover:border-blue-300 dark:hover:border-blue-700 transition-all cursor-pointer flex items-center justify-between shadow-sm hover:shadow-md"
+                className="group p-4 bg-white border border-slate-200 rounded-xl hover:border-blue-300 transition-all cursor-pointer flex items-center justify-between shadow-sm hover:shadow-md"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/40 transition-colors">
+                  <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 group-hover:bg-blue-100 transition-colors">
                     <FileText size={20} />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                    <h4 className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">
                       {project.name}
                     </h4>
                     <p className="text-xs text-slate-500 mt-0.5">

@@ -2,13 +2,11 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuth } from '../hooks/useAuth';
-import { Eye, EyeOff, UserPlus, BarChart3, Shield, Zap, Sun, Moon } from 'lucide-react';
-import { useAppContext } from '../app/providers';
+import { Eye, EyeOff, UserPlus, BarChart3, Shield, Zap } from 'lucide-react';
 
 export default function SignupPage() {
     const navigate = useNavigate();
     const { register, loginLoading } = useAuth();
-    const { theme, toggleTheme } = useAppContext();
 
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
@@ -35,31 +33,18 @@ export default function SignupPage() {
         }
     };
 
-    const inputClass = "w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-4 focus:ring-brand-500/15 focus:border-brand-500 outline-none transition-all text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-600 font-medium text-sm bg-slate-50 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700/80";
-    const labelClass = "block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest ml-1";
+    const inputClass = "w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-4 focus:ring-brand-500/15 focus:border-brand-500 outline-none transition-all text-slate-900 placeholder-slate-400 font-medium text-sm bg-slate-50 focus:bg-white";
+    const labelClass = "block text-xs font-bold text-slate-600 uppercase tracking-widest ml-1";
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-brand-700 via-brand-800 to-secondary-900 dark:from-slate-950 dark:via-slate-900 dark:to-secondary-950 p-4 relative overflow-hidden">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-brand-700 via-brand-800 to-secondary-900 p-4 relative overflow-hidden">
             {/* Animated Background Blobs */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute -top-40 -right-40 w-96 h-96 bg-brand-400 dark:bg-brand-600 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-20 dark:opacity-10 animate-blob" />
-                <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-brand-500 dark:bg-indigo-600 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-20 dark:opacity-10 animate-blob animation-delay-2000" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-brand-300 dark:bg-brand-800 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-3xl opacity-20 dark:opacity-10 animate-blob animation-delay-4000" />
+                <div className="absolute -top-40 -right-40 w-96 h-96 bg-brand-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob" />
+                <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-brand-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-brand-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000" />
                 <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
             </div>
-
-            {/* Theme Toggle */}
-            <button
-                onClick={toggleTheme}
-                className="fixed top-4 right-4 z-50 flex items-center gap-2 px-3 py-2 rounded-xl bg-white/10 dark:bg-slate-800/80 backdrop-blur-md border border-white/20 dark:border-slate-700 text-white/80 dark:text-slate-300 hover:bg-white/20 dark:hover:bg-slate-700 transition-all shadow-lg"
-                title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-            >
-                <span className="relative w-4 h-4">
-                    <Moon size={16} className={`absolute inset-0 transition-all duration-300 ${theme === 'light' ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`} />
-                    <Sun size={16} className={`absolute inset-0 transition-all duration-300 ${theme === 'dark' ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`} />
-                </span>
-                <span className="text-xs font-semibold hidden sm:block">{theme === 'light' ? 'Dark' : 'Light'}</span>
-            </button>
 
             <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-12 items-center relative z-10">
                 {/* Left Side — Branding */}
@@ -108,19 +93,19 @@ export default function SignupPage() {
 
                 {/* Right Side — Signup Form */}
                 <div className="w-full max-w-xl lg:max-w-md mx-auto">
-                    <div className="bg-white dark:bg-slate-900 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/30 dark:border-slate-700/50 animate-scale-in">
+                    <div className="bg-white backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/30 animate-scale-in">
                         {/* Mobile Logo */}
                         <div className="lg:hidden text-center mb-5">
                             <div className="w-12 h-12 bg-gradient-to-br from-brand-600 to-brand-800 rounded-2xl flex items-center justify-center mx-auto mb-2 shadow-xl shadow-brand-500/20">
                                 <span className="text-white font-black text-xl">V</span>
                             </div>
-                            <h1 className="text-2xl font-black text-slate-900 dark:text-white">Valuation System</h1>
-                            <p className="text-slate-500 dark:text-slate-400 mt-1 text-sm font-medium">Create your professional account</p>
+                            <h1 className="text-2xl font-black text-slate-900">Valuation System</h1>
+                            <p className="text-slate-500 mt-1 text-sm font-medium">Create your professional account</p>
                         </div>
 
                         <div className="text-center mb-6">
-                            <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-1">Create Account</h2>
-                            <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">Get started with your free account</p>
+                            <h2 className="text-2xl font-black text-slate-900 mb-1">Create Account</h2>
+                            <p className="text-slate-500 text-sm font-medium">Get started with your free account</p>
                         </div>
 
                         <form onSubmit={handleSubmit} className="space-y-4">
@@ -176,7 +161,7 @@ export default function SignupPage() {
                                     <button
                                         type="button"
                                         onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
                                     >
                                         {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                                     </button>
@@ -198,7 +183,7 @@ export default function SignupPage() {
                                     <button
                                         type="button"
                                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
                                     >
                                         {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                                     </button>
@@ -224,10 +209,10 @@ export default function SignupPage() {
                             </button>
                         </form>
 
-                        <div className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800">
-                            <p className="text-sm text-slate-500 dark:text-slate-400 text-center font-medium">
+                        <div className="mt-6 pt-5 border-t border-slate-100">
+                            <p className="text-sm text-slate-500 text-center font-medium">
                                 Already have an account?{' '}
-                                <Link to="/login" className="text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-black hover:underline transition-colors">
+                                <Link to="/login" className="text-brand-600 hover:text-brand-700 font-black hover:underline transition-colors">
                                     Sign In
                                 </Link>
                             </p>

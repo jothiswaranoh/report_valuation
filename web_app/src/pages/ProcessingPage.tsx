@@ -91,13 +91,13 @@ export default function ProcessingPage() {
 
     return (
         <div className="min-h-[80vh] flex items-center justify-center p-6">
-            <div className="max-w-xl w-full bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-100 dark:border-slate-800 p-8 md:p-12 text-center transition-all">
+            <div className="max-w-xl w-full bg-white rounded-3xl shadow-2xl border border-slate-100 p-8 md:p-12 text-center transition-all">
 
                 {/* STATE: PROCESSING */}
                 {status === 'processing' && (
                     <div className="space-y-8 animate-in fade-in duration-500">
                         <div className="relative mx-auto w-24 h-24">
-                            <div className="absolute inset-0 rounded-full border-4 border-slate-100 dark:border-slate-800" />
+                            <div className="absolute inset-0 rounded-full border-4 border-slate-100" />
                             <div
                                 className="absolute inset-0 rounded-full border-4 border-brand-600 border-t-transparent animate-spin"
                                 style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)' }}
@@ -108,10 +108,10 @@ export default function ProcessingPage() {
                         </div>
 
                         <div className="space-y-3">
-                            <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+                            <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
                                 Your document is processing...
                             </h2>
-                            <p className="text-slate-500 dark:text-slate-400 font-medium">
+                            <p className="text-slate-500 font-medium">
                                 You can come back later — this page will auto-update.
                             </p>
                         </div>
@@ -122,7 +122,7 @@ export default function ProcessingPage() {
                                 <span>{progress.completed} of {progress.total} files</span>
                                 <span>{Math.round(progress.percentage)}%</span>
                             </div>
-                            <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                            <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
                                 <div
                                     className="h-full bg-brand-600 transition-all duration-1000 ease-out"
                                     style={{ width: `${progress.percentage}%` }}
@@ -133,14 +133,14 @@ export default function ProcessingPage() {
                         <div className="flex flex-col sm:flex-row gap-3 pt-4">
                             <button
                                 onClick={handleCopyLink}
-                                className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 transition-all"
+                                className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 transition-all"
                             >
                                 {isCopied ? <CheckCircle2 size={18} className="text-green-500" /> : <Copy size={18} />}
                                 {isCopied ? 'Copied!' : 'Copy Link'}
                             </button>
                             <button
                                 onClick={handleGoHome}
-                                className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
+                                className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 transition-all"
                             >
                                 <Home size={18} />
                                 Go to Home
@@ -152,15 +152,15 @@ export default function ProcessingPage() {
                 {/* STATE: COMPLETED */}
                 {status === 'completed' && (
                     <div className="space-y-8 animate-in zoom-in-95 duration-500">
-                        <div className="mx-auto w-24 h-24 bg-green-50 dark:bg-green-900/20 rounded-full flex items-center justify-center">
+                        <div className="mx-auto w-24 h-24 bg-green-50 rounded-full flex items-center justify-center">
                             <CheckCircle2 size={48} className="text-green-500" />
                         </div>
 
                         <div className="space-y-2">
-                            <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+                            <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
                                 Processing Complete!
                             </h2>
-                            <p className="text-slate-500 dark:text-slate-400">
+                            <p className="text-slate-500">
                                 Your valuation report is ready for review.
                             </p>
                         </div>
@@ -182,15 +182,15 @@ export default function ProcessingPage() {
                 {/* STATE: FAILED */}
                 {status === 'failed' && (
                     <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
-                        <div className="mx-auto w-24 h-24 bg-red-50 dark:bg-red-900/20 rounded-full flex items-center justify-center">
+                        <div className="mx-auto w-24 h-24 bg-red-50 rounded-full flex items-center justify-center">
                             <AlertCircle size={48} className="text-red-500" />
                         </div>
 
                         <div className="space-y-3">
-                            <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+                            <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
                                 {errorHeader}
                             </h2>
-                            <div className="px-4 py-3 bg-red-50 dark:bg-red-900/10 rounded-xl border border-red-100 dark:border-red-900/20 text-red-600 dark:text-red-400 text-sm font-medium">
+                            <div className="px-4 py-3 bg-red-50 rounded-xl border border-red-100 text-red-600 text-sm font-medium">
                                 {errorDetails}
                             </div>
                         </div>
@@ -198,7 +198,7 @@ export default function ProcessingPage() {
                         <div className="flex flex-col gap-3 pt-4">
                             <button
                                 onClick={handleTryAgain}
-                                className="w-full flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold hover:bg-slate-800 dark:hover:bg-slate-100 transition-all"
+                                className="w-full flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800 transition-all"
                             >
                                 Upload new file
                             </button>
@@ -215,15 +215,15 @@ export default function ProcessingPage() {
                 {/* STATE: TIMEOUT */}
                 {status === 'timeout' && (
                     <div className="space-y-8 animate-in fade-in duration-500">
-                        <div className="mx-auto w-24 h-24 bg-amber-50 dark:bg-amber-900/20 rounded-full flex items-center justify-center">
+                        <div className="mx-auto w-24 h-24 bg-amber-50 rounded-full flex items-center justify-center">
                             <RefreshCw size={48} className="text-amber-500" />
                         </div>
 
                         <div className="space-y-3">
-                            <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+                            <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
                                 Taking longer than usual...
                             </h2>
-                            <p className="text-slate-500 dark:text-slate-400">
+                            <p className="text-slate-500">
                                 Still processing, check later. You can also try refreshing the status.
                             </p>
                         </div>

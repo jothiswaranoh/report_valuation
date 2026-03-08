@@ -220,13 +220,13 @@ export default function FileManagement({
     const selectedFiles = getSelectedFiles();
 
     return (
-        <div className="h-full flex flex-col">
-            <div className="flex-1 flex flex-col bg-white dark:bg-night-900 rounded-2xl border border-brand-100 dark:border-night-800 shadow-lg dark:shadow-none overflow-hidden">
-                <div className="p-6 border-b border-slate-100 dark:border-night-700 bg-white dark:bg-night-900">
-                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white">File Management</h1>
-                    <p className="text-slate-500 dark:text-slate-300 mt-2">Browse and manage valuation reports</p>
+        <div className="flex-1 flex flex-col min-h-0">
+            <div className="flex-1 min-h-0 flex flex-col bg-white rounded-2xl border border-brand-100 shadow-lg overflow-hidden">
+                <div className="p-6 border-b border-slate-100 bg-white">
+                    <h1 className="text-3xl font-bold text-slate-900">File Management</h1>
+                    <p className="text-slate-500 mt-2">Browse and manage valuation reports</p>
                     {draggedFile && (
-                        <p className="text-xs text-brand-500 dark:text-brand-400 mt-1 animate-pulse">
+                        <p className="text-xs text-brand-500 mt-1 animate-pulse">
                             📂 Dragging <strong>"{draggedFile.name}"</strong> — drop onto a folder in the sidebar to move it
                         </p>
                     )}
@@ -246,22 +246,22 @@ export default function FileManagement({
                     />
 
                     {/* Main Content */}
-                    <div className="flex-1 bg-slate-50 dark:bg-night-950 overflow-auto">
+                    <div className="flex-1 bg-slate-50 overflow-auto">
                         <div className="p-6">
                             <div className="flex items-center justify-between mb-6">
                                 <div>
-                                    <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
+                                    <h2 className="text-xl font-semibold text-slate-900">
                                         {selectedNode ? selectedNode.name : 'Select a folder or file'}
                                     </h2>
                                     {selectedNode && (
-                                        <p className="text-sm text-slate-500 dark:text-slate-300 mt-1">
+                                        <p className="text-sm text-slate-500 mt-1">
                                             {selectedNode.type === 'folder' ? 'Folder' : 'File'} • {selectedFiles.length} items
                                         </p>
                                     )}
                                 </div>
                                 <button
                                     onClick={() => setViewMode(m => m === 'grid' ? 'list' : 'grid')}
-                                    className="flex items-center gap-2 px-4 py-2 border border-slate-200 dark:border-night-700 rounded-xl bg-white dark:bg-night-800 hover:bg-slate-50 dark:hover:bg-night-700 text-slate-600 dark:text-slate-300 transition-all shadow-sm"
+                                    className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-xl bg-white hover:bg-slate-50 text-slate-600 transition-all shadow-sm"
                                 >
                                     <Filter size={16} />
                                     <span className="text-sm font-medium">
@@ -311,8 +311,8 @@ export default function FileManagement({
                             flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg pointer-events-auto
                             text-sm font-medium transition-all duration-300 animate-slide-up
                             ${toast.type === 'success'
-                                    ? 'bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800/50 text-emerald-800 dark:text-emerald-300'
-                                    : 'bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800/50 text-red-800 dark:text-red-300'
+                                    ? 'bg-emerald-50 border border-emerald-200 text-emerald-800'
+                                    : 'bg-red-50 border border-red-200 text-red-800'
                                 }
                         `}
                         >

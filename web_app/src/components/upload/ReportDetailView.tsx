@@ -116,11 +116,11 @@ export default function ReportDetailView({ reportId }: ReportDetailViewProps) {
     html = html.replace(/^### (.*$)/gim, '<h3 class="text-xl font-bold mt-6 mb-3">$1</h3>');
     html = html.replace(
       /^## (.*$)/gim,
-      '<h2 class="text-2xl font-bold mt-8 mb-4 border-b border-slate-100 dark:border-slate-800 pb-2">$1</h2>'
+      '<h2 class="text-2xl font-bold mt-8 mb-4 border-b border-slate-100 pb-2">$1</h2>'
     );
     html = html.replace(/^# (.*$)/gim, '<h1 class="text-3xl font-bold mt-8 mb-4">$1</h1>');
 
-    html = html.replace(/\*\*(.+?)\*\*/g, '<strong class="font-semibold text-slate-900 dark:text-white">$1</strong>');
+    html = html.replace(/\*\*(.+?)\*\*/g, '<strong class="font-semibold text-slate-900">$1</strong>');
     html = html.replace(/\*(.+?)\*/g, '<em class="italic">$1</em>');
 
     html = html.replace(
@@ -140,7 +140,7 @@ export default function ReportDetailView({ reportId }: ReportDetailViewProps) {
 
     html = html.replace(
       /`(.+?)`/g,
-      '<code class="bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-200 dark:border-slate-700">$1</code>'
+      '<code class="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded text-sm font-mono border border-slate-200">$1</code>'
     );
 
     html = html.replace(
@@ -150,7 +150,7 @@ export default function ReportDetailView({ reportId }: ReportDetailViewProps) {
 
     html = html.replace(
       /^(?!<[h|u|o|l|p|d|b])(.+)$/gim,
-      '<p class="mb-4 leading-relaxed text-slate-600 dark:text-slate-300">$1</p>'
+      '<p class="mb-4 leading-relaxed text-slate-600">$1</p>'
     );
 
     html = html.replace(/\n\n/g, '<br/><br/>');
@@ -160,12 +160,12 @@ export default function ReportDetailView({ reportId }: ReportDetailViewProps) {
 
   if (!reportId) {
     return (
-      <div className="h-full flex flex-col items-center justify-center p-8 text-center bg-white/50 dark:bg-slate-900/50">
-        <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-6">
+      <div className="h-full flex flex-col items-center justify-center p-8 text-center bg-white/50">
+        <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mb-6">
           <FileText className="text-slate-400" size={32} />
         </div>
-        <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">No Report Selected</h3>
-        <p className="text-slate-500 dark:text-slate-400 max-w-sm">
+        <h3 className="text-xl font-bold text-slate-800 mb-2">No Report Selected</h3>
+        <p className="text-slate-500 max-w-sm">
           Select a report from the sidebar to view its detailed analysis and valuation insights.
         </p>
       </div>
@@ -174,9 +174,9 @@ export default function ReportDetailView({ reportId }: ReportDetailViewProps) {
 
   if (isLoading || loadingAnalysis) {
     return (
-      <div className="h-full flex flex-col items-center justify-center bg-white/50 dark:bg-slate-900/50">
+      <div className="h-full flex flex-col items-center justify-center bg-white/50">
         <Loader2 className="animate-spin text-brand-600 mb-4" size={40} />
-        <p className="text-slate-600 dark:text-slate-400 font-medium">Loading report details...</p>
+        <p className="text-slate-600 font-medium">Loading report details...</p>
       </div>
     );
   }
@@ -184,11 +184,11 @@ export default function ReportDetailView({ reportId }: ReportDetailViewProps) {
   if (!reportData || !report) {
     return (
       <div className="h-full flex flex-col items-center justify-center text-center p-8">
-        <div className="w-20 h-20 bg-red-50 dark:bg-red-900/20 rounded-full flex items-center justify-center mb-6">
+        <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mb-6">
           <FileText className="text-red-500" size={32} />
         </div>
-        <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">Report Not Found</h3>
-        <p className="text-slate-500 dark:text-slate-400">The requested report could not be accessed.</p>
+        <h3 className="text-xl font-bold text-slate-800 mb-2">Report Not Found</h3>
+        <p className="text-slate-500">The requested report could not be accessed.</p>
       </div>
     );
   }
@@ -197,18 +197,18 @@ export default function ReportDetailView({ reportId }: ReportDetailViewProps) {
 
   const statusClass =
     status === 'approved'
-      ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+      ? 'bg-emerald-100 text-emerald-700'
       : status === 'review'
-        ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
-        : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300';
+        ? 'bg-amber-100 text-amber-700'
+        : 'bg-slate-100 text-slate-700';
 
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-slate-900">
-      <div className="px-8 py-6 border-b border-slate-100 dark:border-slate-800 flex-shrink-0">
+    <div className="flex flex-col h-full bg-white">
+      <div className="px-8 py-6 border-b border-slate-100 flex-shrink-0">
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+              <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
                 {report.report_name || (report as any).name}
               </h1>
 
@@ -217,7 +217,7 @@ export default function ReportDetailView({ reportId }: ReportDetailViewProps) {
               </span>
             </div>
 
-            <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
+            <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500">
               <div className="flex items-center gap-1.5">
                 <Calendar size={14} />
                 <span>{formatDate(report.created_at) || 'Unknown Date'}</span>
@@ -265,7 +265,7 @@ export default function ReportDetailView({ reportId }: ReportDetailViewProps) {
                   console.error('Download failed', error);
                 }
               }}
-              className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:border-brand-300 hover:text-brand-600 transition-colors text-sm font-semibold text-slate-600 dark:text-slate-300 shadow-sm"
+              className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-lg hover:border-brand-300 hover:text-brand-600 transition-colors text-sm font-semibold text-slate-600 shadow-sm"
             >
               <Download size={16} />
               Export PDF
@@ -275,7 +275,7 @@ export default function ReportDetailView({ reportId }: ReportDetailViewProps) {
               <button
                 onClick={handleApprove}
                 disabled={approving}
-                className="flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-lg transition-colors text-sm font-semibold shadow-sm shadow-brand-200 dark:shadow-none"
+                className="flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-lg transition-colors text-sm font-semibold shadow-sm shadow-brand-200"
               >
                 {approving ? <Loader2 size={16} className="animate-spin" /> : <ShieldCheck size={16} />}
                 {approving ? 'Approving...' : 'Approve'}
@@ -294,13 +294,13 @@ export default function ReportDetailView({ reportId }: ReportDetailViewProps) {
             item.value ? (
               <div
                 key={i}
-                className="px-3 py-2 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-800"
+                className="px-3 py-2 bg-slate-50 rounded-lg border border-slate-100"
               >
                 <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-0.5">
                   {item.icon}
                   {item.label}
                 </div>
-                <div className="text-sm font-medium text-slate-900 dark:text-white truncate">{item.value}</div>
+                <div className="text-sm font-medium text-slate-900 truncate">{item.value}</div>
               </div>
             ) : null
           )}
@@ -311,7 +311,7 @@ export default function ReportDetailView({ reportId }: ReportDetailViewProps) {
         {analysisResult ? (
           <div className="max-w-4xl mx-auto">
             <div
-              className="prose prose-slate dark:prose-invert prose-headings:font-bold prose-h1:text-3xl prose-h2:text-2xl prose-h2:border-b prose-h2:border-slate-100 dark:prose-h2:border-slate-800 prose-h2:pb-2 prose-h2:mt-8 prose-p:text-slate-600 dark:prose-p:text-slate-300 prose-p:leading-relaxed prose-li:text-slate-600 dark:prose-li:text-slate-300 prose-strong:text-slate-800 dark:prose-strong:text-slate-200 max-w-none"
+              className="prose prose-slate prose-headings:font-bold prose-h1:text-3xl prose-h2:text-2xl prose-h2:border-b prose-h2:border-slate-100 prose-h2:pb-2 prose-h2:mt-8 prose-p:text-slate-600 prose-p:leading-relaxed prose-li:text-slate-600 prose-strong:text-slate-800 max-w-none"
               dangerouslySetInnerHTML={{ __html: formatMarkdown(analysisResult) }}
             />
           </div>

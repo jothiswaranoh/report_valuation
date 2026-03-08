@@ -61,21 +61,21 @@ export const UserModal: React.FC<UserModalProps> = ({
     return (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
             <div
-                className="bg-white dark:bg-slate-900 rounded-2xl p-6 w-full max-w-lg shadow-xl border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-200"
+                className="bg-white rounded-2xl p-6 w-full max-w-lg shadow-xl border border-slate-200 animate-in zoom-in-95 duration-200"
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="flex items-center justify-between mb-6">
                     <div>
-                        <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+                        <h2 className="text-lg font-bold text-slate-900">
                             {isEdit ? 'Edit User' : 'Create User'}
                         </h2>
-                        <p className="text-sm text-slate-500 dark:text-slate-400">
+                        <p className="text-sm text-slate-500">
                             {isEdit ? 'Update permissions and details' : 'Add a new member to the team'}
                         </p>
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 transition-colors"
+                        className="p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
                     >
                         <X size={20} />
                     </button>
@@ -84,21 +84,21 @@ export const UserModal: React.FC<UserModalProps> = ({
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1.5">
-                            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">First Name</label>
+                            <label className="text-xs font-semibold text-slate-700">First Name</label>
                             <input
                                 required
                                 placeholder="John"
-                                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all dark:text-white"
+                                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
                                 value={form.first_name}
                                 onChange={e => setForm({ ...form, first_name: e.target.value })}
                             />
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Last Name</label>
+                            <label className="text-xs font-semibold text-slate-700">Last Name</label>
                             <input
                                 required
                                 placeholder="Doe"
-                                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all dark:text-white"
+                                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
                                 value={form.last_name}
                                 onChange={e => setForm({ ...form, last_name: e.target.value })}
                             />
@@ -106,36 +106,36 @@ export const UserModal: React.FC<UserModalProps> = ({
                     </div>
 
                     <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Email Address</label>
+                        <label className="text-xs font-semibold text-slate-700">Email Address</label>
                         <input
                             required
                             type="email"
                             placeholder="john@example.com"
-                            className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all dark:text-white"
+                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
                             value={form.email}
                             onChange={e => setForm({ ...form, email: e.target.value })}
                         />
                     </div>
 
                     <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                        <label className="text-xs font-semibold text-slate-700">
                             {isEdit ? 'New Password (Optional)' : 'Password'}
                         </label>
                         <input
                             required={!isEdit}
                             type="password"
                             placeholder={isEdit ? 'Leave blank to keep current' : '••••••••'}
-                            className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all dark:text-white"
+                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
                             value={form.password}
                             onChange={e => setForm({ ...form, password: e.target.value })}
                         />
                     </div>
 
                     <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Role</label>
+                        <label className="text-xs font-semibold text-slate-700">Role</label>
                         <select
                             required
-                            className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all dark:text-white appearance-none"
+                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all appearance-none"
                             value={form.role}
                             onChange={e => setForm({ ...form, role: e.target.value })}
                         >
@@ -148,18 +148,18 @@ export const UserModal: React.FC<UserModalProps> = ({
                         </select>
                     </div>
 
-                    <div className="flex justify-end gap-3 mt-8 pt-6 border-t border-slate-100 dark:border-slate-800">
+                    <div className="flex justify-end gap-3 mt-8 pt-6 border-t border-slate-100">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                            className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-lg transition-colors"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="px-4 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100 rounded-lg text-sm font-medium transition-colors shadow-lg shadow-slate-900/10 flex items-center gap-2"
+                            className="px-4 py-2 bg-slate-900 text-white hover:bg-slate-800 rounded-lg text-sm font-medium transition-colors shadow-lg shadow-slate-900/10 flex items-center gap-2"
                         >
                             {isLoading ? (
                                 <>

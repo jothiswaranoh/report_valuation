@@ -82,12 +82,12 @@ export default function UploadStep({
     <div className="max-w-7xl mx-auto px-2 py-1">
       {/* Header */}
       <div className="mb-10">
-        <h2 className="text-3xl font-bold text-slate-900 dark:text-white">
+        <h2 className="text-3xl font-bold text-slate-900">
           Upload Documents
         </h2>
         <p className="text-slate-500 mt-2">
           Adding files to{' '}
-          <span className="font-semibold text-blue-600 dark:text-blue-400">
+          <span className="font-semibold text-blue-600">
             {projectName}
           </span>
         </p>
@@ -106,8 +106,8 @@ export default function UploadStep({
     transition-all duration-200 cursor-pointer
     flex flex-col items-center justify-center
     ${dragActive
-                ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-950/30'
-                : 'border-gray-300 dark:border-gray-700 hover:border-blue-400 hover:bg-gray-50/50 dark:hover:bg-gray-800/30'
+                ? 'border-blue-500 bg-blue-50/50'
+                : 'border-gray-300 hover:border-blue-400 hover:bg-gray-50/50'
               }
   `}
             onDragEnter={handleDrag}
@@ -132,10 +132,10 @@ export default function UploadStep({
 
             {/* Text Content */}
             <div className="text-center space-y-2">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+              <h3 className="text-xl font-semibold text-gray-900">
                 Drop your files here
               </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 max-w-sm">
+              <p className="text-sm text-gray-500 max-w-sm">
                 Supports PDF and image files • Max 50MB per file
               </p>
             </div>
@@ -144,9 +144,9 @@ export default function UploadStep({
             <button
               type="button"
               className="mt-6 px-8 py-2.5 rounded-xl font-medium text-sm
-      bg-gray-900 dark:bg-white
-      text-white dark:text-gray-900
-      hover:bg-gray-800 dark:hover:bg-gray-100
+      bg-gray-900
+      text-white
+      hover:bg-gray-800
       transition-all duration-200
       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
@@ -163,13 +163,13 @@ export default function UploadStep({
             ].map((item, index) => (
               <div
                 key={index}
-                className="p-6 rounded-xl bg-white dark:bg-slate-900
-                border border-slate-200 dark:border-slate-800
+                className="p-6 rounded-xl bg-white
+                border border-slate-200
                 hover:border-blue-400 transition
                 flex flex-col items-center gap-3 text-center"
               >
                 <item.icon size={28} className="text-blue-500" />
-                <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                <span className="text-sm font-semibold text-slate-700">
                   {item.label}
                 </span>
               </div>
@@ -178,13 +178,13 @@ export default function UploadStep({
         </div>
 
         {/* ---------------- Sidebar ---------------- */}
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 h-fit">
+        <div className="bg-white rounded-xl border border-slate-200 p-6 h-fit">
 
           <div className="flex items-center justify-between mb-5">
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+            <h3 className="text-sm font-bold text-slate-900">
               Uploaded Files
             </h3>
-            <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
+            <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-700">
               {files.length}
             </span>
           </div>
@@ -198,14 +198,14 @@ export default function UploadStep({
               {files.map((file) => (
                 <div
                   key={file.id}
-                  className="group flex items-center gap-3 p-3 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                  className="group flex items-center gap-3 p-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition"
                 >
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-100 text-blue-600">
                     <FileText size={16} />
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold truncate text-slate-900 dark:text-white">
+                    <p className="text-xs font-semibold truncate text-slate-900">
                       {file.name || file.file?.name}
                     </p>
                     <span className="text-xs text-slate-500">

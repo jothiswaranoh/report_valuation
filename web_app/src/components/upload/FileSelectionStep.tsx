@@ -72,20 +72,20 @@ export default function FileSelectionStep({
 
   return (
     <div className="max-w-7xl mx-auto px-1 py-1">
-      <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
 
         {/* Header */}
-        <div className="p-6 border-b border-gray-100 dark:border-gray-800">
+        <div className="p-6 border-b border-gray-100">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
                 <FileText size={24} className="text-white" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                <h2 className="text-2xl font-bold text-gray-900">
                   Select Files
                 </h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <p className="text-sm text-gray-500">
                   Choose which documents to analyze
                 </p>
               </div>
@@ -93,20 +93,20 @@ export default function FileSelectionStep({
             <div className="flex items-center gap-3">
               <button
                 onClick={onBack}
-                className="px-5 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 
-                                    hover:text-blue-600 dark:hover:text-blue-400
-                                    border border-gray-200 dark:border-gray-700 rounded-lg
-                                    hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+                className="px-5 py-2 text-sm font-medium text-gray-600 
+                                    hover:text-blue-600
+                                    border border-gray-200 rounded-lg
+                                    hover:bg-gray-50 transition"
               >
                 Back
               </button>
               <button
                 onClick={() => fileInputRef.current?.click()}
                 className="px-5 py-2 text-sm font-medium
-                                    bg-white dark:bg-gray-800
-                                    text-gray-700 dark:text-gray-200
-                                    border border-gray-200 dark:border-gray-700 rounded-lg
-                                    hover:bg-gray-50 dark:hover:bg-gray-700
+                                    bg-white
+                                    text-gray-700
+                                    border border-gray-200 rounded-lg
+                                    hover:bg-gray-50
                                     flex items-center gap-2 transition"
               >
                 <Plus size={16} />
@@ -125,7 +125,7 @@ export default function FileSelectionStep({
         </div>
 
         {/* Selection Bar */}
-        <div className="px-6 py-4 bg-gray-50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800">
+        <div className="px-6 py-4 bg-gray-50 border-b border-gray-100">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-6">
               <label className="flex items-center gap-3 cursor-pointer group">
@@ -133,22 +133,22 @@ export default function FileSelectionStep({
                   type="checkbox"
                   checked={selectedFiles.length === files.length && files.length > 0}
                   onChange={selectAllFiles}
-                  className="rounded border-gray-300 dark:border-gray-600 
+                  className="rounded border-gray-300 
                                         text-blue-600 focus:ring-blue-500 
                                         w-4 h-4 transition"
                 />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <span className="text-sm font-medium text-gray-700">
                   Select All
                 </span>
               </label>
-              <span className="text-sm text-gray-500 dark:text-gray-400">
+              <span className="text-sm text-gray-500">
                 {selectedFiles.length} of {files.length} selected
               </span>
             </div>
             {selectedFiles.length > 0 && (
               <button
                 onClick={clearAllFiles}
-                className="text-sm text-red-600 hover:text-red-700 dark:text-red-400 
+                className="text-sm text-red-600 hover:text-red-700 
                                     flex items-center gap-1.5 transition"
               >
                 <Trash2 size={14} />
@@ -162,14 +162,14 @@ export default function FileSelectionStep({
         <div className="p-6">
           {files.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
-              <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 
+              <div className="w-16 h-16 rounded-full bg-gray-100 
                                 flex items-center justify-center mb-4">
                 <FileText size={24} className="text-gray-400" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+              <h3 className="text-lg font-semibold text-gray-900 mb-1">
                 No files uploaded
               </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              <p className="text-sm text-gray-500 mb-4">
                 Add files to get started with analysis
               </p>
               <button
@@ -190,8 +190,8 @@ export default function FileSelectionStep({
                   key={file.id}
                   className={`border rounded-lg transition-all cursor-pointer
                                         ${selectedFiles.includes(file.id)
-                      ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-950/30'
-                      : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-700 hover:bg-gray-50 dark:hover:bg-gray-800/50'
+                      ? 'border-blue-500 bg-blue-50/50'
+                      : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
                     }`}
                 >
                   {/* File Row */}
@@ -203,42 +203,42 @@ export default function FileSelectionStep({
                       type="checkbox"
                       checked={selectedFiles.includes(file.id)}
                       onChange={() => { }}
-                      className="rounded border-gray-300 dark:border-gray-600 
+                      className="rounded border-gray-300 
                                                 text-blue-600 focus:ring-blue-500 
                                                 w-4 h-4 transition"
                     />
 
                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center
                                             ${selectedFiles.includes(file.id)
-                        ? 'bg-blue-100 dark:bg-blue-900/30'
-                        : 'bg-gray-100 dark:bg-gray-800'
+                        ? 'bg-blue-100'
+                        : 'bg-gray-100'
                       }`}>
                       <FileText size={18} className={
                         selectedFiles.includes(file.id)
-                          ? 'text-blue-600 dark:text-blue-400'
-                          : 'text-gray-500 dark:text-gray-400'
+                          ? 'text-blue-600'
+                          : 'text-gray-500'
                       } />
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                      <p className="text-sm font-medium text-gray-900 truncate">
                         {file.name || file.file?.name}
                       </p>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                        <span className="text-xs text-gray-500">
                           {file.fileSize}
                         </span>
                         <span className="text-xs text-gray-400">•</span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                        <span className="text-xs text-gray-500">
                           {formatDate(file.uploadDate)}
                         </span>
                         {file.status === 'uploading' && (
-                          <span className="text-xs text-blue-600 dark:text-blue-400 animate-pulse">
+                          <span className="text-xs text-blue-600 animate-pulse">
                             Uploading...
                           </span>
                         )}
                         {file.status === 'error' && (
-                          <span className="text-xs text-red-600 dark:text-red-400">
+                          <span className="text-xs text-red-600">
                             Error
                           </span>
                         )}
@@ -253,8 +253,8 @@ export default function FileSelectionStep({
                             onDownload(file);
                           }}
                           className="p-1.5 rounded-lg text-gray-400 
-                                                        hover:text-blue-600 dark:hover:text-blue-400
-                                                        hover:bg-white dark:hover:bg-gray-700 transition"
+                                                        hover:text-blue-600
+                                                        hover:bg-white transition"
                         >
                           <Download size={14} />
                         </button>
@@ -265,8 +265,8 @@ export default function FileSelectionStep({
                           setExpandedFile(expandedFile === file.id ? null : file.id);
                         }}
                         className="p-1.5 rounded-lg text-gray-400 
-                                                    hover:text-gray-600 dark:hover:text-gray-300
-                                                    hover:bg-white dark:hover:bg-gray-700 transition"
+                                                    hover:text-gray-600
+                                                    hover:bg-white transition"
                       >
                         {expandedFile === file.id ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                       </button>
@@ -276,8 +276,8 @@ export default function FileSelectionStep({
                           removeFile(file.id);
                         }}
                         className="p-1.5 rounded-lg text-gray-400 
-                                                    hover:text-red-600 dark:hover:text-red-400
-                                                    hover:bg-white dark:hover:bg-gray-700 transition"
+                                                    hover:text-red-600
+                                                    hover:bg-white transition"
                       >
                         <X size={14} />
                       </button>
@@ -286,17 +286,17 @@ export default function FileSelectionStep({
 
                   {/* Expanded Details */}
                   {expandedFile === file.id && (
-                    <div className="px-3 pb-3 pt-1 border-t border-gray-100 dark:border-gray-800">
+                    <div className="px-3 pb-3 pt-1 border-t border-gray-100">
                       <div className="grid grid-cols-2 gap-4 text-xs">
                         <div>
-                          <p className="text-gray-500 dark:text-gray-400 mb-1">File Name</p>
-                          <p className="text-gray-900 dark:text-white font-medium">
+                          <p className="text-gray-500 mb-1">File Name</p>
+                          <p className="text-gray-900 font-medium">
                             {file.name || file.file?.name}
                           </p>
                         </div>
                         <div>
-                          <p className="text-gray-500 dark:text-gray-400 mb-1">Size</p>
-                          <p className="text-gray-900 dark:text-white font-medium">
+                          <p className="text-gray-500 mb-1">Size</p>
+                          <p className="text-gray-900 font-medium">
                             {file.fileSize}
                           </p>
                         </div>
@@ -311,14 +311,14 @@ export default function FileSelectionStep({
 
         {/* Footer */}
         {files.length > 0 && (
-          <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-800 
-                        bg-gray-50 dark:bg-gray-800/50">
+          <div className="px-6 py-4 border-t border-gray-100 
+                        bg-gray-50">
             <div className="flex items-center justify-between">
               <div className="text-sm">
-                <span className="font-semibold text-blue-600 dark:text-blue-400">
+                <span className="font-semibold text-blue-600">
                   {selectedFiles.length}
                 </span>
-                <span className="text-gray-500 dark:text-gray-400 ml-1">
+                <span className="text-gray-500 ml-1">
                   files selected for analysis
                 </span>
               </div>
