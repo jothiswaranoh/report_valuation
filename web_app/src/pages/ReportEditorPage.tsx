@@ -23,8 +23,10 @@ export default function ReportEditorPage() {
     // updateReportMutation.mutate({ reportId, data: { content } });
   };
 
-  const handleNewReport = () => {
-    navigate('/upload');
+  const handleApprove = () => {
+    // In a real app, this would trigger an approval mutation
+    console.log('Approving report:', id);
+    navigate('/files');
   };
 
   if (isLoading) {
@@ -51,7 +53,7 @@ export default function ReportEditorPage() {
       report={selectedReport}
       onBack={handleBack}
       onSave={handleSave}
-      onNewReport={handleNewReport}
+      onApprove={handleApprove}
     />
   );
 }

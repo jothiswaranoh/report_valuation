@@ -115,7 +115,7 @@ export default function Layout() {
             fixed lg:static
             my-4 ml-4 mb-4 rounded-3xl shrink-0
             ${sidebarOpen ? 'w-64' : 'w-20'}
-            ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-[calc(100%+2rem)] lg:translate-x-0'}
+            ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
           `}
         >
           {/* Navigation */}

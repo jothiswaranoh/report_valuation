@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { X, UserPlus, Save } from 'lucide-react';
+import { X, UserPlus, Save, Eye, EyeOff } from 'lucide-react';
 import { User, Role } from '../../types/User';
 
 interface UserModalProps {
@@ -26,6 +26,8 @@ export const UserModal: React.FC<UserModalProps> = ({
         password: '',
         role: '',
     });
+
+    const [showPassword, setShowPassword] = useState(false);
 
     useEffect(() => {
         if (user) {

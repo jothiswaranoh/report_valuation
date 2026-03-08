@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Save, Plus, Sparkles, MessageSquare, ChevronLeft } from 'lucide-react';
+import { Save, Check, Sparkles, MessageSquare, ChevronLeft } from 'lucide-react';
 import { ValuationReport } from '../../types';
 import { formatDate } from '../../utils/formatDate';
 
@@ -7,10 +7,10 @@ interface ReportEditorProps {
     report: ValuationReport | null;
     onBack: () => void;
     onSave: (reportId: string, content: ValuationReport['content']) => void;
-    onNewReport: () => void;
+    onApprove?: () => void;
 }
 
-export default function ReportEditor({ report, onBack, onSave, onNewReport }: ReportEditorProps) {
+export default function ReportEditor({ report, onBack, onSave, onApprove }: ReportEditorProps) {
     const [content, setContent] = useState(report?.content || {
         summary: '',
         propertyDetails: '',
@@ -94,12 +94,12 @@ export default function ReportEditor({ report, onBack, onSave, onNewReport }: Re
                             <span className="font-medium">Save Draft</span>
                         </button>
                         <button
-                            id="new-report-btn"
-                            onClick={onNewReport}
-                            className="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-all shadow-sm active:scale-[0.98]"
+                            id="approve-btn"
+                            onClick={onApprove}
+                            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all shadow-sm active:scale-[0.98]"
                         >
-                            <Plus size={18} />
-                            <span className="font-medium">New Report</span>
+                            <Check size={18} />
+                            <span className="font-medium">Approve</span>
                         </button>
                     </div>
                 </div>
