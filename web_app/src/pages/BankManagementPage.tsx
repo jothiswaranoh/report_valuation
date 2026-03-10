@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { Plus, Pencil, Trash2, Building2, Search } from 'lucide-react';
 import Modal from '../components/common/Modal';
 import Button from '../components/common/Button';
+import Skeleton from 'react-loading-skeleton';
 
 export default function BankManagementPage() {
     const queryClient = useQueryClient();
@@ -85,14 +86,32 @@ export default function BankManagementPage() {
 
     if (isLoading) {
         return (
-            <div className="h-full flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <div className="min-h-screen bg-transparent p-8">
+                <div className="container mx-auto max-w-6xl space-y-8 animate-in fade-in duration-700">
+                    <div className="flex justify-between items-end mb-10">
+                        <div>
+                            <Skeleton height={40} width={300} className="mb-2" />
+                            <Skeleton height={20} width={400} />
+                        </div>
+                        <Skeleton height={48} width={150} borderRadius={12} />
+                    </div>
+                    <div className="bg-white rounded-2xl shadow-xl border border-secondary-200 overflow-hidden">
+                        <div className="p-6 border-b border-secondary-200">
+                            <Skeleton height={48} width={400} borderRadius={12} />
+                        </div>
+                        <div className="p-8 space-y-4">
+                            {[1, 2, 3, 4, 5].map(i => (
+                                <Skeleton key={i} height={60} className="w-full" />
+                            ))}
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/20 to-gray-50 p-8">
+        <div className="min-h-screen bg-transparent p-8">
             <div className="container mx-auto max-w-6xl">
                 {/* Header */}
                 <div className="flex justify-between items-end mb-10 fade-in">

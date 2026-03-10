@@ -58,15 +58,14 @@ export default function Layout() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-brand-100 transition-colors duration-200 relative overflow-hidden z-0">
+    <div className="flex flex-col h-screen bg-white relative overflow-hidden z-0">
       {/* Global Static Background Elements */}
-      <div className="fixed inset-0 pointer-events-none bg-dot-pattern bg-dot-md z-0" />
-      <div className="fixed inset-0 pointer-events-none bg-gradient-to-b from-transparent via-brand-100/40 to-brand-100/90 z-0" />
+      <div className="fixed inset-0 pointer-events-none bg-dot-pattern bg-dot-md z-0 opacity-40" />
 
       {/* Top Header Bar */}
       <header className={`
         h-16 flex items-center justify-between px-6 transition-all duration-300 z-30 shrink-0
-        bg-gradient-to-r from-brand-800 via-brand-900 to-brand-950 backdrop-blur-md
+        bg-gradient-to-r from-brand-700 to-brand-900 backdrop-blur-md
         border-b border-brand-700
         shadow-sm shadow-brand-900/50
       `}>
@@ -108,12 +107,12 @@ export default function Layout() {
         {/* Sidebar */}
         <aside
           className={`
-            flex flex-col h-[calc(100vh-6rem)] z-40 transition-all duration-300 ease-in-out
-            border border-brand-700/30
+            flex flex-col h-[calc(100vh-4rem)] z-40 transition-all duration-300 ease-in-out
+            border-r border-brand-700/30
             bg-gradient-to-b from-brand-800 via-brand-900 to-brand-950
             shadow-xl shadow-brand-900/20
             fixed lg:static
-            my-4 ml-4 mb-4 rounded-3xl shrink-0
+            shrink-0
             ${sidebarOpen ? 'w-64' : 'w-20'}
             ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
           `}
@@ -124,7 +123,13 @@ export default function Layout() {
               <span className="text-[10px] font-bold text-brand-300/70 uppercase tracking-[0.2em]">Menu</span>
             </div>
             {filteredNavItems.map((item) => {
-              const isActive = location.pathname === item.path || (item.path !== '/' && location.pathname.startsWith(item.path));
+              const isActive =
+                (item.path === '/' && (
+                  location.pathname === '/' ||
+                  location.pathname.startsWith('/list') ||
+                  location.pathname.startsWith('/reports')
+                )) ||
+                (item.path !== '/' && location.pathname.startsWith(item.path));
               return (
                 <NavLink
                   key={item.path}
@@ -154,7 +159,7 @@ export default function Layout() {
           </nav>
 
           {/* Footer Sidebar */}
-          <div className="p-4 border-t border-brand-700/40 bg-brand-950/30 rounded-b-[calc(1.5rem-1px)]">
+          <div className="p-4 border-t border-brand-700/40 bg-brand-950/30 rounded-none">
             <div className={`flex items-center gap-3 ${!sidebarOpen ? 'flex-col' : ''}`}>
               <div className="relative group cursor-pointer">
                 <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center font-bold text-white transition-all group-hover:shadow-md border border-white/20">

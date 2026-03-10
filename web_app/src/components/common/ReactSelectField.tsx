@@ -56,7 +56,7 @@ export const ReactSelectField: React.FC<ReactSelectFieldProps> = ({
         minHeight: '48px',
         borderRadius: '12px',
         backgroundColor: 'var(--select-bg, #f8fafc)',
-        borderColor: state.isFocused ? '#3b82f6' : '#e2e8f0',
+        borderColor: state.isFocused ? '#3b82f6' : '#cbd5e1',
         boxShadow: state.isFocused ? '0 0 0 2px rgba(59,130,246,0.2)' : 'none',
         transition: 'all 0.2s ease',
         '&:hover': {

@@ -2,6 +2,8 @@ import { FileText, Calendar, ChevronRight, Loader2 } from 'lucide-react';
 import { useReports } from '../../hooks/useReports';
 import { ApiReport } from '../../apis/report.api';
 
+import Skeleton from 'react-loading-skeleton';
+
 interface ReportsSidebarProps {
     selectedReportId: string | null;
     onReportSelect: (reportId: string) => void;
@@ -23,8 +25,23 @@ export default function ReportsSidebar({ selectedReportId, onReportSelect }: Rep
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center h-full">
-                <Loader2 className="animate-spin text-brand-600" size={32} />
+            <div className="h-full bg-white flex flex-col">
+                <div className="p-6 border-b border-secondary-800 bg-secondary-900">
+                    <Skeleton height={28} width={150} className="mb-2 opacity-20" />
+                    <Skeleton height={16} width={100} className="opacity-20" />
+                </div>
+                <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                    {[1, 2, 3, 4, 5].map(i => (
+                        <div key={i} className="p-4 rounded-xl border border-slate-100">
+                            <Skeleton height={20} width="80%" className="mb-2" />
+                            <Skeleton height={14} width="50%" className="mb-3" />
+                            <div className="flex justify-between items-center">
+                                <Skeleton height={12} width={80} />
+                                <Skeleton height={20} width={60} borderRadius={10} />
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
         );
     }
@@ -69,16 +86,16 @@ export default function ReportsSidebar({ selectedReportId, onReportSelect }: Rep
                                     key={report.id}
                                     onClick={() => onReportSelect(report.id)}
                                     className={`w-full text-left p-4 rounded-xl border transition-all group hover:shadow-soft ${selectedReportId === report.id
-                                            ? 'border-brand-500 bg-brand-50 shadow-sm'
-                                            : 'border-secondary-100 hover:border-brand-300 bg-white'
+                                        ? 'border-brand-500 bg-brand-50 shadow-sm'
+                                        : 'border-secondary-100 hover:border-brand-300 bg-white'
                                         }`}
                                 >
                                     <div className="flex items-start justify-between gap-2">
                                         <div className="flex-1 min-w-0">
                                             <h3
                                                 className={`font-semibold truncate ${selectedReportId === report.id
-                                                        ? 'text-brand-900'
-                                                        : 'text-secondary-900 group-hover:text-brand-800'
+                                                    ? 'text-brand-900'
+                                                    : 'text-secondary-900 group-hover:text-brand-800'
                                                     }`}
                                             >
                                                 {report.report_name || report.name}
@@ -103,8 +120,8 @@ export default function ReportsSidebar({ selectedReportId, onReportSelect }: Rep
                                         <ChevronRight
                                             size={20}
                                             className={`flex-shrink-0 transition-transform ${selectedReportId === report.id
-                                                    ? 'text-brand-600 translate-x-1'
-                                                    : 'text-secondary-300 group-hover:text-brand-500 group-hover:translate-x-1'
+                                                ? 'text-brand-600 translate-x-1'
+                                                : 'text-secondary-300 group-hover:text-brand-500 group-hover:translate-x-1'
                                                 }`}
                                         />
                                     </div>

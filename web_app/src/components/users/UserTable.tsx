@@ -1,6 +1,7 @@
 import React from 'react';
 import { Users, Edit2, Trash2, Plus } from 'lucide-react';
 import { User } from '../../types/User';
+import Skeleton from 'react-loading-skeleton';
 
 interface UserTableProps {
     users: User[];
@@ -21,9 +22,11 @@ export const UserTable: React.FC<UserTableProps> = ({
 }) => {
     if (isLoading) {
         return (
-            <div className="bg-slate-50/50 rounded-2xl border border-brand-100 p-12 text-center">
-                <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mb-4"></div>
-                <p className="text-slate-500 text-sm">Loading users...</p>
+            <div className="bg-white rounded-2xl border border-brand-100 overflow-hidden shadow-sm p-4 h-[400px]">
+                <div className="flex flex-col gap-4">
+                    <Skeleton height={40} className="w-full rounded-lg" />
+                    <Skeleton height={60} count={4} className="w-full rounded-xl" style={{ marginBottom: '1rem' }} />
+                </div>
             </div>
         );
     }
@@ -72,7 +75,7 @@ export const UserTable: React.FC<UserTableProps> = ({
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                         {users.map((user) => (
-                            <tr key={user.id} className="group hover:bg-slate-50 transition-colors">
+                            <tr key={user.id} className="group odd:bg-brand-75 hover:bg-brand-100 transition-colors">
                                 <td className="px-6 py-4">
                                     <div className="flex items-center gap-4">
                                         <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-medium text-sm">

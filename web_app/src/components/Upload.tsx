@@ -401,12 +401,12 @@ export default function Upload() {
         {/* Header */}
         <header className="shrink-0 sticky top-0 z-40 bg-white backdrop-blur-xl border-b border-slate-100">
           <div className="w-full mx-auto px-2 sm:px-3 lg:px-4 py-4 md:py-6">
-            <div className="flex flex-col lg:grid lg:grid-cols-3 items-center gap-6 lg:gap-0 w-full">
+            <div className="flex flex-col lg:grid lg:grid-cols-3 items-start gap-6 lg:gap-0 w-full">
               {/* Left Placeholder for Grid Alignment */}
               <div className="hidden lg:block"></div>
 
               {/* Step Indicator */}
-              <div className="flex items-center justify-center w-full">
+              <div className="flex items-center justify-center w-full pt-4 lg:pt-8">
                 {viewMode === 'upload' && (
                   <StepIndicator currentStep={currentStep} />
                 )}
@@ -414,12 +414,12 @@ export default function Upload() {
 
               {/* View Mode Toggle */}
               <div className="flex justify-center lg:justify-end w-full">
-                <div className="flex gap-2 bg-blue-600 p-1 rounded-xl shrink-0">
+                <div className="flex gap-2 bg-gradient-to-r from-brand-700 to-brand-900 shadow-md shadow-brand-300/40 p-1 rounded-xl shrink-0">
                   <button
                     onClick={() => setViewMode('upload')}
                     className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${viewMode === 'upload'
-                      ? 'bg-white text-blue-600 shadow-sm'
-                      : 'text-blue-100 hover:text-white'
+                      ? 'bg-white text-brand-800 shadow-sm'
+                      : 'text-brand-100 hover:text-white'
                       }`}
                   >
                     <LayoutGrid size={16} />
@@ -428,8 +428,8 @@ export default function Upload() {
                   <button
                     onClick={() => setViewMode('browse')}
                     className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${viewMode === 'browse'
-                      ? 'bg-white text-blue-600 shadow-sm'
-                      : 'text-blue-100 hover:text-white'
+                      ? 'bg-white text-brand-800 shadow-sm'
+                      : 'text-brand-100 hover:text-white'
                       }`}
                   >
                     <History size={16} />

@@ -13,6 +13,7 @@ import { formatDate } from '../utils/formatDate';
 import { useReport, useUpdateReport } from '../hooks/useReports';
 import { mapApiReportToValuation } from '../utils/reportMapper';
 import Loader from '../components/common/Loader';
+import Skeleton from 'react-loading-skeleton';
 
 export default function ReviewApprovalPage() {
   const navigate = useNavigate();
@@ -48,7 +49,34 @@ export default function ReviewApprovalPage() {
   };
 
   if (isLoading) {
-    return <Loader />;
+    return (
+      <div className="h-screen flex flex-col bg-gray-50/50">
+        <div className="bg-white border-b border-secondary-200 px-10 py-8 shadow-sm">
+          <div className="flex items-center justify-between mb-8">
+            <Skeleton height={24} width={150} />
+            <div className="flex gap-4">
+              <Skeleton height={48} width={140} borderRadius={16} />
+              <Skeleton height={48} width={140} borderRadius={16} />
+              <Skeleton height={48} width={140} borderRadius={16} />
+            </div>
+          </div>
+          <Skeleton height={40} width={300} className="mb-4" />
+          <Skeleton height={16} width={400} />
+        </div>
+        <div className="flex-1 overflow-auto p-8">
+          <div className="bg-white border border-secondary-100 rounded-2xl p-6 shadow-md">
+            <Skeleton height={28} width={200} className="mb-6" />
+            <div className="flex justify-between items-center mb-8 gap-3">
+              <Skeleton height={50} width="100%" borderRadius={12} />
+              <div className="w-10 h-0.5 bg-secondary-100 mx-3 rounded-full" />
+              <Skeleton height={50} width="100%" borderRadius={12} />
+              <div className="w-10 h-0.5 bg-secondary-100 mx-3 rounded-full" />
+              <Skeleton height={50} width="100%" borderRadius={12} />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (!report) {

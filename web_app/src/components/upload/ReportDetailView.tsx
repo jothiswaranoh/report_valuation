@@ -14,6 +14,8 @@ import { useReport } from '../../hooks/useReports';
 import { reportsApi } from '../../apis/report.api';
 import { useQueryClient } from '@tanstack/react-query';
 
+import Skeleton from 'react-loading-skeleton';
+
 interface ReportDetailViewProps {
   reportId: string | null;
 }
@@ -174,9 +176,33 @@ export default function ReportDetailView({ reportId }: ReportDetailViewProps) {
 
   if (isLoading || loadingAnalysis) {
     return (
-      <div className="h-full flex flex-col items-center justify-center bg-white/50">
-        <Loader2 className="animate-spin text-brand-600 mb-4" size={40} />
-        <p className="text-slate-600 font-medium">Loading report details...</p>
+      <div className="flex flex-col h-full bg-white">
+        <div className="px-8 py-6 border-b border-slate-100 flex-shrink-0">
+          <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
+            <div className="w-full">
+              <Skeleton height={32} width="40%" className="mb-2" />
+              <Skeleton height={20} width="60%" />
+            </div>
+            <div className="flex items-center gap-2">
+              <Skeleton height={36} width={36} borderRadius={8} />
+              <Skeleton height={36} width={120} borderRadius={8} />
+              <Skeleton height={36} width={100} borderRadius={8} />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map(i => (
+              <Skeleton key={i} height={60} borderRadius={8} />
+            ))}
+          </div>
+        </div>
+        <div className="flex-1 px-8 py-8">
+          <div className="max-w-4xl mx-auto space-y-4">
+            <Skeleton height={40} width="60%" className="mb-6" />
+            <Skeleton count={5} height={16} className="mb-2" />
+            <Skeleton height={200} className="my-6 rounded-xl" />
+            <Skeleton count={4} height={16} className="mb-2" />
+          </div>
+        </div>
       </div>
     );
   }

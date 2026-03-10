@@ -6,6 +6,7 @@ export default {
       colors: {
         brand: {
           50: '#eef5ff',
+          75: '#e4eeff',
           100: '#d9e8ff',
           200: '#bbd5ff',
           300: '#8eb8ff',
@@ -63,11 +64,16 @@ export default {
         sans: ['Inter', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
-        'soft': '0 2px 10px rgba(0, 0, 0, 0.04)',
-        'medium': '0 4px 20px rgba(0, 0, 0, 0.06)',
-        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.08)',
-        'card': '0 1px 3px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04)',
-        'card-lg': '0 4px 6px rgba(0,0,0,0.04), 0 12px 40px rgba(0,0,0,0.06)',
+        'sm': '0 1px 2px 0 rgba(0, 0, 0, 0.08)',
+        DEFAULT: '0 2px 6px 0 rgba(0, 0, 0, 0.1)',
+        'md': '0 4px 12px 0 rgba(0, 0, 0, 0.12)',
+        'lg': '0 10px 24px 0 rgba(0, 0, 0, 0.15)',
+        'xl': '0 20px 40px 0 rgba(0, 0, 0, 0.18)',
+        'soft': '0 2px 10px rgba(0, 0, 0, 0.06)',
+        'medium': '0 4px 20px rgba(0, 0, 0, 0.08)',
+        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.1)',
+        'card': '0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.08)',
+        'card-lg': '0 4px 6px rgba(0,0,0,0.06), 0 12px 40px rgba(0,0,0,0.1)',
         'glow': '0 0 24px rgba(0, 82, 204, 0.2)',
         'glow-lg': '0 0 48px rgba(0, 82, 204, 0.25)',
         'inner-sm': 'inset 0 1px 3px rgba(0,0,0,0.06)',
@@ -104,8 +110,8 @@ export default {
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'dot-pattern': 'radial-gradient(circle, #94a3b8 1px, transparent 1px)',
-        'dot-pattern-dark': 'radial-gradient(circle, #334155 1.5px, transparent 1.5px)',
+        'dot-pattern': 'radial-gradient(circle, #9ca3af 1px, transparent 1px)',
+        'dot-pattern-dark': 'radial-gradient(circle, #374151 1.5px, transparent 1.5px)',
       },
       backgroundSize: {
         'dot-sm': '16px 16px',

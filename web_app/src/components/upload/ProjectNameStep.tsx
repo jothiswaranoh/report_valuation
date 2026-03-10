@@ -155,7 +155,7 @@ export default function ProjectNameStep({
               onChange={(e) => setProjectName(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleProjectNameSubmit()}
               placeholder="e.g. Valuation Report - Jan 2024"
-              className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder-slate-400"
+              className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder-slate-400"
             />
           </div>
         </div>
@@ -163,7 +163,7 @@ export default function ProjectNameStep({
         <button
           onClick={handleProjectNameSubmit}
           disabled={!projectName?.trim() || !bankName?.trim()}
-          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white px-6 py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40"
+          className="w-full bg-blue-600 hover:bg-blue-700 disabled:cursor-not-allowed text-white px-6 py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40"
         >
           Create Report
           <ArrowRight size={18} />

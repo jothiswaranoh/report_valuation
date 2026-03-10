@@ -1,16 +1,17 @@
-import { useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Search, Filter } from 'lucide-react';
 import { useReports } from '../hooks/useReports';
 import { ApiReport } from '../apis/report.api';
 import { ValuationReport, ReportStatus, PropertyType } from '../types';
 import { formatDate } from '../utils/formatDate';
+import Skeleton from 'react-loading-skeleton';
 
 export default function ReportListPage() {
     const { data: reportsData, isLoading } = useReports();
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-
+    const [searchQuery, setSearchQuery] = useState('');
     const statusFilter = searchParams.get('status') as ReportStatus | null;
 
     const handleReportClick = (report: ValuationReport) => {
@@ -40,7 +41,7 @@ export default function ReportListPage() {
             reports = reports.filter(r => (r.report_status || r.status) === statusFilter);
         }
 
-        return reports
+        let mappedReports = reports
             .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
             .map((r: ApiReport) => ({
                 id: r.id,
@@ -59,7 +60,20 @@ export default function ReportListPage() {
                 comments: [],
                 auditTrail: [],
             }));
-    }, [reportsData, statusFilter]);
+
+        if (searchQuery.trim()) {
+            const query = searchQuery.toLowerCase();
+            mappedReports = mappedReports.filter(report =>
+                report.customerName.toLowerCase().includes(query) ||
+                report.bankName.toLowerCase().includes(query) ||
+                report.propertyType.toLowerCase().includes(query) ||
+                report.status.toLowerCase().includes(query) ||
+                report.location.toLowerCase().includes(query)
+            );
+        }
+
+        return mappedReports;
+    }, [reportsData, statusFilter, searchQuery]);
 
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -77,8 +91,24 @@ export default function ReportListPage() {
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center min-h-[400px]">
-                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-brand-600"></div>
+            <div className="space-y-8 animate-in fade-in duration-700">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                        <Skeleton height={40} width={40} borderRadius={12} />
+                        <div>
+                            <Skeleton height={36} width={200} className="mb-2" />
+                            <Skeleton height={16} width={150} />
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <Skeleton height={40} width={320} borderRadius={12} />
+                        <Skeleton height={40} width={40} borderRadius={12} />
+                    </div>
+                </div>
+                <div className="bg-white rounded-2xl border border-brand-100 shadow-md p-4">
+                    <Skeleton height={40} className="mb-4" />
+                    <Skeleton count={5} height={60} className="mb-2" />
+                </div>
             </div>
         );
     }
@@ -107,6 +137,8 @@ export default function ReportListPage() {
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-brand-500 transition-colors" size={18} />
                         <input
                             type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder="Search reports..."
                             className="pl-10 pr-4 py-2.5 bg-white border border-brand-200 rounded-xl text-base focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 outline-none w-80 shadow-sm transition-all font-medium text-slate-900 placeholder:text-slate-400"
                         />
@@ -122,7 +154,7 @@ export default function ReportListPage() {
                 <div className="overflow-x-auto">
                     <table className="w-full">
                         <thead>
-                            <tr className="bg-slate-50/50 border-b border-slate-100">
+                            <tr className="bg-gray-50/50 border-b border-gray-100">
                                 <th className="px-8 py-5 text-left text-xs font-bold text-slate-400 uppercase tracking-[0.15em] w-1/4">
                                     Customer / Report
                                 </th>
@@ -140,7 +172,7 @@ export default function ReportListPage() {
                                 </th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-50">
+                        <tbody className="divide-y divide-gray-50">
                             {filteredReports.length > 0 ? filteredReports.map((report) => (
                                 <tr
                                     key={report.id}
