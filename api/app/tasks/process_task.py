@@ -356,6 +356,16 @@ def process_document_task(self, document_id: str, user_id: str):
             "completed_at":      datetime.utcnow(),
         },
     )
+
+    # Check if all files for this report are completed; if so, update report_status to 'review'
+    all_files = list(db["original_files"].find({"report_id": ObjectId(report_id)}))
+    if all_files and all(f.get("processing_status") == "completed" for f in all_files):
+        db["reports"].update_one(
+            {"_id": ObjectId(report_id)},
+            {"$set": {"report_status": "review", "updated_at": datetime.utcnow()}}
+        )
+        logger.info("[%s] All files completed. Report %s status → 'review'", document_id, report_id)
+
     logger.info("[%s] ✅ Processing completed", document_id)
 
     # Return value is stored in Celery result backend (Redis)

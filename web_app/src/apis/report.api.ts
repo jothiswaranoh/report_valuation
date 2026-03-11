@@ -36,7 +36,7 @@ export interface CheckReportNameResponse {
 }
 
 export interface UpdateReportRequest {
-  report_name: string;
+  report_name?: string;
   report_status?: string;
 }
 

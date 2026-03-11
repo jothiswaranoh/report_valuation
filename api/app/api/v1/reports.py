@@ -33,7 +33,7 @@ class CreateReportRequest(BaseModel):
   bank_name: str
 
 class UpdateReportRequest(BaseModel):
-    report_name: str
+    report_name: Optional[str] = None
     report_status: Optional[str] = None
 
 class AnalysisRequest(BaseModel):
@@ -362,25 +362,26 @@ async def update_report(
     ):
         raise HTTPException(status_code=403, detail="Access denied")
 
-    updated_report = ReportRepository.update_name(
-        report_id,
-        payload.report_name,
-        current_user["id"],
-    )
-
-    if not updated_report:
-        raise HTTPException(status_code=500, detail="Failed to update report")
+    if payload.report_name:
+        updated_report = ReportRepository.update_name(
+            report_id,
+            payload.report_name,
+            current_user["id"],
+        )
+        if not updated_report:
+            raise HTTPException(status_code=500, detail="Failed to update report name")
 
     # Also update status if provided
     if payload.report_status:
         ReportRepository.update_status(report_id, payload.report_status)
-        updated_report = ReportRepository.get_by_id(report_id)
+        
+    updated_report = ReportRepository.get_by_id(report_id)
 
     return {
         "id": updated_report["id"],
-        "report_name": updated_report["report_name"],
+        "report_name": updated_report.get("report_name", ""),
         "report_status": updated_report.get("report_status"),
-        "created_at": updated_report["created_at"],
+        "created_at": updated_report.get("created_at"),
     }
 
 

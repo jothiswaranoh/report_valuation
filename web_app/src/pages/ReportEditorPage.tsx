@@ -23,10 +23,20 @@ export default function ReportEditorPage() {
     // updateReportMutation.mutate({ reportId, data: { content } });
   };
 
-  const handleApprove = () => {
-    // In a real app, this would trigger an approval mutation
-    console.log('Approving report:', id);
-    navigate('/files');
+  const handleApprove = async () => {
+    if (!id || !selectedReport) return;
+    try {
+      await import('../apis/report.api').then(m =>
+        m.reportsApi.updateReport(id, {
+          report_name: selectedReport.customerName,
+          report_status: 'approved'
+        })
+      );
+      navigate(`/reports/${id}/review`);
+    } catch (err) {
+      console.error('Failed to approve report:', err);
+      alert('Failed to approve report');
+    }
   };
 
   if (isLoading) {
