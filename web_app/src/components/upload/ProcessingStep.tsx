@@ -44,13 +44,29 @@ export default function ProcessingStep({
                         <Loader2 size={32} className="text-brand-600 animate-spin" />
                     </div>
                     <h2 className="text-2xl font-bold text-slate-900 mb-2 tracking-tight">Processing Documents</h2>
-                    <p className="text-slate-500 text-sm mb-6 max-w-md mx-auto font-medium">
+                    <p className="text-slate-500 text-sm mb-4 max-w-md mx-auto font-medium">
                         Our AI is analyzing{' '}
                         <span className="font-bold text-brand-600 underline decoration-brand-200 decoration-2 underline-offset-4">
                             {selectedFiles.length} {selectedFiles.length === 1 ? 'file' : 'files'}
                         </span>
                         . This might take a moment.
                     </p>
+
+                    {/* Currently processing file banner */}
+                    {(() => {
+                        const activeFile = files
+                            .filter(f => selectedFiles.includes(f.id))
+                            .find(f => (f.progress ?? 0) < 100);
+                        return activeFile ? (
+                            <div className="flex items-center justify-center gap-2 mb-5 px-4 py-2.5 bg-brand-50 border border-brand-100 rounded-xl max-w-sm mx-auto">
+                                <span className="w-2 h-2 rounded-full bg-brand-500 animate-pulse shrink-0" />
+                                <p className="text-xs font-semibold text-brand-700 truncate">
+                                    <span className="text-brand-400 font-medium mr-1">Analyzing:</span>
+                                    {activeFile.name || activeFile.file?.name}
+                                </p>
+                            </div>
+                        ) : null;
+                    })()}
 
                     {/* Overall progress bar */}
                     <div className="mb-6 space-y-2">
@@ -72,8 +88,8 @@ export default function ProcessingStep({
                             id="processing-copy-link-btn"
                             onClick={handleCopy}
                             className={`flex items-center gap-2 px-5 py-2.5 rounded-xl border font-semibold hover:scale-[1.03] transition-all duration-200 text-sm ${copied
-                                    ? 'bg-emerald-500 border-emerald-500 text-white shadow-md scale-105'
-                                    : 'border-slate-200 text-slate-700 hover:bg-slate-50'
+                                ? 'bg-emerald-500 border-emerald-500 text-white shadow-md scale-105'
+                                : 'border-slate-200 text-slate-700 hover:bg-slate-50'
                                 }`}
                         >
                             {copied ? (

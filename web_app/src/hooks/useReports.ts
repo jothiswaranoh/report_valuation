@@ -34,10 +34,11 @@ export function useCreateReport() {
  * Get all reports
  * GET /api/v1/reports
  */
-export function useReports() {
+export function useReports(options?: { refetchInterval?: number }) {
   return useQuery({
     queryKey: REPORTS_KEY,
     queryFn: reportsApi.getReports,
+    ...(options?.refetchInterval ? { refetchInterval: options.refetchInterval } : {}),
   });
 }
 

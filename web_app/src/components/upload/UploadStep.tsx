@@ -15,6 +15,7 @@ interface UploadStepProps {
   onFilesChange: (files: UploadedFile[]) => void;
   onUpload: (files: File[]) => void;
   onNext: () => void;
+  onUploadOnly: () => void;
   onBack: () => void;
   onDownload: (file: UploadedFile) => void;
 }
@@ -25,6 +26,8 @@ export default function UploadStep({
   onFilesChange,
   onUpload,
   onNext,
+  onUploadOnly,
+  onBack,
   onDownload
 }: UploadStepProps) {
   const [dragActive, setDragActive] = useState(false);
@@ -242,18 +245,31 @@ export default function UploadStep({
           )}
 
           {files.length > 0 && (
-            <button
-              onClick={onNext}
-              className="w-full mt-6 py-3 rounded-lg
-              bg-gradient-to-r from-blue-600 to-blue-700
-              hover:from-blue-700 hover:to-blue-800
-              text-white font-semibold
-              flex items-center justify-center gap-2
-              shadow-md hover:shadow-lg transition"
-            >
-              Continue
-              <ArrowRight size={16} />
-            </button>
+            <div className="mt-6 flex flex-col gap-3">
+              <button
+                onClick={onUploadOnly}
+                className="w-full py-3 rounded-lg
+                bg-gradient-to-r from-blue-600 to-blue-700
+                hover:from-blue-700 hover:to-blue-800
+                text-white font-semibold
+                flex items-center justify-center gap-2
+                shadow-md hover:shadow-lg transition"
+              >
+                Upload
+              </button>
+              <button
+                onClick={onNext}
+                className="w-full py-3 rounded-lg
+                bg-gradient-to-r from-blue-600 to-blue-700
+                hover:from-blue-700 hover:to-blue-800
+                text-white font-semibold
+                flex items-center justify-center gap-2
+                shadow-md hover:shadow-lg transition"
+              >
+                Upload & Continue
+                <ArrowRight size={16} />
+              </button>
+            </div>
           )}
         </div>
       </div>

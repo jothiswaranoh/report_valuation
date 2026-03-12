@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import {
     FileText,
     Clock,
@@ -6,21 +6,22 @@ import {
     FileSearch,
     Upload,
     TrendingUp,
-    ArrowRight,
-    Search,
-    Filter
-} from 'lucide-react';
+    ArrowRight
+}
+
+    from 'lucide-react';
 import { DashboardStats, ValuationReport, ReportStatus, PropertyType } from '../types';
 import { formatDate } from '../utils/formatDate';
 import { mockDashboardStats } from '../data/mockData';
 import { useNavigate } from "react-router-dom";
 import { useReports } from '../hooks/useReports';
 import { ApiReport } from '../apis/report.api';
+import ActiveProcessingCard from '../components/dashboard/ActiveProcessingCard';
 
 export default function DashboardPage() {
-    const { data: reportsData, isLoading } = useReports();
+    // Poll every 5s so importing status cards appear/disappear without manual refresh
+    const { data: reportsData, isLoading } = useReports({ refetchInterval: 5000 });
     const navigate = useNavigate();
-    const [searchQuery, setSearchQuery] = useState('');
 
     const handleReportClick = (report: ValuationReport) => {
         switch (report.status) {
@@ -82,19 +83,32 @@ export default function DashboardPage() {
                 auditTrail: [],
             }));
 
-        if (searchQuery.trim()) {
-            const query = searchQuery.toLowerCase();
-            mappedReports = mappedReports.filter((report: ValuationReport) =>
-                report.customerName.toLowerCase().includes(query) ||
-                report.bankName.toLowerCase().includes(query) ||
-                report.propertyType.toLowerCase().includes(query) ||
-                report.status.toLowerCase().includes(query) ||
-                report.location.toLowerCase().includes(query)
-            );
-        }
-
         return mappedReports;
-    }, [reportsData, searchQuery]);
+    }, [reportsData]);
+
+    const processingReports: ValuationReport[] = useMemo(() => {
+        if (!reportsData?.reports) return [];
+
+        return reportsData.reports
+            .filter((r: ApiReport) => (r.report_status || r.status || '').toLowerCase() === 'importing')
+            .map((r: ApiReport) => ({
+                id: r.id,
+                customerName: (r as any).report_name || r.customer_name || r.name || (r as any).property_owner || r.bank_name || 'Untitled Report',
+                bankName: r.bank_name || 'Unknown Bank',
+                propertyType: (r.property_type as PropertyType) || 'Residential',
+                location: r.location || 'Unknown Location',
+                status: 'process',
+                createdAt: new Date(r.created_at),
+                updatedAt: new Date(r.updated_at),
+                year: new Date(r.created_at).getFullYear().toString(),
+                month: (new Date(r.created_at).getMonth() + 1).toString().padStart(2, '0'),
+                files: [],
+                metadata: {} as any,
+                content: {} as any,
+                comments: [],
+                auditTrail: [],
+            }));
+    }, [reportsData]);
 
     const statCards = [
         {
@@ -106,7 +120,7 @@ export default function DashboardPage() {
             border: 'border-brand-200',
             circleBg: 'bg-brand-300',
             trendColor: 'bg-brand-100 text-brand-700',
-            trend: 'All Reports',
+            trend: 'All generated reports',
             path: '/list'
         },
         {
@@ -118,7 +132,7 @@ export default function DashboardPage() {
             border: 'border-amber-200',
             circleBg: 'bg-amber-300',
             trendColor: 'bg-amber-100 text-amber-700',
-            trend: 'Upload',
+            trend: 'Awaiting file uploads',
             path: '/list?status=draft'
         },
         {
@@ -130,7 +144,7 @@ export default function DashboardPage() {
             border: 'border-blue-200',
             circleBg: 'bg-blue-300',
             trendColor: 'bg-blue-100 text-blue-700',
-            trend: 'In Progress',
+            trend: 'Ready for AI analysis',
             path: '/list?status=process'
         },
         {
@@ -142,7 +156,7 @@ export default function DashboardPage() {
             border: 'border-orange-200',
             circleBg: 'bg-orange-300',
             trendColor: 'bg-orange-100 text-orange-700',
-            trend: 'Pending',
+            trend: 'Pending your approval',
             path: '/list?status=review'
         },
         {
@@ -154,7 +168,7 @@ export default function DashboardPage() {
             border: 'border-emerald-200',
             circleBg: 'bg-emerald-300',
             trendColor: 'bg-emerald-100 text-emerald-700',
-            trend: 'Verified',
+            trend: 'Finalized reports',
             path: '/list?status=approved'
         },
     ];
@@ -244,19 +258,6 @@ export default function DashboardPage() {
                     <p className="text-slate-600 font-semibold mt-1">Overview of valuation reports and system activity</p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <div className="relative group">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-brand-500 transition-colors" size={18} />
-                        <input
-                            type="text"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="Search reports..."
-                            className="pl-10 pr-4 py-2.5 bg-white border border-brand-200 rounded-xl text-base focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 outline-none w-80 shadow-sm transition-all font-medium text-slate-900 placeholder:text-slate-400"
-                        />
-                    </div>
-                    <button className="p-2.5 bg-white border border-brand-200 rounded-xl text-brand-600 hover:bg-brand-50 transition-all shadow-sm">
-                        <Filter size={20} />
-                    </button>
                     <button
                         onClick={() => navigate('upload')}
                         className="bg-gradient-to-r from-brand-700 to-brand-900 hover:from-brand-800 hover:to-brand-950 text-white px-6 py-2.5 rounded-xl text-base font-bold flex items-center gap-2 shadow-lg shadow-brand-300/40 transition-all hover:-translate-y-0.5"
@@ -293,6 +294,15 @@ export default function DashboardPage() {
                     </div>
                 ))}
             </div>
+
+            {/* Processing State - Only visible when reports are in process state */}
+            {processingReports.length > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {processingReports.map((report) => (
+                        <ActiveProcessingCard key={`processing-${report.id}`} report={report} />
+                    ))}
+                </div>
+            )}
 
             {/* Main Section */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

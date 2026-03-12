@@ -476,6 +476,7 @@ export default function Upload() {
                   onUpload={handleFileUpload}
                   onDownload={handleDownload}
                   onNext={() => setCurrentStep(3)}
+                  onUploadOnly={() => navigate('/')}
                   onBack={() => setCurrentStep(1)}
                 />
               )}

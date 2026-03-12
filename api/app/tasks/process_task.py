@@ -357,9 +357,16 @@ def process_document_task(self, document_id: str, user_id: str):
         },
     )
 
-    # Check if all files for this report are completed; if so, update report_status to 'review'
+    # Only promote to 'review' if the user explicitly started AI analysis (report_status == 'importing').
+    # Reports in 'process' (files uploaded but analysis not triggered) must NOT auto-advance.
     all_files = list(db["original_files"].find({"report_id": ObjectId(report_id)}))
-    if all_files and all(f.get("processing_status") == "completed" for f in all_files):
+    report_doc = db["reports"].find_one({"_id": ObjectId(report_id)}, {"report_status": 1})
+    if (
+        all_files
+        and all(f.get("processing_status") == "completed" for f in all_files)
+        and report_doc
+        and report_doc.get("report_status") == "importing"
+    ):
         db["reports"].update_one(
             {"_id": ObjectId(report_id)},
             {"$set": {"report_status": "review", "updated_at": datetime.utcnow()}}

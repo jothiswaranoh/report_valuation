@@ -239,6 +239,9 @@ async def import_report_files(
     if not queued_jobs and not skipped_files:
         raise HTTPException(status_code=400, detail="No files to process")
 
+    # Mark report as actively importing (AI analysis kicked off)
+    ReportRepository.update_status(report_id, "importing")
+
     return {
         "success":       True,
         "report_id":     report_id,
@@ -438,8 +441,14 @@ async def get_report_status(
     analysis = AIExtractedContentRepository.get_by_report(report_id)
     
     # Determine overall status
-    if not files:
+    # If the user has explicitly triggered AI import, always treat as 'processing'
+    # regardless of individual file statuses (files may have completed OCR but AI analysis hasn't run yet)
+    if report.get("report_status") == "importing":
+        overall_status = "processing"
+    elif not files:
         overall_status = "empty"
+    elif all(f.get("processing_status", "pending") in ("pending", None) for f in files):
+        overall_status = "pending"
     elif all(f.get("processing_status") == "completed" for f in files) and analysis:
         overall_status = "completed"
     elif any(f.get("processing_status") == "failed" for f in files):
