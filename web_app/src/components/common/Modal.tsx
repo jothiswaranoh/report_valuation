@@ -59,12 +59,12 @@ export function Modal({
         <div className="fixed inset-0 z-50 overflow-y-auto">
             {/* Overlay */}
             <div
-                className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+                className="fixed inset-0 bg-black/20 backdrop-blur-md transition-opacity"
                 onClick={closeOnOverlayClick ? onClose : undefined}
             />
 
             {/* Modal Container */}
-            <div className="flex min-h-full items-center justify-center p-4">
+            <div className="flex min-h-full items-start justify-center pt-16 px-4 pb-4">
                 <div
                     className={`
             relative w-full ${sizeStyles[size]} bg-white rounded-lg shadow-xl

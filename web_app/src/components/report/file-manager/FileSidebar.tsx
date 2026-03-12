@@ -5,9 +5,10 @@ import {
     ChevronDown,
     Search,
     FileText,
-    X
+    X,
+    MoreVertical
 } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FileNode } from '../../../types';
 
 interface FileSidebarProps {
@@ -64,6 +65,29 @@ export default function FileSidebar({
 }: FileSidebarProps) {
     const isSearching = searchQuery.trim().length > 0;
     const [dragOverNodeId, setDragOverNodeId] = useState<string | null>(null);
+    // ID of the node whose kebab menu is currently open
+    const [activeMenu, setActiveMenu] = useState<string | null>(null);
+
+    // Close menu on any outside click
+    useEffect(() => {
+        const closeMenu = () => setActiveMenu(null);
+        window.addEventListener('click', closeMenu);
+        return () => window.removeEventListener('click', closeMenu);
+    }, []);
+
+    // ── Kebab action placeholders ────────────────────────────────────────────
+    const handleCopy = (node: FileNode) => {
+        console.log('Copy', node.name);
+        setActiveMenu(null);
+    };
+    const handleRename = (node: FileNode) => {
+        console.log('Rename', node.name);
+        setActiveMenu(null);
+    };
+    const handleDelete = (node: FileNode) => {
+        console.log('Delete', node.name);
+        setActiveMenu(null);
+    };
 
     // Filtered tree based on search query
     const filteredTree = useMemo(
@@ -110,11 +134,13 @@ export default function FileSidebar({
             }
         };
 
+        const isMenuOpen = activeMenu === node.id;
+
         return (
             <div key={node.id} className="mb-0.5">
                 <div
                     className={`
-                        flex items-center gap-2 px-3 py-2 cursor-pointer rounded-lg transition-all
+                        group relative flex items-center gap-2 px-3 py-2 cursor-pointer rounded-lg transition-all
                         ${isSelected
                             ? 'bg-brand-50 text-brand-700'
                             : 'text-slate-700 hover:bg-slate-100'
@@ -142,7 +168,6 @@ export default function FileSidebar({
                     <span className="flex-shrink-0">
                         {node.type === 'folder' ? (
                             isDragOver ? (
-                                // Open folder icon while dragging over
                                 <FolderOpen size={16} className="text-blue-500 animate-pulse" />
                             ) : isExpanded ? (
                                 <FolderOpen size={16} className="text-blue-500" />
@@ -161,6 +186,54 @@ export default function FileSidebar({
                         <span className="text-xs font-semibold text-blue-500 flex-shrink-0 bg-blue-50 px-1.5 py-0.5 rounded">
                             Drop here
                         </span>
+                    )}
+
+                    {/* Kebab button + dropdown */}
+                    {!isDragOver && (
+                        <div className="relative flex-shrink-0">
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setActiveMenu(isMenuOpen ? null : node.id);
+                                }}
+                                className={`
+                                    p-0.5 rounded transition-all
+                                    opacity-0 group-hover:opacity-100
+                                    ${isMenuOpen ? 'opacity-100 bg-slate-200 text-slate-700' : 'hover:bg-slate-200 text-slate-400 hover:text-slate-600'}
+                                `}
+                                title="More options"
+                                aria-label="More options"
+                            >
+                                <MoreVertical size={15} />
+                            </button>
+
+                            {isMenuOpen && (
+                                <div
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="absolute right-0 top-full mt-1 w-36 bg-white border border-slate-200 rounded-lg shadow-md text-sm z-50 py-1 overflow-hidden"
+                                >
+                                    <button
+                                        onClick={() => handleCopy(node)}
+                                        className="flex items-center w-full text-left px-3 py-2 hover:bg-slate-100 text-slate-700 transition-colors"
+                                    >
+                                        Copy
+                                    </button>
+                                    <button
+                                        onClick={() => handleRename(node)}
+                                        className="flex items-center w-full text-left px-3 py-2 hover:bg-slate-100 text-slate-700 transition-colors"
+                                    >
+                                        Rename
+                                    </button>
+                                    <div className="my-1 border-t border-slate-100" />
+                                    <button
+                                        onClick={() => handleDelete(node)}
+                                        className="flex items-center w-full text-left px-3 py-2 hover:bg-red-50 text-red-500 transition-colors"
+                                    >
+                                        Delete
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     )}
                 </div>
 
