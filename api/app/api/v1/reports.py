@@ -188,22 +188,23 @@ async def import_report_files(
 
     queued_jobs   = []
     skipped_files = []
+    # Collect tasks to dispatch — we'll send them AFTER setting 'importing' status
+    # to avoid a race condition where Celery runs before the status is updated.
+    tasks_to_dispatch = []
 
     for file_doc in files:
         file_id   = file_doc["id"]
         file_path = file_doc.get("file_path")
 
         current_status = file_doc.get("processing_status", "")
-        # Check if we actually HAVE content (not just an empty string or whitespace)
         file_content   = file_doc.get("file_content", "")
         has_content    = bool(file_content and file_content.strip())
 
-        # Skip only if processing is actively in flight OR already successfully completed with content.
-        # If status is "completed" but content is missing, we re-queue it (likely a stale/failed job).
+        # Skip if already in-flight or completed with content
         if current_status in ("queued", "processing") or (current_status == "completed" and has_content):
             skipped_files.append({
                 "file_id": file_id,
-                "reason": f"Already {current_status}" if has_content or current_status != "completed" else "Already completed with content"
+                "reason": f"Already {current_status}"
             })
             continue
 
@@ -214,13 +215,26 @@ async def import_report_files(
             })
             continue
 
-        # Mark as queued in MongoDB so the poll endpoint reflects it immediately
+        # Mark as queued in MongoDB immediately
         orig_col.update_one(
             {"_id": ObjectId(file_id)},
             {"$set": {"processing_status": "queued", "updated_at": _dt.utcnow()}},
         )
+        tasks_to_dispatch.append((file_id, file_doc.get("file_name")))
 
-        # Dispatch Celery task — use file_id as task_id so job polling is easy
+    if not tasks_to_dispatch and not skipped_files:
+        raise HTTPException(status_code=400, detail="No files to process")
+
+    # Set report status BEFORE dispatching tasks — eliminates race condition
+    if tasks_to_dispatch:
+        ReportRepository.update_status(report_id, "importing")
+    else:
+        # All files already completed — advance directly to review
+        ReportRepository.update_status(report_id, "review")
+        logger.info("All files already completed for report %s — advancing to 'review'", report_id)
+
+    # NOW dispatch Celery tasks — worker will see 'importing' status
+    for file_id, file_name in tasks_to_dispatch:
         task = _celery.send_task(
             "app.tasks.process_task.process_document_task",
             args    = [file_id, current_user["id"]],
@@ -228,19 +242,13 @@ async def import_report_files(
             task_id = file_id,
         )
         logger.info("Queued process_document_task: file_id=%s task_id=%s", file_id, task.id)
-
         queued_jobs.append({
             "file_id":    file_id,
-            "job_id":     task.id,          # same as file_id
-            "file_name":  file_doc.get("file_name"),
+            "job_id":     task.id,
+            "file_name":  file_name,
             "status_url": f"/api/v1/jobs/{task.id}",
         })
 
-    if not queued_jobs and not skipped_files:
-        raise HTTPException(status_code=400, detail="No files to process")
-
-    # Mark report as actively importing (AI analysis kicked off)
-    ReportRepository.update_status(report_id, "importing")
 
     return {
         "success":       True,
