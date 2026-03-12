@@ -69,7 +69,7 @@ export default function FilePreviewModal({
                         {/* Preview Area */}
                         <div className="lg:col-span-2 bg-gray-100 rounded-2xl overflow-hidden border border-gray-200 flex flex-col relative shadow-inner">
                             {file.url && file.url !== '#' ? (
-                                <div className="flex-1 overflow-auto flex items-center justify-center p-4">
+                                <div className="flex-1 overflow-auto flex items-start justify-center p-4">
                                     {isPdf ? (
                                         <Document
                                             file={file.url}
