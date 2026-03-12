@@ -58,44 +58,44 @@ export default function Layout() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-white relative overflow-hidden z-0">
+    <div className="flex flex-col h-screen bg-sky-100 relative overflow-hidden z-0">
       {/* Global Static Background Elements */}
-      <div className="fixed inset-0 pointer-events-none bg-dot-pattern bg-dot-md z-0 opacity-40" />
+      <div className="fixed inset-0 pointer-events-none bg-dot-pattern bg-dot-md z-0 opacity-20" />
 
       {/* Top Header Bar */}
       <header className={`
         h-16 flex items-center justify-between px-6 transition-all duration-300 z-30 shrink-0
-        bg-gradient-to-r from-brand-700 to-brand-900 backdrop-blur-md
-        border-b border-brand-700
-        shadow-sm shadow-brand-900/50
+        bg-white
+        border-b border-sky-100
+        shadow-sm
       `}>
         <div className="flex items-center gap-4">
           <button
             onClick={() => setMobileMenuOpen(true)}
-            className="lg:hidden p-2 rounded-xl bg-white/10 shadow-sm border border-white/20"
+            className="lg:hidden p-2 rounded-xl bg-sky-50 shadow-sm border border-sky-100"
           >
-            <Menu size={20} className="text-white" />
+            <Menu size={20} className="text-sky-600" />
           </button>
           {/* Logo Section in Header */}
           <div className="flex items-center gap-3 overflow-hidden ml-2">
-            <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg border border-white/20">
+            <div className="w-8 h-8 bg-gradient-to-br from-sky-400 to-sky-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
               <span className="text-white font-black text-lg">V</span>
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-white leading-none">Valuation System AI</span>
+              <span className="font-bold text-slate-800 leading-none">Valuation <span className="text-sky-500">System AI</span></span>
             </div>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
 
-          <button className="p-2 text-white/60 hover:text-white transition-colors relative">
+          <button className="p-2 text-slate-400 hover:text-sky-500 transition-colors relative">
             <Bell size={20} />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-brand-400 rounded-full border-2 border-brand-900" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-sky-400 rounded-full border-2 border-white" />
           </button>
-          <div className="h-4 w-[1px] bg-white/20 mx-1" />
+          <div className="h-4 w-[1px] bg-sky-100 mx-1" />
           <div className="flex items-center gap-2 pl-2">
-            <div className="w-8 h-8 rounded-full bg-white/20 text-white flex items-center justify-center font-bold text-xs">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-sky-400 to-sky-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">
               {initials}
             </div>
           </div>
@@ -108,9 +108,9 @@ export default function Layout() {
         <aside
           className={`
             flex flex-col h-[calc(100vh-4rem)] z-40 transition-all duration-300 ease-in-out
-            border-r border-brand-700/30
-            bg-gradient-to-b from-brand-800 via-brand-900 to-brand-950
-            shadow-xl shadow-brand-900/20
+            border-r border-sky-100
+            bg-white
+            shadow-sm
             fixed lg:static
             shrink-0
             ${sidebarOpen ? 'w-64' : 'w-20'}
@@ -118,9 +118,9 @@ export default function Layout() {
           `}
         >
           {/* Navigation */}
-          <nav className="flex-1 p-3 space-y-3 overflow-y-auto overflow-x-hidden custom-scrollbar mt-2">
-            <div className={`px-3 mb-2 ${!sidebarOpen ? 'hidden' : ''}`}>
-              <span className="text-[10px] font-bold text-brand-300/70 uppercase tracking-[0.2em]">Menu</span>
+          <nav className="flex-1 p-3 space-y-1.5 overflow-y-auto overflow-x-hidden custom-scrollbar mt-2">
+            <div className={`px-3 mb-3 ${!sidebarOpen ? 'hidden' : ''}`}>
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Menu</span>
             </div>
             {filteredNavItems.map((item) => {
               const isActive =
@@ -137,8 +137,8 @@ export default function Layout() {
                   className={`
                     flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative
                     ${isActive
-                      ? 'bg-white/15 backdrop-blur-sm text-white shadow-lg shadow-brand-950/20 border border-white/20'
-                      : 'text-brand-200/70 hover:bg-white/10 hover:text-white'
+                      ? 'bg-sky-500 text-white shadow-md shadow-sky-200'
+                      : 'text-slate-500 hover:bg-sky-50 hover:text-sky-600'
                     }
                     ${!sidebarOpen ? 'justify-center px-0' : ''}
                   `}
@@ -151,7 +151,7 @@ export default function Layout() {
                   </div>
                   {sidebarOpen && <span className="text-sm font-semibold truncate">{item.label}</span>}
                   {isActive && sidebarOpen && (
-                    <div className="absolute right-2 w-1.5 h-1.5 bg-brand-300 rounded-full shadow-[0_0_8px_rgba(147,197,253,0.8)]" />
+                    <div className="absolute right-2 w-1.5 h-1.5 bg-white/70 rounded-full" />
                   )}
                 </NavLink>
               );
@@ -159,26 +159,26 @@ export default function Layout() {
           </nav>
 
           {/* Footer Sidebar */}
-          <div className="p-4 border-t border-brand-700/40 bg-brand-950/30 rounded-none">
+          <div className="p-4 border-t border-sky-100 bg-sky-100/50 rounded-none">
             <div className={`flex items-center gap-3 ${!sidebarOpen ? 'flex-col' : ''}`}>
               <div className="relative group cursor-pointer">
-                <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center font-bold text-white transition-all group-hover:shadow-md border border-white/20">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center font-bold text-white transition-all group-hover:shadow-md">
                   {initials}
                 </div>
-                <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-400 border-2 border-brand-900 rounded-full" />
+                <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-400 border-2 border-white rounded-full" />
               </div>
 
               {sidebarOpen && (
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-bold text-white truncate tracking-tight">{user?.first_name} {user?.last_name}</p>
-                  <p className="text-[10px] text-brand-300/70 truncate mt-0.5 font-medium">{user?.email}</p>
+                  <p className="text-xs font-bold text-slate-800 truncate tracking-tight">{user?.first_name} {user?.last_name}</p>
+                  <p className="text-[10px] text-slate-400 truncate mt-0.5 font-medium">{user?.email}</p>
                 </div>
               )}
 
               {sidebarOpen && (
                 <button
                   onClick={() => setLogoutModalOpen(true)}
-                  className="p-1.5 text-brand-300/70 hover:text-red-300 transition-colors bg-white/10 rounded-lg border border-white/10 hover:bg-red-500/10"
+                  className="p-1.5 text-slate-400 hover:text-red-500 transition-colors bg-white rounded-lg border border-slate-100 hover:bg-red-50 hover:border-red-100"
                 >
                   <LogOut size={16} />
                 </button>
@@ -189,7 +189,7 @@ export default function Layout() {
           {/* Toggle Button */}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="lg:flex hidden absolute -right-3 top-20 w-6 h-6 bg-white border border-brand-100 rounded-full items-center justify-center shadow-md text-brand-600 hover:text-brand-700 transition-all z-50 hover:scale-110"
+            className="lg:flex hidden absolute -right-3 top-20 w-6 h-6 bg-white border border-sky-200 rounded-full items-center justify-center shadow-md text-sky-500 hover:text-sky-600 transition-all z-50 hover:scale-110"
           >
             {sidebarOpen ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
           </button>

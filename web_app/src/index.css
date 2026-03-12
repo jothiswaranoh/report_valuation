@@ -27,7 +27,7 @@
   }
 
   body {
-    @apply bg-white text-slate-900;
+    @apply bg-sky-100 text-slate-900;
     font-family: 'Inter', system-ui, sans-serif;
   }
 
@@ -36,14 +36,17 @@
     width: 5px;
     height: 5px;
   }
+
   ::-webkit-scrollbar-track {
     background: transparent;
   }
+
   ::-webkit-scrollbar-thumb {
-    @apply bg-slate-200 rounded-full;
+    @apply bg-sky-200 rounded-full;
   }
+
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-slate-300;
+    @apply bg-sky-300;
   }
 }
 
@@ -51,6 +54,7 @@
    UTILITIES
    ============================================================ */
 @layer utilities {
+
   /* Animations */
   .animate-slide-up {
     animation: slide-up 0.3s ease-out;
@@ -62,21 +66,21 @@
 
   /* Glass effect */
   .glass {
-    @apply bg-white/80 backdrop-blur-xl border border-white/20;
+    @apply bg-white/80 backdrop-blur-xl border border-sky-100/60;
   }
 
   .glass-card {
-    @apply bg-white border border-slate-100 rounded-2xl shadow-sm;
+    @apply bg-white border border-sky-100 rounded-2xl shadow-sm;
   }
 
   /* Theme toggle ring */
   .theme-ring {
-    @apply ring-2 ring-offset-2 ring-brand-500 ring-offset-white;
+    @apply ring-2 ring-offset-2 ring-sky-400 ring-offset-white;
   }
 
   /* Gradient text */
   .gradient-text {
-    @apply bg-gradient-to-r from-brand-600 to-brand-400 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-sky-500 to-sky-400 bg-clip-text text-transparent;
   }
 
   /* Card hover effect */
@@ -93,6 +97,7 @@
     opacity: 0;
     transform: translateY(16px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -100,69 +105,86 @@
 }
 
 @keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes blob {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(30px, -50px) scale(1.1); }
-  66% { transform: translate(-20px, 20px) scale(0.9); }
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
 }
 
 @keyframes pulse-ring {
-  0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(56, 148, 255, 0.4); }
-  70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(56, 148, 255, 0); }
-  100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(56, 148, 255, 0); }
+  0% {
+    transform: scale(0.9);
+    box-shadow: 0 0 0 0 rgba(56, 148, 255, 0.4);
+  }
+
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 8px rgba(56, 148, 255, 0);
+  }
+
+  100% {
+    transform: scale(0.9);
+    box-shadow: 0 0 0 0 rgba(56, 148, 255, 0);
+  }
 }
 
 /* ============================================================
    COMPONENT CLASSES
    ============================================================ */
 @layer components {
+
   /* Animated blobs for auth pages */
   .animate-blob {
     animation: blob 7s infinite;
   }
+
   .animation-delay-2000 {
     animation-delay: 2s;
   }
+
   .animation-delay-4000 {
     animation-delay: 4s;
   }
 
   /* Input base style */
   .input-base {
-    @apply w-full px-4 py-3 rounded-xl border border-slate-200
-           bg-slate-50 focus:bg-white
-           text-slate-900 placeholder-slate-400
-           focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500
-           outline-none transition-all font-medium;
+    @apply w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white text-slate-900 placeholder-slate-400 focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 outline-none transition-all font-medium;
   }
 
   /* Badge variants */
   .badge-draft {
-    @apply px-3 py-1 rounded-lg text-xs font-bold border
-           bg-amber-50 text-amber-600
-           border-amber-100;
+    @apply px-3 py-1 rounded-lg text-xs font-bold border bg-amber-50 text-amber-600 border-amber-100;
   }
+
   .badge-review {
-    @apply px-3 py-1 rounded-lg text-xs font-bold border
-           bg-orange-50 text-orange-600
-           border-orange-100;
+    @apply px-3 py-1 rounded-lg text-xs font-bold border bg-orange-50 text-orange-600 border-orange-100;
   }
+
   .badge-approved {
-    @apply px-3 py-1 rounded-lg text-xs font-bold border
-           bg-emerald-50 text-emerald-600
-           border-emerald-100;
+    @apply px-3 py-1 rounded-lg text-xs font-bold border bg-emerald-50 text-emerald-600 border-emerald-100;
   }
 
   /* Theme toggle button */
   .theme-toggle {
-    @apply relative p-2.5 rounded-xl transition-all duration-300
-           bg-white border border-slate-200
-           hover:bg-slate-50 hover:border-brand-200
-           text-slate-500 hover:text-brand-600
-           shadow-sm hover:shadow-md;
+    @apply relative p-2.5 rounded-xl transition-all duration-300 bg-white border border-slate-200 hover:bg-slate-50 hover:border-brand-200 text-slate-500 hover:text-brand-600 shadow-sm hover:shadow-md;
   }
 }
