@@ -33,7 +33,7 @@ export default function SignupPage() {
         }
     };
 
-    const inputClass = "w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:ring-4 focus:ring-brand-500/15 focus:border-brand-500 outline-none transition-all text-slate-900 placeholder-slate-400 font-medium text-sm bg-slate-50 focus:bg-white";
+    const inputClass = "w-full px-4 py-2.5 border border-slate-200 rounded-lg focus:ring-4 focus:ring-brand-500/15 focus:border-brand-500 outline-none transition-all text-slate-900 placeholder-slate-400 font-medium text-sm bg-slate-50 focus:bg-white";
     const labelClass = "block text-xs font-bold text-slate-600 uppercase tracking-widest ml-1";
 
     return (
@@ -69,7 +69,7 @@ export default function SignupPage() {
                             { icon: <Zap size={20} />, title: 'Global Access', desc: 'Work from anywhere on any device' },
                         ].map(feature => (
                             <div key={feature.title} className="flex items-center gap-4 group">
-                                <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/20 transition-all border border-white/10 flex-shrink-0 shadow-lg">
+                                <div className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/20 transition-all border border-white/10 flex-shrink-0 shadow-lg">
                                     {feature.icon}
                                 </div>
                                 <div>
@@ -83,7 +83,7 @@ export default function SignupPage() {
                     {/* Stats row */}
                     <div className="grid grid-cols-3 gap-4">
                         {[['500+', 'Valuators'], ['10k+', 'Reports'], ['99.9%', 'Uptime']].map(([val, label]) => (
-                            <div key={label} className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center">
+                            <div key={label} className="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
                                 <p className="text-2xl font-black">{val}</p>
                                 <p className="text-white/50 text-xs font-semibold mt-1">{label}</p>
                             </div>
@@ -93,10 +93,10 @@ export default function SignupPage() {
 
                 {/* Right Side — Signup Form */}
                 <div className="w-full max-w-xl lg:max-w-md mx-auto">
-                    <div className="bg-white backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/30 animate-scale-in">
+                    <div className="bg-white backdrop-blur-xl rounded-2xl shadow-2xl p-8 border border-white/30 animate-scale-in">
                         {/* Mobile Logo */}
                         <div className="lg:hidden text-center mb-5">
-                            <div className="w-12 h-12 bg-gradient-to-br from-brand-600 to-brand-800 rounded-2xl flex items-center justify-center mx-auto mb-2 shadow-xl shadow-brand-500/20">
+                            <div className="w-12 h-12 bg-gradient-to-br from-brand-600 to-brand-800 rounded-xl flex items-center justify-center mx-auto mb-2 shadow-xl shadow-brand-500/20">
                                 <span className="text-white font-black text-xl">V</span>
                             </div>
                             <h1 className="text-2xl font-black text-slate-900">Valuation System</h1>
@@ -193,7 +193,7 @@ export default function SignupPage() {
                             <button
                                 type="submit"
                                 disabled={loginLoading}
-                                className="w-full bg-gradient-to-br from-brand-600 to-brand-700 hover:from-brand-700 hover:to-brand-800 text-white py-3.5 rounded-xl font-black text-base flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-xl shadow-brand-500/25 hover:shadow-brand-500/40 transform hover:-translate-y-0.5 mt-6"
+                                className="w-full bg-gradient-to-br from-brand-600 to-brand-700 hover:from-brand-700 hover:to-brand-800 text-white py-3.5 rounded-lg font-black text-base flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-xl shadow-brand-500/25 hover:shadow-brand-500/40 transform hover:-translate-y-0.5 mt-6"
                             >
                                 {loginLoading ? (
                                     <>

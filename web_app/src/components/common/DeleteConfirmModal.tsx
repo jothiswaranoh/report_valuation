@@ -45,7 +45,7 @@ export function DeleteConfirmModal({
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm transition-opacity animate-fade-in">
             <div
                 ref={modalRef}
-                className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all animate-scale-in border border-secondary-100"
+                className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden transform transition-all animate-scale-in border border-secondary-100"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
@@ -80,14 +80,14 @@ export function DeleteConfirmModal({
                     <button
                         onClick={onClose}
                         disabled={isDeleting}
-                        className="px-4 py-2 text-secondary-700 font-medium hover:bg-secondary-200 rounded-xl transition-colors disabled:opacity-50"
+                        className="px-4 py-2 text-secondary-700 font-medium hover:bg-secondary-200 rounded-lg transition-colors disabled:opacity-50"
                     >
                         Cancel
                     </button>
                     <button
                         onClick={onConfirm}
                         disabled={isDeleting}
-                        className="px-4 py-2 bg-red-600 text-white font-medium rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-600/20 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
+                        className="px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-all shadow-lg shadow-red-600/20 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
                     >
                         {isDeleting ? (
                             <>

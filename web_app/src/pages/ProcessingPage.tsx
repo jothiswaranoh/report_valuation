@@ -6,7 +6,6 @@ import {
     AlertCircle,
     Copy,
     Home,
-    ExternalLink,
     ChevronRight,
     RefreshCw
 } from 'lucide-react';
@@ -23,7 +22,6 @@ export default function ProcessingPage() {
     const [progress, setProgress] = useState({ completed: 0, total: 0, percentage: 0 });
     const [errorHeader, setErrorHeader] = useState<string | null>(null);
     const [errorDetails, setErrorDetails] = useState<string | null>(null);
-    const [pollCount, setPollCount] = useState(0);
     const [isCopied, setIsCopied] = useState(false);
 
     const pollStatus = useCallback(async () => {
@@ -58,16 +56,14 @@ export default function ProcessingPage() {
     useEffect(() => {
         if (status !== 'processing') return;
 
+        const startTime = new Date().getTime();
         const interval = setInterval(() => {
-            setPollCount(prev => {
-                if (prev >= 300) { // 10 minutes (300 * 2s)
-                    setStatus('timeout');
-                    clearInterval(interval);
-                    return prev;
-                }
+            if (new Date().getTime() > startTime + 10 * 60 * 1000) { // 10 minutes timeout
+                setStatus('timeout');
+                clearInterval(interval);
+            } else {
                 pollStatus();
-                return prev + 1;
-            });
+            }
         }, 2000);
 
         return () => clearInterval(interval);
@@ -84,7 +80,6 @@ export default function ProcessingPage() {
     const handleGoHome = () => navigate('/');
     const handleTryAgain = () => navigate('/upload');
     const handleRefresh = () => {
-        setPollCount(0);
         setStatus('processing');
         pollStatus();
     };
@@ -99,11 +94,11 @@ export default function ProcessingPage() {
                         <div className="relative mx-auto w-24 h-24">
                             <div className="absolute inset-0 rounded-full border-4 border-slate-100" />
                             <div
-                                className="absolute inset-0 rounded-full border-4 border-brand-600 border-t-transparent animate-spin"
+                                className="absolute inset-0 rounded-full border-4 border-sky-500 border-t-transparent animate-spin"
                                 style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)' }}
                             />
                             <div className="absolute inset-0 flex items-center justify-center">
-                                <Loader2 size={40} className="text-brand-600 animate-pulse" />
+                                <Loader2 size={40} className="text-sky-500 animate-pulse" />
                             </div>
                         </div>
 
@@ -124,7 +119,7 @@ export default function ProcessingPage() {
                             </div>
                             <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
                                 <div
-                                    className="h-full bg-brand-600 transition-all duration-1000 ease-out"
+                                    className="h-full bg-sky-500 transition-all duration-1000 ease-out"
                                     style={{ width: `${progress.percentage}%` }}
                                 />
                             </div>
@@ -133,14 +128,14 @@ export default function ProcessingPage() {
                         <div className="flex flex-col sm:flex-row gap-3 pt-4">
                             <button
                                 onClick={handleCopyLink}
-                                className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 transition-all"
+                                className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-sky-50 text-sky-600 font-semibold hover:bg-sky-100 transition-all border border-sky-100"
                             >
                                 {isCopied ? <CheckCircle2 size={18} className="text-green-500" /> : <Copy size={18} />}
                                 {isCopied ? 'Copied!' : 'Copy Link'}
                             </button>
                             <button
                                 onClick={handleGoHome}
-                                className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 transition-all"
+                                className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-sky-100 text-slate-600 font-semibold hover:bg-sky-50 transition-all"
                             >
                                 <Home size={18} />
                                 Go to Home
@@ -167,7 +162,7 @@ export default function ProcessingPage() {
 
                         <button
                             onClick={() => navigate(`/reports/${reportId}/edit`)}
-                            className="w-full flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-brand-600 text-white font-bold hover:bg-brand-700 shadow-lg shadow-brand-500/20 transition-all group"
+                            className="w-full flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-sky-500 text-white font-bold hover:bg-sky-600 shadow-lg shadow-sky-200 transition-all group"
                         >
                             <span>View Report</span>
                             <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
@@ -198,7 +193,7 @@ export default function ProcessingPage() {
                         <div className="flex flex-col gap-3 pt-4">
                             <button
                                 onClick={handleTryAgain}
-                                className="w-full flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800 transition-all"
+                                className="w-full flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-sky-500 text-white font-bold hover:bg-sky-600 transition-all shadow-md shadow-sky-200"
                             >
                                 Upload new file
                             </button>
@@ -231,7 +226,7 @@ export default function ProcessingPage() {
                         <div className="flex flex-col gap-3 pt-4">
                             <button
                                 onClick={handleRefresh}
-                                className="w-full flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-brand-600 text-white font-bold hover:bg-brand-700 transition-all"
+                                className="w-full flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-sky-500 text-white font-bold hover:bg-sky-600 transition-all shadow-lg shadow-sky-200"
                             >
                                 <RefreshCw size={18} />
                                 Refresh Status

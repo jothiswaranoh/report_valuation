@@ -72,13 +72,13 @@ export default function Layout() {
         <div className="flex items-center gap-4">
           <button
             onClick={() => setMobileMenuOpen(true)}
-            className="lg:hidden p-2 rounded-xl bg-sky-50 shadow-sm border border-sky-100"
+            className="lg:hidden p-2 rounded-lg bg-sky-50 shadow-sm border border-sky-100"
           >
             <Menu size={20} className="text-sky-600" />
           </button>
           {/* Logo Section in Header */}
           <div className="flex items-center gap-3 overflow-hidden ml-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-sky-400 to-sky-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
+            <div className="w-8 h-8 bg-gradient-to-br from-sky-400 to-sky-600 rounded-lg flex items-center justify-center flex-shrink-0 shadow-md">
               <span className="text-white font-black text-lg">V</span>
             </div>
             <div className="flex flex-col">
@@ -135,7 +135,7 @@ export default function Layout() {
                   key={item.path}
                   to={item.path}
                   className={`
-                    flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative
+                    flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group relative
                     ${isActive
                       ? 'bg-sky-500 text-white shadow-md shadow-sky-200'
                       : 'text-slate-500 hover:bg-sky-50 hover:text-sky-600'
@@ -162,7 +162,7 @@ export default function Layout() {
           <div className="p-4 border-t border-sky-100 bg-sky-100/50 rounded-none">
             <div className={`flex items-center gap-3 ${!sidebarOpen ? 'flex-col' : ''}`}>
               <div className="relative group cursor-pointer">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center font-bold text-white transition-all group-hover:shadow-md">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center font-bold text-white transition-all group-hover:shadow-md">
                   {initials}
                 </div>
                 <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-400 border-2 border-white rounded-full" />

@@ -14,6 +14,7 @@ export interface UploadedFile {
 export interface ProjectReport {
     id: string;
     name: string;
+    bankName?: string;
     createdAt: Date;
     fileCount: number;
     status: 'completed' | 'processing';

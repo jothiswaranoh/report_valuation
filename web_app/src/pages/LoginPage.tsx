@@ -58,7 +58,7 @@ export default function LoginPage() {
               { icon: <Zap size={20} />, title: 'Fast Performance', desc: 'Lightning-fast report generation' },
             ].map(feature => (
               <div key={feature.title} className="flex items-center gap-4 group">
-                <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/20 transition-all border border-white/10 flex-shrink-0 shadow-lg">
+                <div className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/20 transition-all border border-white/10 flex-shrink-0 shadow-lg">
                   {feature.icon}
                 </div>
                 <div>
@@ -70,7 +70,7 @@ export default function LoginPage() {
           </div>
 
           {/* Decorative card */}
-          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-5 max-w-sm">
+          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-5 max-w-sm">
             <p className="text-white/80 text-sm font-medium italic leading-relaxed">
               "The fastest way to generate accurate property valuation reports — highly recommend."
             </p>
@@ -86,10 +86,10 @@ export default function LoginPage() {
 
         {/* Right Side — Login Form */}
         <div className="w-full max-w-xl lg:max-w-md mx-auto">
-          <div className="bg-white backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/30 animate-scale-in">
+          <div className="bg-white backdrop-blur-xl rounded-2xl shadow-2xl p-8 border border-white/30 animate-scale-in">
             {/* Mobile Logo */}
             <div className="lg:hidden text-center mb-6">
-              <div className="w-14 h-14 bg-gradient-to-br from-brand-600 to-brand-800 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-xl shadow-brand-500/20">
+              <div className="w-14 h-14 bg-gradient-to-br from-brand-600 to-brand-800 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-xl shadow-brand-500/20">
                 <span className="text-white font-black text-2xl">V</span>
               </div>
               <h1 className="text-2xl font-black text-slate-900">Valuation System</h1>
@@ -112,7 +112,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   placeholder="name@company.com"
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-4 focus:ring-brand-500/15 focus:border-brand-500 outline-none transition-all text-slate-900 placeholder-slate-400 font-medium bg-slate-50 focus:bg-white"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:ring-4 focus:ring-brand-500/15 focus:border-brand-500 outline-none transition-all text-slate-900 placeholder-slate-400 font-medium bg-slate-50 focus:bg-white"
                 />
               </div>
 
@@ -132,7 +132,7 @@ export default function LoginPage() {
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                     placeholder="Enter your password"
-                    className="w-full px-4 py-3 pr-12 border border-slate-200 rounded-xl focus:ring-4 focus:ring-brand-500/15 focus:border-brand-500 outline-none transition-all text-slate-900 placeholder-slate-400 font-medium bg-slate-50 focus:bg-white"
+                    className="w-full px-4 py-3 pr-12 border border-slate-200 rounded-lg focus:ring-4 focus:ring-brand-500/15 focus:border-brand-500 outline-none transition-all text-slate-900 placeholder-slate-400 font-medium bg-slate-50 focus:bg-white"
                   />
                   <button
                     type="button"
@@ -147,7 +147,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loginLoading}
-                className="w-full bg-gradient-to-br from-brand-600 to-brand-700 hover:from-brand-700 hover:to-brand-800 text-white py-3.5 rounded-xl font-bold text-base flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-xl shadow-brand-500/25 hover:shadow-brand-500/40 transform hover:-translate-y-0.5 mt-2"
+                className="w-full bg-gradient-to-br from-brand-600 to-brand-700 hover:from-brand-700 hover:to-brand-800 text-white py-3.5 rounded-lg font-bold text-base flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-xl shadow-brand-500/25 hover:shadow-brand-500/40 transform hover:-translate-y-0.5 mt-2"
               >
                 {loginLoading ? (
                   <>

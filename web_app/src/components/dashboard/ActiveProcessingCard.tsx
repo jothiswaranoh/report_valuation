@@ -66,7 +66,7 @@ export default function ActiveProcessingCard({ report, onComplete }: ActiveProce
     return (
         <div
             onClick={() => navigate(`/upload/${report.id}?step=process`)}
-            className="group cursor-pointer bg-white rounded-2xl border border-blue-100 p-6 shadow-md hover:shadow-xl hover:shadow-blue-200/40 hover:border-blue-200 transition-all duration-300 relative overflow-hidden"
+            className="group cursor-pointer bg-white rounded-xl border border-blue-100 p-6 shadow-md hover:shadow-xl hover:shadow-blue-200/40 hover:border-blue-200 transition-all duration-300 relative overflow-hidden"
         >
             <div className="flex justify-between items-start mb-4">
                 <div className="min-w-0 flex-1 mr-3">

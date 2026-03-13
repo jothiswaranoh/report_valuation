@@ -34,9 +34,9 @@ export default function Dashboard({ stats, recentReports, onNavigate }: Dashboar
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {statCards.map((card) => (
-          <div key={card.label} className="bg-white rounded-xl border border-secondary-200 p-6 shadow-sm hover:shadow-soft hover:border-brand-200 transition-all duration-300 group">
+          <div key={card.label} className="bg-white rounded-lg border border-secondary-200 p-6 shadow-sm hover:shadow-soft hover:border-brand-200 transition-all duration-300 group">
             <div className="flex items-center justify-between mb-4">
-              <div className={`${card.color} ${card.text} p-3 rounded-xl shadow-sm group-hover:scale-110 transition-transform duration-300`}>{card.icon}</div>
+              <div className={`${card.color} ${card.text} p-3 rounded-lg shadow-sm group-hover:scale-110 transition-transform duration-300`}>{card.icon}</div>
               <div className="text-3xl font-bold text-secondary-900">{card.value}</div>
             </div>
             <p className="text-sm font-medium text-secondary-500 group-hover:text-secondary-700 transition-colors">{card.label}</p>
@@ -47,11 +47,11 @@ export default function Dashboard({ stats, recentReports, onNavigate }: Dashboar
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         <button
           onClick={() => onNavigate('upload')}
-          className="bg-gradient-to-br from-brand-600 to-brand-700 hover:from-brand-700 hover:to-brand-800 text-white rounded-xl p-8 flex items-center gap-6 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1 group relative overflow-hidden"
+          className="bg-gradient-to-br from-brand-600 to-brand-700 hover:from-brand-700 hover:to-brand-800 text-white rounded-lg p-8 flex items-center gap-6 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1 group relative overflow-hidden"
         >
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-700" />
 
-          <div className="bg-white/20 p-4 rounded-xl backdrop-blur-sm group-hover:bg-white/30 transition-colors">
+          <div className="bg-white/20 p-4 rounded-lg backdrop-blur-sm group-hover:bg-white/30 transition-colors">
             <Upload size={32} />
           </div>
           <div className="text-left relative z-10">
@@ -62,9 +62,9 @@ export default function Dashboard({ stats, recentReports, onNavigate }: Dashboar
 
         <button
           onClick={() => onNavigate('files')}
-          className="bg-white hover:bg-secondary-50 border border-secondary-200 hover:border-brand-300 rounded-xl p-8 flex items-center gap-6 transition-all shadow-sm hover:shadow-soft group"
+          className="bg-white hover:bg-secondary-50 border border-secondary-200 hover:border-brand-300 rounded-lg p-8 flex items-center gap-6 transition-all shadow-sm hover:shadow-soft group"
         >
-          <div className="bg-secondary-100 p-4 rounded-xl group-hover:bg-brand-50 transition-colors">
+          <div className="bg-secondary-100 p-4 rounded-lg group-hover:bg-brand-50 transition-colors">
             <FolderOpen size={32} className="text-secondary-600 group-hover:text-brand-600 transition-colors" />
           </div>
           <div className="text-left">
@@ -73,7 +73,7 @@ export default function Dashboard({ stats, recentReports, onNavigate }: Dashboar
           </div>
         </button>
 
-        <div className="bg-white border border-secondary-200 rounded-xl p-8 shadow-sm flex items-center justify-between relative overflow-hidden hover:shadow-soft transition-all">
+        <div className="bg-white border border-secondary-200 rounded-lg p-8 shadow-sm flex items-center justify-between relative overflow-hidden hover:shadow-soft transition-all">
           <div className="absolute top-0 right-0 w-24 h-24 bg-brand-50 rounded-full blur-2xl -translate-y-8 translate-x-8" />
 
           <div>
@@ -84,13 +84,13 @@ export default function Dashboard({ stats, recentReports, onNavigate }: Dashboar
               Uploads this week
             </p>
           </div>
-          <div className="p-4 bg-brand-50 rounded-xl">
+          <div className="p-4 bg-brand-50 rounded-lg">
             <Clock size={32} className="text-brand-600" />
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-secondary-200 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-lg border border-secondary-200 shadow-sm overflow-hidden">
         <div className="px-8 py-6 border-b border-secondary-100 flex items-center justify-between bg-secondary-50/50">
           <h2 className="text-lg font-bold text-secondary-900">Recent Reports</h2>
           <button className="text-sm text-brand-600 hover:text-brand-700 font-medium hover:underline">View All</button>

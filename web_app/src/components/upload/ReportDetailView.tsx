@@ -137,7 +137,7 @@ export default function ReportDetailView({ reportId }: ReportDetailViewProps) {
 
     html = html.replace(
       /```([\s\S]*?)```/g,
-      '<pre class="bg-slate-900 text-slate-50 p-4 rounded-xl overflow-x-auto my-6 shadow-sm border border-slate-800 text-sm"><code>$1</code></pre>'
+      '<pre class="bg-slate-900 text-slate-50 p-4 rounded-lg overflow-x-auto my-6 shadow-sm border border-slate-800 text-sm"><code>$1</code></pre>'
     );
 
     html = html.replace(
@@ -199,7 +199,7 @@ export default function ReportDetailView({ reportId }: ReportDetailViewProps) {
           <div className="max-w-4xl mx-auto space-y-4">
             <Skeleton height={40} width="60%" className="mb-6" />
             <Skeleton count={5} height={16} className="mb-2" />
-            <Skeleton height={200} className="my-6 rounded-xl" />
+            <Skeleton height={200} className="my-6 rounded-lg" />
             <Skeleton count={4} height={16} className="mb-2" />
           </div>
         </div>

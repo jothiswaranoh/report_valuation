@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { X, UserPlus, Save, Eye, EyeOff } from 'lucide-react';
+import { X, UserPlus, Save } from 'lucide-react';
 import { User, Role } from '../../types/User';
 
 interface UserModalProps {
@@ -27,7 +27,6 @@ export const UserModal: React.FC<UserModalProps> = ({
         role: '',
     });
 
-    const [showPassword, setShowPassword] = useState(false);
 
     useEffect(() => {
         if (user) {
@@ -63,7 +62,7 @@ export const UserModal: React.FC<UserModalProps> = ({
     return (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
             <div
-                className="bg-white rounded-2xl p-6 w-full max-w-lg shadow-xl border border-slate-200 animate-in zoom-in-95 duration-200"
+                className="bg-white rounded-xl p-6 w-full max-w-lg shadow-xl border border-slate-200 animate-in zoom-in-95 duration-200"
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="flex items-center justify-between mb-6">
@@ -77,7 +76,7 @@ export const UserModal: React.FC<UserModalProps> = ({
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
+                        className="p-2 rounded-md hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
                     >
                         <X size={20} />
                     </button>
@@ -90,7 +89,7 @@ export const UserModal: React.FC<UserModalProps> = ({
                             <input
                                 required
                                 placeholder="John"
-                                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                                className="w-full px-3 py-2 bg-sky-50/30 border border-sky-200 rounded-md text-sm focus:ring-2 focus:ring-sky-400/30 focus:border-sky-400 outline-none transition-all"
                                 value={form.first_name}
                                 onChange={e => setForm({ ...form, first_name: e.target.value })}
                             />
@@ -100,7 +99,7 @@ export const UserModal: React.FC<UserModalProps> = ({
                             <input
                                 required
                                 placeholder="Doe"
-                                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                                className="w-full px-3 py-2 bg-sky-50/30 border border-sky-200 rounded-md text-sm focus:ring-2 focus:ring-sky-400/30 focus:border-sky-400 outline-none transition-all"
                                 value={form.last_name}
                                 onChange={e => setForm({ ...form, last_name: e.target.value })}
                             />
@@ -113,7 +112,7 @@ export const UserModal: React.FC<UserModalProps> = ({
                             required
                             type="email"
                             placeholder="john@example.com"
-                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-md text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
                             value={form.email}
                             onChange={e => setForm({ ...form, email: e.target.value })}
                         />
@@ -127,7 +126,7 @@ export const UserModal: React.FC<UserModalProps> = ({
                             required={!isEdit}
                             type="password"
                             placeholder={isEdit ? 'Leave blank to keep current' : '••••••••'}
-                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-md text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
                             value={form.password}
                             onChange={e => setForm({ ...form, password: e.target.value })}
                         />
@@ -154,14 +153,14 @@ export const UserModal: React.FC<UserModalProps> = ({
                         <button
                             type="button"
                             onClick={onClose}
-                            className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-lg transition-colors"
+                            className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-md transition-colors"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="px-4 py-2 bg-slate-900 text-white hover:bg-slate-800 rounded-lg text-sm font-medium transition-colors shadow-lg shadow-slate-900/10 flex items-center gap-2"
+                            className="px-4 py-2 bg-sky-500 text-white hover:bg-sky-600 rounded-lg text-sm font-semibold transition-all shadow-md shadow-sky-200 flex items-center gap-2"
                         >
                             {isLoading ? (
                                 <>

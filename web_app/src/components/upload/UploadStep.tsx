@@ -103,16 +103,11 @@ export default function UploadStep({
         <div className="space-y-8">
 
           {/* Drop Zone */}
-          <div
-            className={`
-    relative border-2 border-dashed rounded-2xl p-8
-    transition-all duration-200 cursor-pointer
-    flex flex-col items-center justify-center
-    ${dragActive
-                ? 'border-blue-500 bg-blue-50/50'
-                : 'border-gray-300 hover:border-blue-400 hover:bg-gray-50/50'
-              }
-  `}
+          <section
+            className={`relative border-2 border-dashed rounded-xl py-12 px-8 transition-all duration-200 cursor-pointer flex flex-col items-center justify-center min-h-[300px] ${dragActive
+              ? 'border-blue-500 bg-blue-50/50'
+              : 'border-gray-300 hover:border-blue-400 hover:bg-gray-50/50'
+              }`}
             onDragEnter={handleDrag}
             onDragOver={handleDrag}
             onDragLeave={handleDrag}
@@ -129,7 +124,7 @@ export default function UploadStep({
             />
 
             {/* Icon */}
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg mb-4">
+            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg mb-4">
               <UploadIcon size={20} className="text-white" />
             </div>
 
@@ -146,7 +141,7 @@ export default function UploadStep({
             {/* Browse Button */}
             <button
               type="button"
-              className="mt-6 px-8 py-2.5 rounded-xl font-medium text-sm
+              className="mt-6 px-8 py-2.5 rounded-lg font-medium text-sm
       bg-gray-900
       text-white
       hover:bg-gray-800
@@ -155,7 +150,7 @@ export default function UploadStep({
             >
               Browse Files
             </button>
-          </div>
+          </section>
 
           {/* Feature Cards */}
           <div className="grid sm:grid-cols-3 gap-5">
@@ -166,7 +161,7 @@ export default function UploadStep({
             ].map((item, index) => (
               <div
                 key={index}
-                className="p-6 rounded-xl bg-white
+                className="p-6 rounded-lg bg-white
                 border border-slate-200
                 hover:border-blue-400 transition
                 flex flex-col items-center gap-3 text-center"
@@ -181,7 +176,7 @@ export default function UploadStep({
         </div>
 
         {/* ---------------- Sidebar ---------------- */}
-        <div className="bg-white rounded-xl border border-slate-200 p-6 h-fit">
+        <div className="bg-white rounded-lg border border-slate-200 p-6 h-fit">
 
           <div className="flex items-center justify-between mb-5">
             <h3 className="text-sm font-bold text-slate-900">

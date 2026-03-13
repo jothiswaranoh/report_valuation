@@ -21,13 +21,13 @@ export const UserActionBar: React.FC<UserActionBarProps> = ({
                     placeholder="Search users..."
                     value={searchTerm}
                     onChange={(e) => onSearchChange(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 bg-white border border-brand-200 rounded-xl text-base focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500 outline-none shadow-sm transition-all font-medium text-slate-900 placeholder:text-slate-400"
+                    className="w-full pl-10 pr-4 py-2.5 bg-white border border-sky-200 rounded-lg text-base focus:ring-4 focus:ring-sky-500/10 focus:border-sky-500 outline-none shadow-sm transition-all font-medium text-slate-900 placeholder:text-slate-400"
                 />
             </div>
 
             <button
                 onClick={onAddClick}
-                className="flex items-center gap-2 bg-gradient-to-r from-brand-700 to-brand-900 hover:from-brand-800 hover:to-brand-950 text-white px-6 py-2.5 rounded-xl text-base font-bold shadow-lg shadow-brand-300/40 transition-all hover:-translate-y-0.5 w-full md:w-auto justify-center"
+                className="flex items-center gap-2 bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white px-6 py-2.5 rounded-lg text-base font-bold shadow-lg shadow-sky-200 transition-all hover:-translate-y-0.5 w-full md:w-auto justify-center"
             >
                 <Plus size={16} />
                 Add User

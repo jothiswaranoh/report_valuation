@@ -72,13 +72,13 @@ export default function FileSelectionStep({
 
   return (
     <div className="max-w-7xl mx-auto px-1 py-1">
-      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
 
         {/* Header */}
         <div className="p-6 border-b border-gray-100">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
+              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
                 <FileText size={24} className="text-white" />
               </div>
               <div>
@@ -95,7 +95,7 @@ export default function FileSelectionStep({
                 onClick={onBack}
                 className="px-5 py-2 text-sm font-medium text-gray-600 
                                     hover:text-blue-600
-                                    border border-gray-200 rounded-lg
+                                    border border-gray-200 rounded-md
                                     hover:bg-gray-50 transition"
               >
                 Back
@@ -105,7 +105,7 @@ export default function FileSelectionStep({
                 className="px-5 py-2 text-sm font-medium
                                     bg-white
                                     text-gray-700
-                                    border border-gray-200 rounded-lg
+                                    border border-gray-200 rounded-md
                                     hover:bg-gray-50
                                     flex items-center gap-2 transition"
               >
@@ -176,7 +176,7 @@ export default function FileSelectionStep({
                 onClick={() => fileInputRef.current?.click()}
                 className="px-6 py-2.5 text-sm font-medium
                                     bg-blue-600 hover:bg-blue-700
-                                    text-white rounded-lg
+                                    text-white rounded-md
                                     flex items-center gap-2 transition"
               >
                 <Plus size={16} />
@@ -188,7 +188,7 @@ export default function FileSelectionStep({
               {files.map((file) => (
                 <div
                   key={file.id}
-                  className={`border rounded-lg transition-all cursor-pointer
+                  className={`border rounded-md transition-all cursor-pointer
                                         ${selectedFiles.includes(file.id)
                       ? 'border-blue-500 bg-blue-50/50'
                       : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
@@ -208,7 +208,7 @@ export default function FileSelectionStep({
                                                 w-4 h-4 transition"
                     />
 
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center
+                    <div className={`w-10 h-10 rounded-md flex items-center justify-center
                                             ${selectedFiles.includes(file.id)
                         ? 'bg-blue-100'
                         : 'bg-gray-100'
@@ -252,7 +252,7 @@ export default function FileSelectionStep({
                             e.stopPropagation();
                             onDownload(file);
                           }}
-                          className="p-1.5 rounded-lg text-gray-400 
+                          className="p-1.5 rounded-md text-gray-400 
                                                         hover:text-blue-600
                                                         hover:bg-white transition"
                         >
@@ -264,7 +264,7 @@ export default function FileSelectionStep({
                           e.stopPropagation();
                           setExpandedFile(expandedFile === file.id ? null : file.id);
                         }}
-                        className="p-1.5 rounded-lg text-gray-400 
+                        className="p-1.5 rounded-md text-gray-400 
                                                     hover:text-gray-600
                                                     hover:bg-white transition"
                       >
@@ -275,7 +275,7 @@ export default function FileSelectionStep({
                           e.stopPropagation();
                           removeFile(file.id);
                         }}
-                        className="p-1.5 rounded-lg text-gray-400 
+                        className="p-1.5 rounded-md text-gray-400 
                                                     hover:text-red-600
                                                     hover:bg-white transition"
                       >
@@ -330,7 +330,7 @@ export default function FileSelectionStep({
                                     hover:from-blue-700 hover:to-blue-800
                                     disabled:from-gray-300 disabled:to-gray-300
                                     disabled:text-gray-500 disabled:cursor-not-allowed
-                                    text-white rounded-lg
+                                    text-white rounded-md
                                     flex items-center gap-2
                                     shadow-md hover:shadow-lg
                                     transition-all duration-200"

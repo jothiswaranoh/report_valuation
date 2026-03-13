@@ -397,7 +397,7 @@ export default function Upload() {
 
   return (
     <div className="flex-1 flex flex-col min-h-0">
-      <div className="flex-1 min-h-0 flex flex-col bg-white rounded-2xl border border-brand-100 shadow-lg overflow-hidden">
+      <div className="flex-1 min-h-0 flex flex-col bg-white rounded-xl border border-sky-100 shadow-lg overflow-hidden">
         {/* Header */}
         <header className="shrink-0 sticky top-0 z-40 bg-white backdrop-blur-xl border-b border-slate-100">
           <div className="w-full mx-auto px-2 sm:px-3 lg:px-4 py-4 md:py-6">
@@ -414,12 +414,12 @@ export default function Upload() {
 
               {/* View Mode Toggle */}
               <div className="flex justify-center lg:justify-end w-full">
-                <div className="flex gap-2 bg-gradient-to-r from-brand-700 to-brand-900 shadow-md shadow-brand-300/40 p-1 rounded-xl shrink-0">
+                <div className="flex gap-2 bg-sky-500 shadow-md shadow-sky-200 p-1 rounded-lg shrink-0">
                   <button
                     onClick={() => setViewMode('upload')}
-                    className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${viewMode === 'upload'
-                      ? 'bg-white text-brand-800 shadow-sm'
-                      : 'text-brand-100 hover:text-white'
+                    className={`px-4 py-2 rounded-md font-medium transition-all flex items-center gap-2 ${viewMode === 'upload'
+                      ? 'bg-white text-sky-600 shadow-sm'
+                      : 'text-white/80 hover:text-white'
                       }`}
                   >
                     <LayoutGrid size={16} />
@@ -427,9 +427,9 @@ export default function Upload() {
                   </button>
                   <button
                     onClick={() => setViewMode('browse')}
-                    className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${viewMode === 'browse'
-                      ? 'bg-white text-brand-800 shadow-sm'
-                      : 'text-brand-100 hover:text-white'
+                    className={`px-4 py-2 rounded-md font-medium transition-all flex items-center gap-2 ${viewMode === 'browse'
+                      ? 'bg-white text-sky-600 shadow-sm'
+                      : 'text-white/80 hover:text-white'
                       }`}
                   >
                     <History size={16} />
@@ -445,13 +445,13 @@ export default function Upload() {
         <main className="flex-1 min-h-0 overflow-y-auto max-w-7xl w-full mx-auto px-2 sm:px-3 lg:px-4 py-8">
           {viewMode === 'browse' ? (
             <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-6 min-h-full">
-              <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden flex flex-col min-h-0">
+              <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden flex flex-col min-h-0">
                 <ReportsSidebar
                   selectedReportId={selectedBrowseReportId}
                   onReportSelect={setSelectedBrowseReportId}
                 />
               </div>
-              <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden flex flex-col min-h-0">
+              <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden flex flex-col min-h-0">
                 <ReportDetailView reportId={selectedBrowseReportId} />
               </div>
             </div>

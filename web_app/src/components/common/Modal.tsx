@@ -59,7 +59,7 @@ export function Modal({
         <div className="fixed inset-0 z-50 overflow-y-auto">
             {/* Overlay */}
             <div
-                className="fixed inset-0 bg-black/20 backdrop-blur-md transition-opacity"
+                className="fixed inset-0 bg-sky-900/20 backdrop-blur-md transition-opacity"
                 onClick={closeOnOverlayClick ? onClose : undefined}
             />
 
@@ -67,21 +67,21 @@ export function Modal({
             <div className="flex min-h-full items-start justify-center pt-16 px-4 pb-4">
                 <div
                     className={`
-            relative w-full ${sizeStyles[size]} bg-white rounded-lg shadow-xl
-            transform transition-all
+            relative w-full ${sizeStyles[size]} bg-white rounded-xl shadow-2xl shadow-sky-200/50
+            transform transition-all border border-sky-100
           `}
                     onClick={(e) => e.stopPropagation()}
                 >
                     {/* Header */}
                     {(title || showCloseButton) && (
-                        <div className="flex items-center justify-between p-4 border-b border-secondary-200">
+                        <div className="flex items-center justify-between p-5 border-b border-sky-100">
                             {title && (
-                                <h3 className="text-lg font-semibold text-secondary-900">{title}</h3>
+                                <h3 className="text-lg font-bold text-slate-900">{title}</h3>
                             )}
                             {showCloseButton && (
                                 <button
                                     onClick={onClose}
-                                    className="p-1 rounded-md text-secondary-400 hover:text-secondary-600 hover:bg-secondary-100 transition-colors"
+                                    className="p-1.5 rounded-md text-slate-400 hover:text-sky-600 hover:bg-sky-50 transition-colors"
                                 >
                                     <X size={20} />
                                 </button>
@@ -90,11 +90,11 @@ export function Modal({
                     )}
 
                     {/* Body */}
-                    <div className="p-4">{children}</div>
+                    <div className="p-5">{children}</div>
 
                     {/* Footer */}
                     {footer && (
-                        <div className="flex items-center justify-end gap-3 p-4 border-t border-secondary-200">
+                        <div className="flex items-center justify-end gap-3 p-5 border-t border-sky-100">
                             {footer}
                         </div>
                     )}

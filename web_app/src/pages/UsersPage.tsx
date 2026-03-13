@@ -135,7 +135,7 @@ export default function UsersPage() {
 
   return (
     <div className="flex-1 flex flex-col animate-in fade-in duration-500">
-      <div className="flex-1 max-w-[1600px] w-full mx-auto space-y-6 bg-white rounded-2xl border border-brand-100 shadow-lg p-6 md:p-8">
+      <div className="flex-1 max-w-[1600px] w-full mx-auto space-y-6 bg-white rounded-xl border border-brand-100 shadow-lg p-6 md:p-8">
         <UserHeader
           totalUsers={stats.total}
           rolesCount={stats.rolesCount}

@@ -1,4 +1,4 @@
-import { FileText, Calendar, ChevronRight, Loader2 } from 'lucide-react';
+import { FileText, Calendar, ChevronRight } from 'lucide-react';
 import { useReports } from '../../hooks/useReports';
 import { ApiReport } from '../../apis/report.api';
 
@@ -26,13 +26,13 @@ export default function ReportsSidebar({ selectedReportId, onReportSelect }: Rep
     if (isLoading) {
         return (
             <div className="h-full bg-white flex flex-col">
-                <div className="p-6 border-b border-secondary-800 bg-secondary-900">
-                    <Skeleton height={28} width={150} className="mb-2 opacity-20" />
-                    <Skeleton height={16} width={100} className="opacity-20" />
+                <div className="p-6 border-b border-sky-100 bg-sky-50/50">
+                    <Skeleton height={28} width={150} className="mb-2" />
+                    <Skeleton height={16} width={100} />
                 </div>
                 <div className="flex-1 overflow-y-auto p-4 space-y-3">
                     {[1, 2, 3, 4, 5].map(i => (
-                        <div key={i} className="p-4 rounded-xl border border-slate-100">
+                        <div key={i} className="p-4 rounded-lg border border-slate-100">
                             <Skeleton height={20} width="80%" className="mb-2" />
                             <Skeleton height={14} width="50%" className="mb-3" />
                             <div className="flex justify-between items-center">
@@ -51,12 +51,12 @@ export default function ReportsSidebar({ selectedReportId, onReportSelect }: Rep
     return (
         <div className="h-full bg-white flex flex-col">
             {/* Header */}
-            <div className="p-6 border-b border-secondary-800 bg-secondary-900">
-                <h2 className="text-xl font-bold text-white flex items-center gap-2 tracking-tight">
-                    <FileText size={24} className="text-brand-400" />
+            <div className="p-6 border-b border-sky-100 bg-sky-50/50">
+                <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2 tracking-tight">
+                    <FileText size={24} className="text-sky-500" />
                     All Reports
                 </h2>
-                <p className="text-secondary-400 text-sm mt-1 font-medium">
+                <p className="text-slate-500 text-sm mt-1 font-medium">
                     {reports.length} {reports.length === 1 ? 'report' : 'reports'} available
                 </p>
             </div>
@@ -79,23 +79,23 @@ export default function ReportsSidebar({ selectedReportId, onReportSelect }: Rep
                                     ? 'bg-emerald-100 text-emerald-800'
                                     : status === 'review'
                                         ? 'bg-orange-100 text-orange-800'
-                                        : 'bg-secondary-100 text-secondary-800';
+                                        : 'bg-sky-100 text-sky-800';
 
                             return (
                                 <button
                                     key={report.id}
                                     onClick={() => onReportSelect(report.id)}
-                                    className={`w-full text-left p-4 rounded-xl border transition-all group hover:shadow-soft ${selectedReportId === report.id
-                                        ? 'border-brand-500 bg-brand-50 shadow-sm'
-                                        : 'border-secondary-100 hover:border-brand-300 bg-white'
+                                    className={`w-full text-left p-4 rounded-lg border transition-all group hover:shadow-soft ${selectedReportId === report.id
+                                        ? 'border-sky-500 bg-sky-50 shadow-sm'
+                                        : 'border-sky-100 hover:border-sky-300 bg-white'
                                         }`}
                                 >
                                     <div className="flex items-start justify-between gap-2">
                                         <div className="flex-1 min-w-0">
                                             <h3
                                                 className={`font-semibold truncate ${selectedReportId === report.id
-                                                    ? 'text-brand-900'
-                                                    : 'text-secondary-900 group-hover:text-brand-800'
+                                                    ? 'text-sky-900'
+                                                    : 'text-slate-900 group-hover:text-sky-600'
                                                     }`}
                                             >
                                                 {report.report_name || report.name}
@@ -120,8 +120,8 @@ export default function ReportsSidebar({ selectedReportId, onReportSelect }: Rep
                                         <ChevronRight
                                             size={20}
                                             className={`flex-shrink-0 transition-transform ${selectedReportId === report.id
-                                                ? 'text-brand-600 translate-x-1'
-                                                : 'text-secondary-300 group-hover:text-brand-500 group-hover:translate-x-1'
+                                                ? 'text-sky-600 translate-x-1'
+                                                : 'text-slate-300 group-hover:text-sky-500 group-hover:translate-x-1'
                                                 }`}
                                         />
                                     </div>

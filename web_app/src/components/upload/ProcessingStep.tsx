@@ -23,30 +23,23 @@ export default function ProcessingStep({
 
     const [copied, setCopied] = useState(false);
 
-    const handleCopy = async () => {
-        if (!onCopyLink) return;
-        const ok = await onCopyLink();
-        if (ok !== false) {
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-        }
-    };
+
 
     return (
         <div className="max-w-3xl mx-auto space-y-6">
-            <div className="bg-white rounded-2xl shadow-xl border border-slate-100 p-8 text-center relative overflow-hidden">
+            <div className="bg-white rounded-xl shadow-xl border border-slate-100 p-8 text-center relative overflow-hidden">
                 {/* Animated top bar */}
-                <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-brand-500 via-brand-600 to-indigo-600 animate-pulse" />
-                <div className="absolute top-0 right-0 w-32 h-32 bg-brand-50 rounded-full blur-3xl -translate-y-16 translate-x-16 pointer-events-none opacity-50" />
+                <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-sky-400 via-sky-500 to-sky-600 animate-pulse" />
+                <div className="absolute top-0 right-0 w-32 h-32 bg-sky-50 rounded-full blur-3xl -translate-y-16 translate-x-16 pointer-events-none opacity-50" />
 
                 <div className="relative z-10 pt-4">
-                    <div className="w-16 h-16 bg-brand-50/50 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-brand-100/50 shadow-sm">
-                        <Loader2 size={32} className="text-brand-600 animate-spin" />
+                    <div className="w-16 h-16 bg-sky-50/50 rounded-xl flex items-center justify-center mx-auto mb-6 border border-sky-100/50 shadow-sm">
+                        <Loader2 size={32} className="text-sky-500 animate-spin" />
                     </div>
                     <h2 className="text-2xl font-bold text-slate-900 mb-2 tracking-tight">Processing Documents</h2>
                     <p className="text-slate-500 text-sm mb-4 max-w-md mx-auto font-medium">
                         Our AI is analyzing{' '}
-                        <span className="font-bold text-brand-600 underline decoration-brand-200 decoration-2 underline-offset-4">
+                        <span className="font-bold text-sky-600 underline decoration-sky-200 decoration-2 underline-offset-4">
                             {selectedFiles.length} {selectedFiles.length === 1 ? 'file' : 'files'}
                         </span>
                         . This might take a moment.
@@ -58,10 +51,10 @@ export default function ProcessingStep({
                             .filter(f => selectedFiles.includes(f.id))
                             .find(f => (f.progress ?? 0) < 100);
                         return activeFile ? (
-                            <div className="flex items-center justify-center gap-2 mb-5 px-4 py-2.5 bg-brand-50 border border-brand-100 rounded-xl max-w-sm mx-auto">
-                                <span className="w-2 h-2 rounded-full bg-brand-500 animate-pulse shrink-0" />
-                                <p className="text-xs font-semibold text-brand-700 truncate">
-                                    <span className="text-brand-400 font-medium mr-1">Analyzing:</span>
+                            <div className="flex items-center justify-center gap-2 mb-5 px-4 py-2.5 bg-sky-50 border border-sky-100 rounded-lg max-w-sm mx-auto">
+                                <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse shrink-0" />
+                                <p className="text-xs font-semibold text-sky-700 truncate">
+                                    <span className="text-sky-400 font-medium mr-1">Analyzing:</span>
                                     {activeFile.name || activeFile.file?.name}
                                 </p>
                             </div>
@@ -74,10 +67,10 @@ export default function ProcessingStep({
                             <span>{done} of {total} files</span>
                             <span>{pct}%</span>
                         </div>
-                        <div className="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                        <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
                             <div
-                                className="h-full bg-gradient-to-r from-brand-500 to-indigo-500 rounded-full transition-all duration-1000 ease-out"
-                                style={{ width: `${pct}%` }}
+                                className="h-full bg-sky-500 transition-all duration-1000 ease-out"
+                                style={{ width: `${progress?.percentage ?? 0}%` }}
                             />
                         </div>
                     </div>
@@ -86,10 +79,15 @@ export default function ProcessingStep({
                     <div className="flex items-center justify-center gap-3 mb-6">
                         <button
                             id="processing-copy-link-btn"
-                            onClick={handleCopy}
-                            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl border font-semibold hover:scale-[1.03] transition-all duration-200 text-sm ${copied
-                                ? 'bg-emerald-500 border-emerald-500 text-white shadow-md scale-105'
-                                : 'border-slate-200 text-slate-700 hover:bg-slate-50'
+                            onClick={async () => {
+                                if (onCopyLink) {
+                                    const ok = await onCopyLink();
+                                    if (ok) setCopied(true);
+                                }
+                            }}
+                            className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-bold transition-all ${copied
+                                ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
+                                : 'bg-white text-sky-600 border-2 border-sky-100 hover:bg-sky-50 active:scale-95'
                                 }`}
                         >
                             {copied ? (
@@ -106,12 +104,11 @@ export default function ProcessingStep({
                         </button>
 
                         <button
-                            id="processing-go-home-btn"
                             onClick={onGoHome}
-                            className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-semibold hover:bg-slate-50 hover:scale-[1.03] transition-all duration-200 text-sm"
+                            className="flex items-center gap-2 bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white px-8 py-2.5 rounded-lg font-bold shadow-lg shadow-sky-200 transition-all hover:-translate-y-0.5"
                         >
-                            <Home size={15} />
-                            Go to Home
+                            <Home size={18} />
+                            Go to Dashboard
                         </button>
                     </div>
                 </div>
@@ -123,16 +120,16 @@ export default function ProcessingStep({
                         .map((file, index) => (
                             <div
                                 key={file.id}
-                                className="bg-slate-50 rounded-xl p-4 border border-slate-100 flex items-center gap-4 transition-all group"
+                                className="bg-slate-50 rounded-lg p-4 border border-slate-100 flex items-center gap-4 transition-all group"
                                 style={{
                                     animation: `fadeInUp 0.5s ease-out forwards ${index * 0.1}s`,
                                     opacity: 0
                                 }}
                             >
-                                <div className="p-2 bg-white rounded-lg shadow-sm">
+                                <div className="p-2 bg-white rounded-md shadow-sm">
                                     {file.progress >= 100
                                         ? <CheckCircle2 size={16} className="text-emerald-500" />
-                                        : <Loader2 size={16} className="text-brand-500 animate-spin" />
+                                        : <Loader2 size={16} className="text-sky-500 animate-spin" />
                                     }
                                 </div>
 
@@ -141,14 +138,14 @@ export default function ProcessingStep({
                                         <h4 className="text-sm font-semibold text-slate-900 truncate tracking-tight">
                                             {file.name || file.file?.name}
                                         </h4>
-                                        <span className="text-[10px] font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded border border-brand-100 uppercase tracking-wider flex-shrink-0 ml-2">
+                                        <span className="text-[10px] font-bold text-sky-600 bg-sky-50 px-2 py-0.5 rounded border border-sky-100 uppercase tracking-wider flex-shrink-0 ml-2">
                                             {file.progress >= 100 ? 'Done' : 'Analyzing'}
                                         </span>
                                     </div>
 
                                     <div className="w-full bg-slate-200 rounded-full h-1 overflow-hidden">
                                         <div
-                                            className="bg-brand-600 h-full rounded-full transition-all duration-700 ease-in-out"
+                                            className="bg-sky-500 h-full rounded-full transition-all duration-700 ease-in-out"
                                             style={{ width: `${file.progress ?? 40}%` }}
                                         />
                                     </div>
@@ -159,7 +156,7 @@ export default function ProcessingStep({
             </div>
 
             <p className="text-center text-xs font-bold text-slate-400 uppercase tracking-[0.2em] flex items-center justify-center gap-3">
-                <span className="w-2 h-2 bg-brand-500 rounded-full shrink-0 animate-pulse" />
+                <span className="w-2 h-2 bg-sky-500 rounded-full shrink-0 animate-pulse" />
                 Processing is active — The wizard will auto-advance when done
             </p>
         </div>

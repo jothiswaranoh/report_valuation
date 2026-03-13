@@ -21,7 +21,7 @@ export default function StepIndicator({ currentStep }: StepIndicatorProps) {
 
                 {/* Connecting Line - Progress */}
                 <div
-                    className="absolute left-0 top-1/2 -translate-y-1/2 h-0.5 bg-blue-600 transition-all duration-500 -z-10"
+                    className="absolute left-0 top-1/2 -translate-y-1/2 h-0.5 bg-sky-500 transition-all duration-500 -z-10"
                     style={{ width: `${((currentStep - 1) / (steps.length - 1)) * 100}%` }}
                 />
 
@@ -36,9 +36,9 @@ export default function StepIndicator({ currentStep }: StepIndicatorProps) {
                                 className={`
                                     w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 border-2
                                     ${isCompleted
-                                        ? 'bg-blue-600 border-blue-600 text-white'
+                                        ? 'bg-sky-500 border-sky-500 text-white'
                                         : isCurrent
-                                            ? 'bg-white border-blue-600 text-blue-600 scale-110 shadow-lg shadow-blue-500/20'
+                                            ? 'bg-white border-sky-500 text-sky-500 scale-110 shadow-lg shadow-sky-200'
                                             : 'bg-white border-slate-300 text-slate-400'
                                     }
                                 `}

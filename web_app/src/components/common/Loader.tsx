@@ -23,17 +23,17 @@ export function Loader({
         <div className={`flex flex-col items-center justify-center gap-3 ${className}`}>
             <Loader2
                 size={sizeMap[size]}
-                className="text-brand-600 animate-spin"
+                className="text-sky-500 animate-spin"
             />
             {text && (
-                <p className="text-sm text-secondary-600">{text}</p>
+                <p className="text-sm text-slate-500 font-medium">{text}</p>
             )}
         </div>
     );
 
     if (fullScreen) {
         return (
-            <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-80 z-50">
+            <div className="fixed inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm z-50">
                 {spinner}
             </div>
         );

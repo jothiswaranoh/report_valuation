@@ -22,10 +22,10 @@ export const UserTable: React.FC<UserTableProps> = ({
 }) => {
     if (isLoading) {
         return (
-            <div className="bg-white rounded-2xl border border-brand-100 overflow-hidden shadow-sm p-4 h-[400px]">
+            <div className="bg-white rounded-xl border border-brand-100 overflow-hidden shadow-sm p-4 h-[400px]">
                 <div className="flex flex-col gap-4">
-                    <Skeleton height={40} className="w-full rounded-lg" />
-                    <Skeleton height={60} count={4} className="w-full rounded-xl" style={{ marginBottom: '1rem' }} />
+                    <Skeleton height={40} className="w-full rounded-md" />
+                    <Skeleton height={60} count={4} className="w-full rounded-lg" style={{ marginBottom: '1rem' }} />
                 </div>
             </div>
         );
@@ -33,8 +33,8 @@ export const UserTable: React.FC<UserTableProps> = ({
 
     if (users.length === 0) {
         return (
-            <div className="bg-slate-50/50 rounded-2xl border border-brand-100 p-12 text-center flex flex-col items-center">
-                <div className="h-16 w-16 bg-white rounded-2xl shadow-sm border border-brand-100 flex items-center justify-center mb-6">
+            <div className="bg-slate-50/50 rounded-xl border border-brand-100 p-12 text-center flex flex-col items-center">
+                <div className="h-16 w-16 bg-white rounded-xl shadow-sm border border-brand-100 flex items-center justify-center mb-6">
                     <Users className="h-8 w-8 text-brand-400" />
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 mb-2">
@@ -46,7 +46,7 @@ export const UserTable: React.FC<UserTableProps> = ({
                 {!searchTerm && (
                     <button
                         onClick={onAddClick}
-                        className="inline-flex items-center gap-2 bg-gradient-to-r from-brand-700 to-brand-900 hover:from-brand-800 hover:to-brand-950 text-white px-6 py-2.5 rounded-xl text-base font-bold shadow-lg shadow-brand-300/40 transition-all hover:-translate-y-0.5 mt-2"
+                        className="inline-flex items-center gap-2 bg-gradient-to-r from-brand-700 to-brand-900 hover:from-brand-800 hover:to-brand-950 text-white px-6 py-2.5 rounded-lg text-base font-bold shadow-lg shadow-brand-300/40 transition-all hover:-translate-y-0.5 mt-2"
                     >
                         <Plus size={16} />
                         Add First User
@@ -57,7 +57,7 @@ export const UserTable: React.FC<UserTableProps> = ({
     }
 
     return (
-        <div className="bg-white rounded-2xl border border-brand-100 overflow-hidden shadow-sm">
+        <div className="bg-white rounded-xl border border-brand-100 overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                     <thead>

@@ -192,18 +192,18 @@ export default function DashboardPage() {
                         <p className="text-slate-600 font-semibold mt-1">Overview of valuation reports and system activity</p>
                     </div>
                     <div className="flex items-center gap-3">
-                        <div className="h-10 w-80 bg-slate-200 animate-pulse rounded-xl" />
-                        <div className="h-10 w-10 bg-slate-200 animate-pulse rounded-xl" />
-                        <div className="h-10 w-36 bg-slate-200 animate-pulse rounded-xl" />
+                        <div className="h-10 w-80 bg-slate-200 animate-pulse rounded-lg" />
+                        <div className="h-10 w-10 bg-slate-200 animate-pulse rounded-lg" />
+                        <div className="h-10 w-36 bg-slate-200 animate-pulse rounded-lg" />
                     </div>
                 </div>
 
                 {/* Skeleton Stats Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                     {[1, 2, 3, 4, 5].map((i) => (
-                        <div key={i} className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm h-36 flex flex-col justify-between">
+                        <div key={i} className="bg-white rounded-xl border border-slate-100 p-6 shadow-sm h-36 flex flex-col justify-between">
                             <div className="flex items-start justify-between">
-                                <div className="w-12 h-12 rounded-2xl bg-slate-200 animate-pulse" />
+                                <div className="w-12 h-12 rounded-xl bg-slate-200 animate-pulse" />
                                 <div className="flex flex-col items-end gap-2">
                                     <div className="w-16 h-3 bg-slate-200 animate-pulse rounded-full" />
                                     <div className="w-8 h-8 bg-slate-200 animate-pulse rounded-full" />
@@ -216,19 +216,19 @@ export default function DashboardPage() {
 
                 {/* Skeleton Main Section */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                    <div className="lg:col-span-12 bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden min-h-[400px]">
+                    <div className="lg:col-span-12 bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden min-h-[400px]">
                         <div className="px-8 py-6 border-b border-slate-50 flex items-center justify-between">
                             <div className="space-y-2">
                                 <div className="w-32 h-6 bg-slate-200 animate-pulse rounded-full" />
                                 <div className="w-64 h-3 bg-slate-200 animate-pulse rounded-full" />
                             </div>
-                            <div className="w-24 h-10 bg-slate-200 animate-pulse rounded-xl" />
+                            <div className="w-24 h-10 bg-slate-200 animate-pulse rounded-lg" />
                         </div>
                         <div className="p-8 space-y-4">
                             {[1, 2, 3, 4].map((i) => (
                                 <div key={i} className="flex items-center gap-6 pb-4 border-b border-slate-50 last:border-0 last:pb-0">
                                     <div className="flex items-center gap-4 w-1/4">
-                                        <div className="w-12 h-12 rounded-xl bg-slate-200 animate-pulse shrink-0" />
+                                        <div className="w-12 h-12 rounded-lg bg-slate-200 animate-pulse shrink-0" />
                                         <div className="space-y-2 w-full">
                                             <div className="w-2/3 h-4 bg-slate-200 animate-pulse rounded-full" />
                                             <div className="w-1/3 h-3 bg-slate-200 animate-pulse rounded-full" />
@@ -259,11 +259,18 @@ export default function DashboardPage() {
                 </div>
                 <div className="flex items-center gap-3">
                     <button
-                        onClick={() => navigate('upload')}
-                        className="bg-gradient-to-r from-brand-700 to-brand-900 hover:from-brand-800 hover:to-brand-950 text-white px-6 py-2.5 rounded-xl text-base font-bold flex items-center gap-2 shadow-lg shadow-brand-300/40 transition-all hover:-translate-y-0.5"
+                        onClick={() => navigate('/upload')}
+                        className="bg-white text-sky-600 border-2 border-sky-100 hover:bg-sky-50 px-6 py-2.5 rounded-lg text-base font-bold flex items-center gap-2 shadow-sm transition-all hover:-translate-y-0.5 active:scale-95"
+                    >
+                        <FileSearch size={18} />
+                        New Analysis
+                    </button>
+                    <button
+                        onClick={() => navigate('/upload')}
+                        className="bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white px-6 py-2.5 rounded-lg text-base font-bold flex items-center gap-2 shadow-lg shadow-sky-200 transition-all hover:-translate-y-0.5"
                     >
                         <Upload size={18} />
-                        New Analysis
+                        Upload Report
                     </button>
                 </div>
             </div>
@@ -274,11 +281,11 @@ export default function DashboardPage() {
                     <div
                         key={card.label}
                         onClick={() => navigate(card.path)}
-                        className="cursor-pointer group bg-white rounded-2xl border border-brand-100 p-6 shadow-lg hover:shadow-2xl hover:shadow-brand-200/40 transition-all duration-500 relative overflow-hidden hover:border-brand-200 isolate"
+                        className="cursor-pointer group bg-white rounded-xl border border-brand-100 p-6 shadow-lg hover:shadow-2xl hover:shadow-brand-200/40 transition-all duration-500 relative overflow-hidden hover:border-brand-200 isolate"
                         style={{ animationDelay: `${index * 100}ms` }}
                     >
                         <div className="flex items-start justify-between relative z-10">
-                            <div className={`${card.bg} ${card.color} ${card.border} p-4 rounded-2xl border group-hover:scale-110 transition-transform duration-500 shadow-md`}>
+                            <div className={`${card.bg} ${card.color} ${card.border} p-4 rounded-xl border group-hover:scale-110 transition-transform duration-500 shadow-md`}>
                                 {React.cloneElement(card.icon as React.ReactElement, { size: 24 })}
                             </div>
                             <div className="flex flex-col items-end">
@@ -307,15 +314,15 @@ export default function DashboardPage() {
             {/* Main Section */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 {/* Tables / Recent Reports */}
-                <div className="lg:col-span-12 bg-white rounded-2xl border border-brand-100 shadow-md overflow-hidden">
-                    <div className="px-8 py-6 border-b border-gray-50 bg-gray-50/30 flex items-center justify-between">
+                <div className="lg:col-span-12 bg-white rounded-xl border border-brand-100 shadow-md overflow-hidden">
+                    <div className="px-8 py-6 border-b border-sky-50 bg-sky-50/30 flex items-center justify-between">
                         <div>
                             <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Recent Activity</h2>
                             <p className="text-sm text-slate-500 font-semibold mt-1">Track your latest generated reports and their status.</p>
                         </div>
                         <button
                             onClick={() => navigate('/list')}
-                            className="text-sm font-bold text-brand-600 hover:text-brand-700 bg-brand-50 hover:bg-brand-100 px-6 py-2.5 rounded-xl transition-all border border-brand-100 active:scale-95"
+                            className="text-sm font-bold text-brand-600 hover:text-brand-700 bg-brand-50 hover:bg-brand-100 px-6 py-2.5 rounded-lg transition-all border border-brand-100 active:scale-95"
                         >
                             View Full History
                         </button>
@@ -323,7 +330,7 @@ export default function DashboardPage() {
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead>
-                                <tr className="bg-gray-50/50 border-b border-gray-100">
+                                <tr className="bg-sky-50/50 border-b border-sky-100">
                                     <th className="px-8 py-5 text-left text-xs font-bold text-slate-400 uppercase tracking-[0.15em] w-1/4">
                                         Customer / Report
                                     </th>
@@ -341,7 +348,7 @@ export default function DashboardPage() {
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-50">
+                            <tbody className="divide-y divide-sky-50">
                                 {recentReports.length > 0 ? recentReports.map((report) => (
                                     <tr
                                         key={report.id}
@@ -350,7 +357,7 @@ export default function DashboardPage() {
                                     >
                                         <td className="px-8 py-6">
                                             <div className="flex items-center gap-4">
-                                                <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-sm group-hover:bg-brand-50 group-hover:text-brand-600 transition-colors">
+                                                <div className="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-sm group-hover:bg-brand-50 group-hover:text-brand-600 transition-colors">
                                                     {report.customerName[0]}
                                                 </div>
                                                 <div className="min-w-0">
@@ -367,7 +374,7 @@ export default function DashboardPage() {
                                             <div className="text-sm text-slate-400 font-medium mt-0.5">{report.location}</div>
                                         </td>
                                         <td className="px-8 py-6">
-                                            <span className={`px-4 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider border ${getStatusColor(report.status)} shadow-sm`}>
+                                            <span className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider border ${getStatusColor(report.status)} shadow-sm`}>
                                                 {report.status}
                                             </span>
                                         </td>
@@ -387,7 +394,7 @@ export default function DashboardPage() {
                         </table>
                     </div>
                     {/* Empty state footer or more reports hint */}
-                    <div className="px-6 py-4 bg-gray-50/20 border-t border-gray-50 flex justify-center">
+                    <div className="px-6 py-4 bg-sky-50/20 border-t border-sky-50 flex justify-center">
                         <button
                             onClick={() => navigate('/list')}
                             className="text-slate-400 text-xs font-bold uppercase tracking-widest hover:text-slate-600 transition-colors flex items-center gap-2"

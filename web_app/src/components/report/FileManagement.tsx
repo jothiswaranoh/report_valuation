@@ -298,7 +298,7 @@ export default function FileManagement({
 
     return (
         <div className="flex-1 flex flex-col min-h-0">
-            <div className="flex-1 min-h-0 flex flex-col bg-white rounded-2xl border border-brand-100 shadow-lg overflow-hidden">
+            <div className="flex-1 min-h-0 flex flex-col bg-white rounded-xl border border-brand-100 shadow-lg overflow-hidden">
 
                 {/* ── Top Header Bar ── */}
                 <FileManagerHeader
@@ -401,7 +401,7 @@ export default function FileManagement({
                         <div
                             key={toast.id}
                             className={`
-                                flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg pointer-events-auto
+                                flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg pointer-events-auto
                                 text-sm font-medium transition-all duration-300 animate-slide-up
                                 ${toast.type === 'success'
                                     ? 'bg-emerald-50 border border-emerald-200 text-emerald-800'

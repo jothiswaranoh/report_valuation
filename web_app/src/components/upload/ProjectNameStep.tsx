@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { ArrowRight, Building2, FileText } from 'lucide-react';
 import { ProjectReport } from './types';
 import { useQuery } from '@tanstack/react-query';
@@ -51,7 +51,7 @@ export default function ProjectNameStep({
   onNext,
   recentProjects
 }: ProjectNameStepProps) {
-  const [showBankSuggestions, setShowBankSuggestions] = useState(false);
+  // No showBankSuggestions needed
 
   const { data: banksData } = useQuery({
     queryKey: ['banks'],
@@ -119,7 +119,7 @@ export default function ProjectNameStep({
         </p>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 space-y-6">
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8 space-y-6">
         {/* Bank Name Input */}
         <div className="space-y-2">
           <label className="text-sm font-semibold text-slate-700">
@@ -127,7 +127,7 @@ export default function ProjectNameStep({
           </label>
           <div className="relative group">
             <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none z-10">
-              <Building2 size={18} className="text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+              <Building2 size={18} className="text-slate-400 group-focus-within:text-sky-500 transition-colors" />
             </div>
             <ReactSelectField
               options={allBankOptions}
@@ -147,7 +147,7 @@ export default function ProjectNameStep({
           </label>
           <div className="relative group">
             <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-              <FileText size={18} className="text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+              <FileText size={18} className="text-slate-400 group-focus-within:text-sky-500 transition-colors" />
             </div>
             <input
               type="text"
@@ -155,7 +155,7 @@ export default function ProjectNameStep({
               onChange={(e) => setProjectName(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleProjectNameSubmit()}
               placeholder="e.g. Valuation Report - Jan 2024"
-              className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder-slate-400"
+              className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all placeholder-slate-400"
             />
           </div>
         </div>
@@ -163,7 +163,7 @@ export default function ProjectNameStep({
         <button
           onClick={handleProjectNameSubmit}
           disabled={!projectName?.trim() || !bankName?.trim()}
-          className="w-full bg-blue-600 hover:bg-blue-700 disabled:cursor-not-allowed text-white px-6 py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40"
+          className="w-full bg-sky-500 hover:bg-sky-600 disabled:cursor-not-allowed text-white px-6 py-3.5 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all shadow-lg shadow-sky-200"
         >
           Create Report
           <ArrowRight size={18} />
@@ -192,14 +192,14 @@ export default function ProjectNameStep({
                 }}
                 role="button"
                 tabIndex={0}
-                className="group p-4 bg-white border border-slate-200 rounded-xl hover:border-blue-300 transition-all cursor-pointer flex items-center justify-between shadow-sm hover:shadow-md"
+                className="group p-4 bg-white border border-slate-200 rounded-lg hover:border-blue-300 transition-all cursor-pointer flex items-center justify-between shadow-sm hover:shadow-md"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 group-hover:bg-blue-100 transition-colors">
+                  <div className="w-10 h-10 rounded-lg bg-sky-50 flex items-center justify-center text-sky-600 group-hover:bg-sky-100 transition-colors">
                     <FileText size={20} />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">
+                    <h4 className="font-semibold text-slate-900 group-hover:text-sky-600 transition-colors">
                       {project.name}
                     </h4>
                     <p className="text-xs text-slate-500 mt-0.5">
@@ -207,7 +207,7 @@ export default function ProjectNameStep({
                     </p>
                   </div>
                 </div>
-                <ArrowRight size={16} className="text-slate-300 group-hover:text-blue-500 transition-colors" />
+                <ArrowRight size={16} className="text-slate-300 group-hover:text-sky-500 transition-colors" />
               </div>
             ))}
           </div>

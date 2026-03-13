@@ -67,7 +67,7 @@ export default function FilePreviewModal({
                 {file && (
                     <>
                         {/* Preview Area */}
-                        <div className="lg:col-span-2 bg-gray-100 rounded-2xl overflow-hidden border border-gray-200 flex flex-col relative shadow-inner">
+                        <div className="lg:col-span-2 bg-gray-100 rounded-xl overflow-hidden border border-gray-200 flex flex-col relative shadow-inner">
                             {file.url && file.url !== '#' ? (
                                 <div className="flex-1 overflow-auto flex items-start justify-center p-4">
                                     {isPdf ? (
@@ -162,7 +162,7 @@ export default function FilePreviewModal({
                         </div>
 
                         {/* Metadata Sidebar */}
-                        <div className="lg:col-span-1 bg-white p-6 rounded-2xl border border-gray-200 overflow-y-auto shadow-sm flex flex-col">
+                        <div className="lg:col-span-1 bg-white p-6 rounded-xl border border-gray-200 overflow-y-auto shadow-sm flex flex-col">
                             <div className="space-y-6 flex-1">
                                 <div>
                                     <h3 className="text-lg font-bold text-gray-900 mb-1">File Details</h3>
