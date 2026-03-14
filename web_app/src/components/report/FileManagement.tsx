@@ -350,6 +350,7 @@ export default function FileManagement({
                                 folderNodes={[]}
                                 files={allRecentFiles}
                                 viewMode={viewMode}
+                                reports={reports}
                                 onFolderClick={() => { }}
                                 onPreview={handlePreview}
                                 onDownload={handleDownload}
@@ -363,6 +364,7 @@ export default function FileManagement({
                                 folderNodes={displayFolderNodes}
                                 files={displayFiles}
                                 viewMode={viewMode}
+                                reports={reports}
                                 onFolderClick={navigateToFolder}
                                 onPreview={handlePreview}
                                 onDownload={handleDownload}

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Folder tab (top-left) -->
+  <path
+    d="M30 160 Q30 120 70 120 L200 120 Q230 120 245 140 L270 168 L30 168 Z"
+    fill="#4BA3C7"
+  />
+  <!-- Folder body background (darker blue, slightly visible at top as border) -->
+  <rect x="20" y="155" width="472" height="337" rx="30" ry="30" fill="#4BA3C7" />
+  <!-- White paper strip -->
+  <rect x="20" y="168" width="472" height="42" rx="0" ry="0" fill="white" />
+  <!-- Folder body foreground (light blue) -->
+  <rect x="20" y="195" width="472" height="297" rx="30" ry="30" fill="#90CAE8" />
+</svg>

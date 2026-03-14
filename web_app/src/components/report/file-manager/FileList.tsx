@@ -3,16 +3,19 @@ import {
     Download,
     Eye,
     Trash2,
-    GripVertical,
-    FileImage,
     FileSpreadsheet,
     File,
     Folder,
+    FolderOpen,
     ChevronRight,
-    MoreVertical
+    ChevronDown,
+    MoreVertical,
+    Image,
+    Copy,
+    Pencil,
 } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import { FileNode, ReportFile } from '../../../types';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { FileNode, ReportFile, ValuationReport } from '../../../types';
 import { formatDate } from '../../../utils/formatDate';
 
 export interface FileListProps {
@@ -21,6 +24,8 @@ export interface FileListProps {
     /** Resolved files to display after folders */
     files: ReportFile[];
     viewMode: 'grid' | 'list';
+    /** All reports — used to resolve FileNode → ReportFile in tree list view */
+    reports?: ValuationReport[];
     onFolderClick: (node: FileNode) => void;
     onPreview: (file: ReportFile) => void;
     onDownload: (file: ReportFile) => void;
@@ -36,14 +41,14 @@ export interface FileListProps {
 function getFileIcon(file: ReportFile) {
     const name = file.name?.toLowerCase() ?? '';
     if (name.endsWith('.pdf'))
-        return { Icon: FileText, bg: 'bg-red-50', color: 'text-red-500' };
+        return { Icon: FileText, bg: 'bg-red-50', color: 'text-red-500', selectedBg: 'bg-red-100' };
     if (/\.(jpg|jpeg|png|gif|webp)$/.test(name))
-        return { Icon: FileImage, bg: 'bg-purple-50', color: 'text-purple-500' };
+        return { Icon: Image, bg: 'bg-purple-50', color: 'text-purple-500', selectedBg: 'bg-purple-100' };
     if (/\.(xlsx|xls|csv)$/.test(name))
-        return { Icon: FileSpreadsheet, bg: 'bg-green-50', color: 'text-green-500' };
+        return { Icon: FileSpreadsheet, bg: 'bg-green-50', color: 'text-green-500', selectedBg: 'bg-green-100' };
     if (file.type === 'final' || file.type === 'draft')
-        return { Icon: FileText, bg: 'bg-blue-50', color: 'text-blue-500' };
-    return { Icon: File, bg: 'bg-slate-50', color: 'text-slate-400' };
+        return { Icon: FileText, bg: 'bg-blue-50', color: 'text-blue-500', selectedBg: 'bg-blue-100' };
+    return { Icon: File, bg: 'bg-slate-50', color: 'text-slate-400', selectedBg: 'bg-slate-100' };
 }
 
 function TypeBadge({ type }: { type: string }) {
@@ -60,7 +65,9 @@ function TypeBadge({ type }: { type: string }) {
     );
 }
 
-// ─── Shared Kebab Dropdown ──────────────────────────────────────────────────
+// ─── Shared Kebab Dropdown ────────────────────────────────────────────────────
+
+type MenuAction = { label: string; icon?: React.ElementType; onClick: () => void; isDestructive?: boolean };
 
 function KebabMenu({
     isOpen,
@@ -69,7 +76,7 @@ function KebabMenu({
 }: {
     isOpen: boolean;
     onToggle: (e: React.MouseEvent) => void;
-    actions: { label: string; onClick: () => void; isDestructive?: boolean }[];
+    actions: MenuAction[];
 }) {
     return (
         <div className="relative flex-shrink-0 ml-2">
@@ -89,20 +96,21 @@ function KebabMenu({
             {isOpen && (
                 <div
                     onClick={(e) => e.stopPropagation()}
-                    className="absolute right-0 top-full mt-1 w-36 bg-white border border-slate-200 rounded-lg shadow-md text-sm z-50 py-1 overflow-hidden"
+                    className="absolute right-0 top-full mt-1 w-40 bg-white border border-slate-200 rounded-xl shadow-lg text-sm z-50 py-1 overflow-hidden"
                 >
                     {actions.map((action, i) => (
                         <button
                             key={i}
                             onClick={() => {
                                 action.onClick();
-                                onToggle({ stopPropagation: () => { } } as React.MouseEvent); // Close menu
+                                onToggle({ stopPropagation: () => { } } as React.MouseEvent);
                             }}
-                            className={`flex items-center w-full text-left px-3 py-2 transition-colors ${action.isDestructive
+                            className={`flex items-center gap-2 w-full text-left px-3 py-2 transition-colors ${action.isDestructive
                                 ? 'hover:bg-red-50 text-red-500'
                                 : 'hover:bg-slate-100 text-slate-700'
                                 }`}
                         >
+                            {action.icon && <action.icon size={14} />}
                             {action.label}
                         </button>
                     ))}
@@ -112,255 +120,136 @@ function KebabMenu({
     );
 }
 
-// ─── Folder Grid Card ─────────────────────────────────────────────────────────
+// ─── Context Menu (right-click) ───────────────────────────────────────────────
 
-function FolderGridCard({
-    node,
-    onClick,
-    activeMenu,
-    setActiveMenu
+function ContextMenu({
+    x,
+    y,
+    actions,
+    onClose,
 }: {
-    node: FileNode;
-    onClick: () => void;
-    activeMenu: string | null;
-    setActiveMenu: (id: string | null) => void;
+    x: number;
+    y: number;
+    actions: MenuAction[];
+    onClose: () => void;
 }) {
-    const childCount = node.children?.length ?? 0;
-    const isMenuOpen = activeMenu === node.id;
+    const ref = useRef<HTMLDivElement>(null);
 
-    return (
-        <button
-            onClick={onClick}
-            className="group w-full relative text-left bg-white border border-slate-200 rounded-2xl p-5 hover:border-amber-300 hover:shadow-md transition-all flex flex-col gap-3 select-none focus:outline-none focus:ring-2 focus:ring-amber-300"
-        >
-            <div className="flex items-center justify-between">
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-amber-50 group-hover:bg-amber-100 transition-colors">
-                    <Folder size={26} className="text-amber-500" />
-                </div>
-                <div className="flex items-center">
-                    <ChevronRight size={16} className={`text-slate-300 transition-colors ${isMenuOpen ? 'opacity-0' : 'group-hover:text-amber-400'}`} />
-                    <KebabMenu
-                        isOpen={isMenuOpen}
-                        onToggle={(e) => {
-                            e.stopPropagation();
-                            setActiveMenu(isMenuOpen ? null : node.id);
-                        }}
-                        actions={[
-                            { label: 'Rename', onClick: () => console.log('Rename folder', node.name) },
-                            { label: 'Copy', onClick: () => console.log('Copy folder', node.name) },
-                            { label: 'Move', onClick: () => console.log('Move folder', node.name) },
-                            { label: 'Delete', onClick: () => console.log('Delete folder', node.name), isDestructive: true },
-                        ]}
-                    />
-                </div>
-            </div>
-            <div className="min-w-0">
-                <h3
-                    className="font-semibold text-slate-900 truncate text-sm leading-snug mb-0.5"
-                    title={node.name}
-                >
-                    {node.name}
-                </h3>
-                <p className="text-xs text-slate-400">
-                    {childCount} {childCount === 1 ? 'item' : 'items'}
-                </p>
-            </div>
-        </button>
-    );
-}
+    useEffect(() => {
+        const handleClick = () => onClose();
+        window.addEventListener('click', handleClick, { once: true });
+        return () => window.removeEventListener('click', handleClick);
+    }, [onClose]);
 
-// ─── Folder List Row ──────────────────────────────────────────────────────────
-
-function FolderListRow({
-    node,
-    isLast,
-    onClick,
-    onCopy,
-    onRename,
-    onDelete,
-    activeMenu,
-    setActiveMenu
-}: {
-    node: FileNode;
-    isLast: boolean;
-    onClick: () => void;
-    onCopy: (node: FileNode | ReportFile) => void;
-    onRename: (node: FileNode | ReportFile) => void;
-    onDelete: (node: FileNode | ReportFile) => void;
-    activeMenu: string | null;
-    setActiveMenu: (id: string | null) => void;
-}) {
-    const childCount = node.children?.length ?? 0;
-    const isMenuOpen = activeMenu === node.id;
-
-    return (
-        <tr
-            onClick={onClick}
-            className={`group bg-white hover:bg-amber-50/60 transition-colors cursor-pointer ${!isLast ? 'border-b border-slate-100' : ''}`}
-        >
-            <td className="px-4 py-3">
-                <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-amber-50">
-                        <Folder size={17} className="text-amber-500" />
-                    </div>
-                    <span
-                        className="text-sm font-semibold text-slate-800 truncate max-w-[220px] group-hover:text-amber-700 transition-colors"
-                        title={node.name}
-                    >
-                        {node.name}
-                    </span>
-                </div>
-            </td>
-            <td className="px-4 py-3 text-xs text-slate-400 whitespace-nowrap">Folder</td>
-            <td className="px-4 py-3 text-xs text-slate-400 whitespace-nowrap">
-                {childCount} {childCount === 1 ? 'item' : 'items'}
-            </td>
-            <td className="px-4 py-3 text-xs text-slate-400 whitespace-nowrap">—</td>
-            <td className="px-4 py-3">
-                <div className="flex items-center justify-end">
-                    <ChevronRight size={16} className={`text-slate-300 transition-colors ${isMenuOpen ? 'opacity-0' : 'group-hover:text-amber-400'}`} />
-                    <KebabMenu
-                        isOpen={isMenuOpen}
-                        onToggle={(e) => {
-                            e.stopPropagation();
-                            setActiveMenu(isMenuOpen ? null : node.id);
-                        }}
-                        actions={[
-                            { label: 'Rename', onClick: () => onRename(node) },
-                            { label: 'Copy', onClick: () => onCopy(node) },
-                            { label: 'Move', onClick: () => console.log('Move folder', node.name) },
-                            { label: 'Delete', onClick: () => onDelete(node), isDestructive: true },
-                        ]}
-                    />
-                </div>
-            </td>
-        </tr>
-    );
-}
-
-// ─── File Grid Card ───────────────────────────────────────────────────────────
-
-function FileGridCard({
-    file,
-    onPreview,
-    onDownload,
-    onCopy,
-    onRename,
-    onDelete,
-    onDragStart: onDragStartProp,
-    activeMenu,
-    setActiveMenu
-}: Omit<FileListProps, 'folderNodes' | 'files' | 'viewMode' | 'onFolderClick'> & {
-    file: ReportFile;
-    activeMenu: string | null;
-    setActiveMenu: (id: string | null) => void;
-}) {
-    const { Icon, bg, color } = getFileIcon(file);
-    const isMenuOpen = activeMenu === file.id;
-
-    const handleDragStart = (e: React.DragEvent) => {
-        e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('fileId', file.id);
-        e.dataTransfer.setData('fileName', file.name);
-        onDragStartProp?.(file);
-    };
+    // Clamp position so menu doesn't overflow viewport
+    const safeX = Math.min(x, window.innerWidth - 160);
+    const safeY = Math.min(y, window.innerHeight - actions.length * 36 - 16);
 
     return (
         <div
-            draggable
-            onDragStart={handleDragStart}
-            className="group relative bg-white border border-slate-200 rounded-2xl p-5 hover:border-brand-300 hover:shadow-md transition-all cursor-grab active:cursor-grabbing active:opacity-60 active:scale-95 active:shadow-lg active:ring-2 active:ring-brand-400 flex flex-col gap-4 select-none"
+            ref={ref}
+            style={{ top: safeY, left: safeX }}
+            className="fixed z-[100] w-44 bg-white border border-slate-200 rounded-xl shadow-xl py-1 text-sm overflow-hidden"
+            onContextMenu={(e) => e.preventDefault()}
         >
-            {/* Context menu positioning context wrapped around the kebab to fix z-index issues */}
-            <div className="absolute top-3 right-3 flex gap-1 z-10">
-                <div className={`opacity-0 group-hover:opacity-30 transition-opacity ${isMenuOpen ? 'opacity-0' : ''}`}>
-                    <GripVertical size={16} className="text-slate-400" />
-                </div>
-                <KebabMenu
-                    isOpen={isMenuOpen}
-                    onToggle={(e) => {
+            {actions.map((action, i) => (
+                <button
+                    key={i}
+                    onClick={(e) => {
                         e.stopPropagation();
-                        setActiveMenu(isMenuOpen ? null : file.id);
+                        action.onClick();
+                        onClose();
                     }}
-                    actions={[
-                        { label: 'Preview', onClick: () => onPreview(file) },
-                        { label: 'Download', onClick: () => onDownload(file) },
-                        { label: 'Rename', onClick: () => onRename(file) },
-                        { label: 'Copy', onClick: () => onCopy(file) },
-                        { label: 'Move', onClick: () => console.log('Move file', file.name) },
-                        { label: 'Delete', onClick: () => onDelete(file), isDestructive: true }
-                    ]}
-                />
-            </div>
-
-            {/* Icon + badge */}
-            <div className="flex items-center justify-between">
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${bg} transition-transform group-hover:scale-105`}>
-                    <Icon size={24} className={color} />
-                </div>
-                <TypeBadge type={file.type} />
-            </div>
-
-            {/* Name + meta */}
-            <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-slate-900 truncate text-sm leading-snug mb-0.5" title={file.name}>
-                    {file.name}
-                </h3>
-                <p className="text-xs text-slate-400">
-                    {file.size} · {formatDate(file.uploadedAt, 'short')}
-                </p>
-            </div>
-
-            {/* Action row */}
-            <div className="flex items-center gap-1.5 pt-3 border-t border-slate-100">
-                <button
-                    onClick={(e) => { e.stopPropagation(); onPreview(file); }}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-1.5 text-xs font-semibold text-brand-600 bg-brand-50 hover:bg-brand-100 rounded-lg transition-colors"
+                    className={`flex items-center gap-2.5 w-full text-left px-3 py-2 transition-colors ${action.isDestructive
+                        ? 'hover:bg-red-50 text-red-500'
+                        : 'hover:bg-slate-100 text-slate-700'
+                        }`}
                 >
-                    <Eye size={14} /> Preview
+                    {action.icon && <action.icon size={14} className="flex-shrink-0" />}
+                    {action.label}
                 </button>
-                <button
-                    onClick={(e) => { e.stopPropagation(); onDownload(file); }}
-                    className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
-                    title="Download"
-                >
-                    <Download size={16} />
-                </button>
-                {onDelete && (
-                    <button
-                        onClick={(e) => { e.stopPropagation(); onDelete(file); }}
-                        className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                        title="Delete"
-                    >
-                        <Trash2 size={16} />
-                    </button>
-                )}
-            </div>
+            ))}
         </div>
     );
 }
 
-// ─── File List Row ────────────────────────────────────────────────────────────
+// ─── Folder Grid Icon (Desktop-style) ────────────────────────────────────────
 
-function FileListRow({
-    file,
-    isLast,
-    onPreview,
-    onDownload,
-    onCopy,
-    onRename,
-    onDelete,
-    onDragStart: onDragStartProp,
-    activeMenu,
-    setActiveMenu
-}: Omit<FileListProps, 'folderNodes' | 'files' | 'viewMode' | 'onFolderClick'> & {
-    file: ReportFile;
-    isLast: boolean;
-    activeMenu: string | null;
-    setActiveMenu: (id: string | null) => void;
+function FolderGridIcon({
+    node,
+    isSelected,
+    onSingleClick,
+    onDoubleClick,
+    onContextMenu,
+}: {
+    node: FileNode;
+    isSelected: boolean;
+    onSingleClick: () => void;
+    onDoubleClick: () => void;
+    onContextMenu: (e: React.MouseEvent) => void;
 }) {
-    const { Icon, bg, color } = getFileIcon(file);
-    const isMenuOpen = activeMenu === file.id;
+    return (
+        <button
+            onClick={onSingleClick}
+            onDoubleClick={onDoubleClick}
+            onContextMenu={onContextMenu}
+            className={`
+                group flex flex-col items-center gap-2 p-3 rounded-xl transition-all select-none
+                focus:outline-none focus:ring-2 focus:ring-amber-400 w-full
+                ${isSelected
+                    ? 'bg-amber-100 ring-2 ring-amber-400'
+                    : 'hover:bg-amber-50'
+                }
+            `}
+        >
+            <div className="flex items-center justify-center">
+                <img
+                    src="/icons/folder.svg"
+                    alt="folder"
+                    className={`w-12 h-10 transition-all ${isSelected ? 'opacity-90 scale-110 drop-shadow-sm' : 'group-hover:scale-105'}`}
+                />
+            </div>
+            <span
+                className={`text-xs font-medium text-center leading-tight line-clamp-2 w-full px-1 ${isSelected ? 'text-amber-900' : 'text-slate-700'}`}
+                title={node.name}
+            >
+                {node.name}
+            </span>
+        </button>
+    );
+}
+
+// ─── File Grid Icon (Desktop-style) ──────────────────────────────────────────
+
+function getFileGridIcon(file: ReportFile) {
+    const name = file.name?.toLowerCase() ?? '';
+    if (name.endsWith('.pdf'))
+        return { Icon: FileText, bg: 'bg-red-50', color: 'text-red-500', selectedBg: 'bg-red-100' };
+    if (/\.(jpg|jpeg|png|gif|webp)$/.test(name))
+        return { Icon: Image, bg: 'bg-purple-50', color: 'text-purple-500', selectedBg: 'bg-purple-100' };
+    if (/\.(xlsx|xls|csv)$/.test(name))
+        return { Icon: FileSpreadsheet, bg: 'bg-green-50', color: 'text-green-500', selectedBg: 'bg-green-100' };
+    if (file.type === 'final' || file.type === 'draft')
+        return { Icon: FileText, bg: 'bg-blue-50', color: 'text-blue-500', selectedBg: 'bg-blue-100' };
+    return { Icon: File, bg: 'bg-slate-50', color: 'text-slate-400', selectedBg: 'bg-slate-100' };
+}
+
+function FileGridIcon({
+    file,
+    isSelected,
+    onSingleClick,
+    onDoubleClick,
+    onContextMenu,
+    onDragStart: onDragStartProp,
+}: {
+    file: ReportFile;
+    isSelected: boolean;
+    onSingleClick: () => void;
+    onDoubleClick: () => void;
+    onContextMenu: (e: React.MouseEvent) => void;
+    onDragStart?: (file: ReportFile) => void;
+}) {
+    const { Icon, bg, color, selectedBg } = getFileGridIcon(file);
 
     const handleDragStart = (e: React.DragEvent) => {
         e.dataTransfer.effectAllowed = 'move';
@@ -370,72 +259,31 @@ function FileListRow({
     };
 
     return (
-        <tr
+        <button
             draggable
             onDragStart={handleDragStart}
-            className={`group bg-white hover:bg-slate-50 transition-colors cursor-grab active:cursor-grabbing active:bg-brand-50 relative ${!isLast ? 'border-b border-slate-100' : ''}`}
+            onClick={onSingleClick}
+            onDoubleClick={onDoubleClick}
+            onContextMenu={onContextMenu}
+            className={`
+                group flex flex-col items-center gap-2 p-3 rounded-xl transition-all select-none
+                focus:outline-none focus:ring-2 focus:ring-brand-400 cursor-pointer active:scale-95 w-full
+                ${isSelected
+                    ? 'bg-brand-100 ring-2 ring-brand-400'
+                    : 'hover:bg-slate-100'
+                }
+            `}
         >
-            <td className="px-4 py-3">
-                <div className="flex items-center gap-3">
-                    <GripVertical
-                        size={14}
-                        className="text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
-                    />
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${bg}`}>
-                        <Icon size={16} className={color} />
-                    </div>
-                    <span className="text-sm font-medium text-slate-800 truncate max-w-[220px]" title={file.name}>
-                        {file.name}
-                    </span>
-                </div>
-            </td>
-            <td className="px-4 py-3 whitespace-nowrap">
-                <TypeBadge type={file.type} />
-            </td>
-            <td className="px-4 py-3 text-sm text-slate-500 whitespace-nowrap">{file.size}</td>
-            <td className="px-4 py-3 text-sm text-slate-500 whitespace-nowrap">
-                {formatDate(file.uploadedAt, 'short')}
-            </td>
-            <td className="px-4 py-3">
-                <div className="flex items-center gap-1 justify-end relative">
-                    <button
-                        onClick={() => onPreview(file)}
-                        className="p-1.5 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors"
-                        title="Preview"
-                    ><Eye size={16} /></button>
-                    <button
-                        onClick={() => onDownload(file)}
-                        className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
-                        title="Download"
-                    ><Download size={16} /></button>
-                    {onDelete && (
-                        <button
-                            onClick={() => onDelete(file)}
-                            className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                            title="Delete"
-                        ><Trash2 size={16} /></button>
-                    )}
-
-                    <div className="ml-1 pl-1 border-l border-slate-200">
-                        <KebabMenu
-                            isOpen={isMenuOpen}
-                            onToggle={(e) => {
-                                e.stopPropagation();
-                                setActiveMenu(isMenuOpen ? null : file.id);
-                            }}
-                            actions={[
-                                { label: 'Preview', onClick: () => onPreview(file) },
-                                { label: 'Download', onClick: () => onDownload(file) },
-                                { label: 'Rename', onClick: () => onRename(file) },
-                                { label: 'Copy', onClick: () => onCopy(file) },
-                                { label: 'Move', onClick: () => console.log('Move file', file.name) },
-                                { label: 'Delete', onClick: () => onDelete(file), isDestructive: true }
-                            ]}
-                        />
-                    </div>
-                </div>
-            </td>
-        </tr>
+            <div className={`w-16 h-16 rounded-xl flex items-center justify-center transition-all ${isSelected ? selectedBg + ' scale-105' : bg + ' group-hover:scale-105'}`}>
+                <Icon size={36} className={color} />
+            </div>
+            <span
+                className={`text-xs font-medium text-center leading-tight line-clamp-2 w-full px-1 ${isSelected ? 'text-brand-900' : 'text-slate-700'}`}
+                title={file.name}
+            >
+                {file.name}
+            </span>
+        </button>
     );
 }
 
@@ -463,12 +311,234 @@ function EmptyState() {
     );
 }
 
+// ─── Resolve FileNode → ReportFile ───────────────────────────────────────────
+
+function resolveFile(node: FileNode, reports: ValuationReport[]): ReportFile | null {
+    if (node.type !== 'file' || !node.reportId) return null;
+    const report = reports.find((r) => r.id === node.reportId);
+    return report?.files.find((f) => f.id === node.id) ?? null;
+}
+
+// ─── Recursive Tree Row (List View) ──────────────────────────────────────────
+
+function TreeRow({
+    node,
+    depth,
+    reports,
+    expandedFolders,
+    selectedId,
+    onToggleExpand,
+    onSelect,
+    onFolderOpen,
+    onPreview,
+    onDownload,
+    onCopy,
+    onRename,
+    onDelete,
+    onDragStart,
+    activeMenu,
+    setActiveMenu,
+    onContextMenu,
+}: {
+    node: FileNode;
+    depth: number;
+    reports: ValuationReport[];
+    expandedFolders: Set<string>;
+    selectedId: string | null;
+    onToggleExpand: (id: string) => void;
+    onSelect: (id: string) => void;
+    onFolderOpen: (node: FileNode) => void;
+    onPreview: (file: ReportFile) => void;
+    onDownload: (file: ReportFile) => void;
+    onCopy: (node: FileNode | ReportFile) => void;
+    onRename: (node: FileNode | ReportFile) => void;
+    onDelete: (node: FileNode | ReportFile) => void;
+    onDragStart?: (file: ReportFile) => void;
+    activeMenu: string | null;
+    setActiveMenu: (id: string | null) => void;
+    onContextMenu: (e: React.MouseEvent, actions: MenuAction[]) => void;
+}) {
+    const isFolder = node.type === 'folder';
+    const isExpanded = expandedFolders.has(node.id);
+    const isSelected = selectedId === node.id;
+    const isMenuOpen = activeMenu === node.id;
+    const indentPx = 16 + depth * 24;
+
+    if (isFolder) {
+        const childCount = node.children?.length ?? 0;
+        const ChevronIcon = isExpanded ? ChevronDown : ChevronRight;
+
+        const folderActions: MenuAction[] = [
+            { label: 'Open', icon: FolderOpen, onClick: () => onFolderOpen(node) },
+            { label: 'Rename', icon: Pencil, onClick: () => onRename(node) },
+            { label: 'Copy', icon: Copy, onClick: () => onCopy(node) },
+            { label: 'Delete', icon: Trash2, onClick: () => onDelete(node), isDestructive: true },
+        ];
+
+        return (
+            <>
+                <tr
+                    onClick={(e) => { e.stopPropagation(); onSelect(node.id); onToggleExpand(node.id); }}
+                    onDoubleClick={(e) => { e.stopPropagation(); onFolderOpen(node); }}
+                    onContextMenu={(e) => { e.preventDefault(); onSelect(node.id); onContextMenu(e, folderActions); }}
+                    className={`group transition-colors cursor-pointer border-b border-slate-100 ${isSelected
+                        ? 'bg-amber-50 border-l-2 border-l-amber-400'
+                        : 'bg-white hover:bg-amber-50/50'
+                        }`}
+                >
+                    <td className="py-3" style={{ paddingLeft: `${indentPx}px`, paddingRight: '16px' }}>
+                        <div className="flex items-center gap-2">
+                            <ChevronIcon
+                                size={16}
+                                className={`flex-shrink-0 transition-colors ${isSelected ? 'text-amber-500' : 'text-slate-400 group-hover:text-amber-500'}`}
+                            />
+                            <img
+                                src="/icons/folder.svg"
+                                alt="folder"
+                                className={`w-7 h-6 flex-shrink-0 transition-all ${isSelected ? 'opacity-90 scale-110' : ''}`}
+                            />
+                            <span
+                                className={`text-sm font-semibold truncate max-w-[220px] transition-colors ${isSelected ? 'text-amber-800' : 'text-slate-800 group-hover:text-amber-700'}`}
+                                title={node.name}
+                            >
+                                {node.name}
+                            </span>
+                        </div>
+                    </td>
+                    <td className="px-4 py-3 text-xs text-slate-400 whitespace-nowrap">Folder</td>
+                    <td className="px-4 py-3 text-xs text-slate-400 whitespace-nowrap">
+                        {childCount} {childCount === 1 ? 'item' : 'items'}
+                    </td>
+                    <td className="px-4 py-3 text-xs text-slate-400 whitespace-nowrap">—</td>
+                    <td className="px-4 py-3">
+                        <div className="flex items-center justify-end">
+                            <KebabMenu
+                                isOpen={isMenuOpen}
+                                onToggle={(e) => {
+                                    e.stopPropagation();
+                                    setActiveMenu(isMenuOpen ? null : node.id);
+                                }}
+                                actions={folderActions}
+                            />
+                        </div>
+                    </td>
+                </tr>
+                {isExpanded && node.children?.map((child) => (
+                    <TreeRow
+                        key={child.id}
+                        node={child}
+                        depth={depth + 1}
+                        reports={reports}
+                        expandedFolders={expandedFolders}
+                        selectedId={selectedId}
+                        onToggleExpand={onToggleExpand}
+                        onSelect={onSelect}
+                        onFolderOpen={onFolderOpen}
+                        onPreview={onPreview}
+                        onDownload={onDownload}
+                        onCopy={onCopy}
+                        onRename={onRename}
+                        onDelete={onDelete}
+                        onDragStart={onDragStart}
+                        activeMenu={activeMenu}
+                        setActiveMenu={setActiveMenu}
+                        onContextMenu={onContextMenu}
+                    />
+                ))}
+            </>
+        );
+    }
+
+    // ── File row ──
+    const file = resolveFile(node, reports);
+    if (!file) return null;
+
+    const { Icon, bg, color, selectedBg } = getFileIcon(file);
+
+    const handleDragStart = (e: React.DragEvent) => {
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('fileId', file.id);
+        e.dataTransfer.setData('fileName', file.name);
+        onDragStart?.(file);
+    };
+
+    const fileActions: MenuAction[] = [
+        { label: 'Preview', icon: Eye, onClick: () => onPreview(file) },
+        { label: 'Download', icon: Download, onClick: () => onDownload(file) },
+        { label: 'Rename', icon: Pencil, onClick: () => onRename(file) },
+        { label: 'Copy', icon: Copy, onClick: () => onCopy(file) },
+        { label: 'Delete', icon: Trash2, onClick: () => onDelete(file), isDestructive: true },
+    ];
+
+    return (
+        <tr
+            draggable
+            onDragStart={handleDragStart}
+            onClick={(e) => { e.stopPropagation(); onSelect(file.id); }}
+            onDoubleClick={(e) => { e.stopPropagation(); onPreview(file); }}
+            onContextMenu={(e) => { e.preventDefault(); onSelect(file.id); onContextMenu(e, fileActions); }}
+            className={`group transition-colors cursor-pointer border-b border-slate-100 ${isSelected
+                ? 'bg-brand-50 border-l-2 border-l-brand-400'
+                : 'bg-white hover:bg-slate-50'
+                }`}
+        >
+            <td className="py-3" style={{ paddingLeft: `${indentPx + 20}px`, paddingRight: '16px' }}>
+                <div className="flex items-center gap-2">
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors ${isSelected ? selectedBg : bg}`}>
+                        <Icon size={16} className={color} />
+                    </div>
+                    <span className={`text-sm font-medium truncate max-w-[220px] ${isSelected ? 'text-brand-800' : 'text-slate-800'}`} title={file.name}>
+                        {file.name}
+                    </span>
+                </div>
+            </td>
+            <td className="px-4 py-3 whitespace-nowrap">
+                <TypeBadge type={file.type} />
+            </td>
+            <td className="px-4 py-3 text-sm text-slate-500 whitespace-nowrap">{file.size}</td>
+            <td className="px-4 py-3 text-sm text-slate-500 whitespace-nowrap">
+                {formatDate(file.uploadedAt, 'short')}
+            </td>
+            <td className="px-4 py-3">
+                <div className="flex items-center gap-1 justify-end relative">
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onPreview(file); }}
+                        className="p-1.5 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors"
+                        title="Preview"
+                    ><Eye size={16} /></button>
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onDownload(file); }}
+                        className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+                        title="Download"
+                    ><Download size={16} /></button>
+                    <button
+                        onClick={(e) => { e.stopPropagation(); onDelete(file); }}
+                        className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Delete"
+                    ><Trash2 size={16} /></button>
+                    <div className="ml-1 pl-1 border-l border-slate-200">
+                        <KebabMenu
+                            isOpen={activeMenu === file.id}
+                            onToggle={(e) => {
+                                e.stopPropagation();
+                                setActiveMenu(activeMenu === file.id ? null : file.id);
+                            }}
+                            actions={fileActions}
+                        />
+                    </div>
+                </div>
+            </td>
+        </tr>
+    );
+}
+
 // ─── Main Export ──────────────────────────────────────────────────────────────
 
 export default function FileList({
     folderNodes,
     files,
     viewMode,
+    reports = [],
     onFolderClick,
     onPreview,
     onDownload,
@@ -479,34 +549,76 @@ export default function FileList({
 }: FileListProps) {
     const hasContent = folderNodes.length > 0 || files.length > 0;
     const [activeMenu, setActiveMenu] = useState<string | null>(null);
+    const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
+    const [selectedId, setSelectedId] = useState<string | null>(null);
+    const [contextMenu, setContextMenu] = useState<{ x: number; y: number; actions: MenuAction[] } | null>(null);
 
-    // Close menu on outside click
+    // Close menus / deselect on outside click
     useEffect(() => {
-        const handleBodyClick = () => setActiveMenu(null);
+        const handleBodyClick = () => {
+            setActiveMenu(null);
+            setSelectedId(null);
+        };
         window.addEventListener('click', handleBodyClick);
         return () => window.removeEventListener('click', handleBodyClick);
     }, []);
 
+    const toggleExpand = useCallback((id: string) => {
+        setExpandedFolders((prev) => {
+            const next = new Set(prev);
+            if (next.has(id)) next.delete(id);
+            else next.add(id);
+            return next;
+        });
+    }, []);
+
+    const handleSelect = useCallback((id: string) => {
+        setSelectedId(id);
+    }, []);
+
+    const openContextMenu = useCallback((e: React.MouseEvent, actions: MenuAction[]) => {
+        e.preventDefault();
+        setContextMenu({ x: e.clientX, y: e.clientY, actions });
+    }, []);
+
     if (!hasContent) return <EmptyState />;
 
-    // ── Grid view ──────────────────────────────────────────────────
+    // ── Grid view ───────────────────────────────────────────────────
 
     if (viewMode === 'grid') {
         return (
-            <div>
+            <div onClick={() => setSelectedId(null)}>
+                {contextMenu && (
+                    <ContextMenu
+                        x={contextMenu.x}
+                        y={contextMenu.y}
+                        actions={contextMenu.actions}
+                        onClose={() => setContextMenu(null)}
+                    />
+                )}
+
                 {folderNodes.length > 0 && (
                     <>
                         <SectionLabel label="Folders" />
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-6">
-                            {folderNodes.map((node) => (
-                                <FolderGridCard
-                                    key={node.id}
-                                    node={node}
-                                    onClick={() => onFolderClick(node)}
-                                    activeMenu={activeMenu}
-                                    setActiveMenu={setActiveMenu}
-                                />
-                            ))}
+                        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-2 mb-6">
+                            {folderNodes.map((node) => {
+                                const folderActions: MenuAction[] = [
+                                    { label: 'Open', icon: FolderOpen, onClick: () => onFolderClick(node) },
+                                    { label: 'Rename', icon: Pencil, onClick: () => onRename(node) },
+                                    { label: 'Copy', icon: Copy, onClick: () => onCopy(node) },
+                                    { label: 'Delete', icon: Trash2, onClick: () => onDelete(node), isDestructive: true },
+                                ];
+                                return (
+                                    <FolderGridIcon
+                                        key={node.id}
+                                        node={node}
+                                        isSelected={selectedId === node.id}
+                                        onSingleClick={() => { handleSelect(node.id); }}
+                                        onDoubleClick={() => onFolderClick(node)}
+                                        onContextMenu={(e) => { e.stopPropagation(); handleSelect(node.id); openContextMenu(e, folderActions); }}
+                                    />
+                                );
+                            })}
                         </div>
                     </>
                 )}
@@ -514,23 +626,28 @@ export default function FileList({
                 {files.length > 0 && (
                     <>
                         <SectionLabel label="Files" />
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                            {files.map((file) =>
-                                file ? (
-                                    <FileGridCard
+                        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-2">
+                            {files.map((file) => {
+                                if (!file) return null;
+                                const fileActions: MenuAction[] = [
+                                    { label: 'Preview', icon: Eye, onClick: () => onPreview(file) },
+                                    { label: 'Download', icon: Download, onClick: () => onDownload(file) },
+                                    { label: 'Rename', icon: Pencil, onClick: () => onRename(file) },
+                                    { label: 'Copy', icon: Copy, onClick: () => onCopy(file) },
+                                    { label: 'Delete', icon: Trash2, onClick: () => onDelete(file), isDestructive: true },
+                                ];
+                                return (
+                                    <FileGridIcon
                                         key={file.id}
                                         file={file}
-                                        onPreview={onPreview}
-                                        onDownload={onDownload}
-                                        onCopy={onCopy}
-                                        onRename={onRename}
-                                        onDelete={onDelete}
+                                        isSelected={selectedId === file.id}
+                                        onSingleClick={() => handleSelect(file.id)}
+                                        onDoubleClick={() => onPreview(file)}
+                                        onContextMenu={(e) => { e.stopPropagation(); handleSelect(file.id); openContextMenu(e, fileActions); }}
                                         onDragStart={onDragStart}
-                                        activeMenu={activeMenu}
-                                        setActiveMenu={setActiveMenu}
                                     />
-                                ) : null
-                            )}
+                                );
+                            })}
                         </div>
                     </>
                 )}
@@ -538,13 +655,26 @@ export default function FileList({
         );
     }
 
-    // ── List (table) view ──────────────────────────────────────────
+    // ── List (tree) view ────────────────────────────────────────────
 
-    const totalRows = folderNodes.length + files.length;
-    let rowIndex = 0;
+    const allNodes: FileNode[] = [
+        ...folderNodes,
+        ...files.map((f) => ({ id: f.id, name: f.name, type: 'file' as const })),
+    ];
 
     return (
-        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+        <div
+            className="overflow-hidden rounded-xl border border-slate-200 bg-white"
+            onClick={() => setSelectedId(null)}
+        >
+            {contextMenu && (
+                <ContextMenu
+                    x={contextMenu.x}
+                    y={contextMenu.y}
+                    actions={contextMenu.actions}
+                    onClose={() => setContextMenu(null)}
+                />
+            )}
             <table className="w-full text-left">
                 <thead>
                     <tr className="bg-slate-50 border-b border-slate-200">
@@ -556,43 +686,28 @@ export default function FileList({
                     </tr>
                 </thead>
                 <tbody>
-                    {folderNodes.map((node) => {
-                        const isLast = rowIndex === totalRows - 1;
-                        rowIndex++;
-                        return (
-                            <FolderListRow
-                                key={node.id}
-                                node={node}
-                                isLast={isLast}
-                                onClick={() => onFolderClick(node)}
-                                onCopy={onCopy}
-                                onRename={onRename}
-                                onDelete={onDelete}
-                                activeMenu={activeMenu}
-                                setActiveMenu={setActiveMenu}
-                            />
-                        );
-                    })}
-                    {files.map((file) => {
-                        if (!file) return null;
-                        const isLast = rowIndex === totalRows - 1;
-                        rowIndex++;
-                        return (
-                            <FileListRow
-                                key={file.id}
-                                file={file}
-                                isLast={isLast}
-                                onPreview={onPreview}
-                                onDownload={onDownload}
-                                onCopy={onCopy}
-                                onRename={onRename}
-                                onDelete={onDelete}
-                                onDragStart={onDragStart}
-                                activeMenu={activeMenu}
-                                setActiveMenu={setActiveMenu}
-                            />
-                        );
-                    })}
+                    {allNodes.map((node) => (
+                        <TreeRow
+                            key={node.id}
+                            node={node}
+                            depth={0}
+                            reports={reports}
+                            expandedFolders={expandedFolders}
+                            selectedId={selectedId}
+                            onToggleExpand={toggleExpand}
+                            onSelect={handleSelect}
+                            onFolderOpen={onFolderClick}
+                            onPreview={onPreview}
+                            onDownload={onDownload}
+                            onCopy={onCopy}
+                            onRename={onRename}
+                            onDelete={onDelete}
+                            onDragStart={onDragStart}
+                            activeMenu={activeMenu}
+                            setActiveMenu={setActiveMenu}
+                            onContextMenu={openContextMenu}
+                        />
+                    ))}
                 </tbody>
             </table>
         </div>
