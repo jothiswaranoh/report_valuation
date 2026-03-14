@@ -4,19 +4,16 @@ import {
     Clock,
     CheckCircle,
     FileSearch,
-    Upload,
     TrendingUp,
-    ArrowRight
-}
-
-    from 'lucide-react';
+    ArrowRight,
+    Activity
+} from 'lucide-react';
 import { DashboardStats, ValuationReport, ReportStatus, PropertyType } from '../types';
 import { formatDate } from '../utils/formatDate';
 import { mockDashboardStats } from '../data/mockData';
 import { useNavigate } from "react-router-dom";
 import { useReports } from '../hooks/useReports';
 import { ApiReport } from '../apis/report.api';
-import ActiveProcessingCard from '../components/dashboard/ActiveProcessingCard';
 
 export default function DashboardPage() {
     // Poll every 5s so importing status cards appear/disappear without manual refresh
@@ -84,30 +81,6 @@ export default function DashboardPage() {
             }));
 
         return mappedReports;
-    }, [reportsData]);
-
-    const processingReports: ValuationReport[] = useMemo(() => {
-        if (!reportsData?.reports) return [];
-
-        return reportsData.reports
-            .filter((r: ApiReport) => (r.report_status || r.status || '').toLowerCase() === 'importing')
-            .map((r: ApiReport) => ({
-                id: r.id,
-                customerName: (r as any).report_name || r.customer_name || r.name || (r as any).property_owner || r.bank_name || 'Untitled Report',
-                bankName: r.bank_name || 'Unknown Bank',
-                propertyType: (r.property_type as PropertyType) || 'Residential',
-                location: r.location || 'Unknown Location',
-                status: 'process',
-                createdAt: new Date(r.created_at),
-                updatedAt: new Date(r.updated_at),
-                year: new Date(r.created_at).getFullYear().toString(),
-                month: (new Date(r.created_at).getMonth() + 1).toString().padStart(2, '0'),
-                files: [],
-                metadata: {} as any,
-                content: {} as any,
-                comments: [],
-                auditTrail: [],
-            }));
     }, [reportsData]);
 
     const statCards = [
@@ -266,11 +239,11 @@ export default function DashboardPage() {
                         New Analysis
                     </button>
                     <button
-                        onClick={() => navigate('/upload')}
+                        onClick={() => navigate('/current-report')}
                         className="bg-sky-500 hover:bg-sky-600 active:bg-sky-700 text-white px-6 py-2.5 rounded-lg text-base font-bold flex items-center gap-2 shadow-lg shadow-sky-200 transition-all hover:-translate-y-0.5"
                     >
-                        <Upload size={18} />
-                        Upload Report
+                        <Activity size={18} />
+                        Current Report
                     </button>
                 </div>
             </div>
@@ -301,15 +274,6 @@ export default function DashboardPage() {
                     </div>
                 ))}
             </div>
-
-            {/* Processing State - Only visible when reports are in process state */}
-            {processingReports.length > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {processingReports.map((report) => (
-                        <ActiveProcessingCard key={`processing-${report.id}`} report={report} />
-                    ))}
-                </div>
-            )}
 
             {/* Main Section */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
