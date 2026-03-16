@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo } from 'react';
 import { CheckCircle2, AlertCircle } from 'lucide-react';
 import { FileNode, ValuationReport, ReportFile } from '../../types';
 import FileList from './file-manager/FileList';
-import FilePreviewModal from './file-manager/FilePreviewModal';
+import InlinePdfViewer from './file-manager/InlinePdfViewer';
 import FileManagerHeader from './file-manager/FileManagerHeader';
 import FileBreadcrumb from './file-manager/FileBreadcrumb';
 import { DeleteConfirmModal } from '../common/DeleteConfirmModal';
@@ -300,91 +300,92 @@ export default function FileManagement({
         <div className="flex-1 flex flex-col min-h-0">
             <div className="flex-1 min-h-0 flex flex-col bg-white rounded-xl border border-brand-100 shadow-lg overflow-hidden">
 
-                {/* ── Top Header Bar ── */}
-                <FileManagerHeader
-                    searchQuery={searchQuery}
-                    onSearchChange={setSearchQuery}
-                    viewMode={viewMode}
-                    onViewModeChange={setViewMode}
-                    activeTab={activeTab}
-                    onTabChange={(tab) => {
-                        setActiveTab(tab);
-                        if (tab === 'recents') {
-                            setCurrentFolderNode(null);
-                            setSearchQuery('');
-                        }
-                    }}
-                />
+                {previewFile ? (
+                    /* ── Inline PDF / file viewer — replaces the file list ── */
+                    <InlinePdfViewer
+                        file={previewFile}
+                        onClose={handleClosePreview}
+                        onDownload={handleDownload}
+                    />
+                ) : (
+                    <>
+                        {/* ── Top Header Bar ── */}
+                        <FileManagerHeader
+                            searchQuery={searchQuery}
+                            onSearchChange={setSearchQuery}
+                            viewMode={viewMode}
+                            onViewModeChange={setViewMode}
+                            activeTab={activeTab}
+                            onTabChange={(tab) => {
+                                setActiveTab(tab);
+                                if (tab === 'recents') {
+                                    setCurrentFolderNode(null);
+                                    setSearchQuery('');
+                                }
+                            }}
+                        />
 
-                {/* ── Main content area — full width, no sidebar ── */}
-                <div className="flex-1 bg-slate-50 overflow-auto">
-                    {/* Drag hint banner */}
-                    {draggedFile && (
-                        <div className="px-6 py-2 bg-blue-50 border-b border-blue-100 text-xs text-blue-600 font-medium">
-                            📂 Dragging <strong>"{draggedFile.name}"</strong> — drop onto a folder to move it
-                        </div>
-                    )}
-
-                    <div className="p-6">
-                        {/* ── Breadcrumb / Recents header row ── */}
-                        <div className="mb-6">
-                            {activeTab === 'files' ? (
-                                <FileBreadcrumb
-                                    folderPath={folderPath}
-                                    onNavigate={navigateBreadcrumb}
-                                    fileCount={itemCount}
-                                />
-                            ) : (
-                                <div className="flex items-center justify-between">
-                                    <span className="text-sm font-bold text-slate-800">Recent Files</span>
-                                    <span className="text-xs text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full">
-                                        {allRecentFiles.length} {allRecentFiles.length === 1 ? 'file' : 'files'}
-                                    </span>
+                        {/* ── Main content area ── */}
+                        <div className="flex-1 bg-slate-50 overflow-auto">
+                            {draggedFile && (
+                                <div className="px-6 py-2 bg-blue-50 border-b border-blue-100 text-xs text-blue-600 font-medium">
+                                    📂 Dragging <strong>"{draggedFile.name}"</strong> — drop onto a folder to move it
                                 </div>
                             )}
+
+                            <div className="p-6">
+                                <div className="mb-6">
+                                    {activeTab === 'files' ? (
+                                        <FileBreadcrumb
+                                            folderPath={folderPath}
+                                            onNavigate={navigateBreadcrumb}
+                                            fileCount={itemCount}
+                                        />
+                                    ) : (
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-sm font-bold text-slate-800">Recent Files</span>
+                                            <span className="text-xs text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full">
+                                                {allRecentFiles.length} {allRecentFiles.length === 1 ? 'file' : 'files'}
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {activeTab === 'recents' ? (
+                                    <FileList
+                                        folderNodes={[]}
+                                        files={allRecentFiles}
+                                        viewMode={viewMode}
+                                        reports={reports}
+                                        onFolderClick={() => { }}
+                                        onPreview={handlePreview}
+                                        onDownload={handleDownload}
+                                        onCopy={handleCopy}
+                                        onRename={handleRename}
+                                        onDelete={handleDeleteLocal}
+                                        onDragStart={setDraggedFile}
+                                    />
+                                ) : (
+                                    <FileList
+                                        folderNodes={displayFolderNodes}
+                                        files={displayFiles}
+                                        viewMode={viewMode}
+                                        reports={reports}
+                                        onFolderClick={navigateToFolder}
+                                        onPreview={handlePreview}
+                                        onDownload={handleDownload}
+                                        onCopy={handleCopy}
+                                        onRename={handleRename}
+                                        onDelete={handleDeleteLocal}
+                                        onDragStart={setDraggedFile}
+                                    />
+                                )}
+                            </div>
                         </div>
+                    </>
+                )}
 
-                        {/* ── File + folder grid / list ── */}
-                        {activeTab === 'recents' ? (
-                            <FileList
-                                folderNodes={[]}
-                                files={allRecentFiles}
-                                viewMode={viewMode}
-                                reports={reports}
-                                onFolderClick={() => { }}
-                                onPreview={handlePreview}
-                                onDownload={handleDownload}
-                                onCopy={handleCopy}
-                                onRename={handleRename}
-                                onDelete={handleDeleteLocal}
-                                onDragStart={setDraggedFile}
-                            />
-                        ) : (
-                            <FileList
-                                folderNodes={displayFolderNodes}
-                                files={displayFiles}
-                                viewMode={viewMode}
-                                reports={reports}
-                                onFolderClick={navigateToFolder}
-                                onPreview={handlePreview}
-                                onDownload={handleDownload}
-                                onCopy={handleCopy}
-                                onRename={handleRename}
-                                onDelete={handleDeleteLocal}
-                                onDragStart={setDraggedFile}
-                            />
-                        )}
-                    </div>
-                </div>
-
-                {/* ── Modals ── */}
-                <FilePreviewModal
-                    file={previewFile}
-                    isOpen={!!previewFile}
-                    onClose={handleClosePreview}
-                    onDownload={handleDownload}
-                />
-
+                {/* ── Delete Modal ── */}
                 {deleteItem && (
                     <DeleteConfirmModal
                         isOpen={!!deleteItem}
