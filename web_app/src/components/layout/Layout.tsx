@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   Upload,
   FolderTree,
+  Landmark,
   Users,
   LogOut,
   Menu,
@@ -26,6 +27,7 @@ const navItems: NavItem[] = [
   { path: '/', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
   { path: '/upload', label: 'Upload & Process', icon: <Upload size={20} /> },
   { path: '/files', label: 'File Management', icon: <FolderTree size={20} /> },
+  { path: '/banks', label: 'Bank Management', icon: <Landmark size={20} /> },
   { path: '/users', label: 'Users', icon: <Users size={20} /> },
 ];
 
@@ -135,10 +137,10 @@ export default function Layout() {
                   key={item.path}
                   to={item.path}
                   className={`
-                    flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group relative
+                    flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-300 group relative
                     ${isActive
-                      ? 'bg-sky-500 text-white shadow-md shadow-sky-200'
-                      : 'text-slate-500 hover:bg-sky-50 hover:text-sky-600'
+                      ? 'bg-gradient-to-r from-brand-500 to-brand-600 text-white shadow-lg shadow-brand-200/50 scale-[1.02]'
+                      : 'text-slate-500 hover:bg-brand-50 hover:text-brand-600'
                     }
                     ${!sidebarOpen ? 'justify-center px-0' : ''}
                   `}
