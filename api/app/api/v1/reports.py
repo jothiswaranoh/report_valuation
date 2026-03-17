@@ -16,6 +16,7 @@ from app.repositories.report_repo import ReportRepository, OriginalFileRepositor
 from app.core.config import config
 from app.api.v1.dependencies import get_current_user
 import os
+import json
 
 
 logger = logging.getLogger(__name__)
@@ -328,6 +329,21 @@ async def analyze_and_summarize(
                     detail="AI services are currently unavailable due to an invalid configuration (API Key). Please check server settings."
                 )
             raise e
+            
+        # Optional Premium Feature: Also extract structured JSON mapping to the final HTML format templates.
+        try:
+            structured_data = llm_service.extract_structured_valuation(merged_content)
+            if structured_data and files:
+                # Save it to the same directory as the original file
+                first_file_path = files[0].get("file_path")
+                if first_file_path:
+                    dir_path = os.path.dirname(first_file_path)
+                    json_path = os.path.join(dir_path, "extracted_data.json")
+                    with open(json_path, "w") as jf:
+                        json.dump(structured_data, jf, indent=2)
+                    logger.info("Successfully generated and saved extracted_data.json for report %s", payload.report_id)
+        except Exception as e:
+            logger.warning("Failed to generate structural json for report %s: %s", payload.report_id, e)
 
         # Save analysis
         AIExtractedContentRepository.save_analysis(
@@ -643,11 +659,30 @@ async def download_report_pdf(
              raise HTTPException(status_code=404, detail="No content found to analyze")
     else:
         analysis_content = analysis_doc["ai_report_content"]
+ 
+    # Premium Flow: Check if consolidated JSON exists
+    json_data = None
+    files = OriginalFileRepository.get_by_report(report_id)
+    if files:
+        # Try to find consolidated JSON in the same directory as the first file
+        file_dir = os.path.dirname(files[0]["file_path"])
+        json_path = os.path.join(file_dir, "extracted_data.json")
+        if os.path.exists(json_path):
+            try:
+                with open(json_path, 'r') as f:
+                    json_data = json.load(f)
+            except Exception as e:
+                logger.error(f"Failed to load extracted_data.json: {e}")
 
-    pdf_bytes = processing_service.generate_pdf(
-        title=report["report_name"],
-        content=analysis_content
-    )
+    if json_data:
+        logger.info(f"Generating premium valuation report for {report_id}")
+        pdf_bytes = processing_service.generate_valuation_report(json_data)
+    else:
+        logger.info(f"Generating basic report for {report_id}")
+        pdf_bytes = processing_service.generate_pdf(
+            title=report["report_name"],
+            content=analysis_content
+        )
     
     return Response(
         content=pdf_bytes,

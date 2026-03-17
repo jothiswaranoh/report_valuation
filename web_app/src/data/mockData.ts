@@ -114,6 +114,39 @@ export const mockReports: ValuationReport[] = [
       { id: 'a7', user: 'System', action: 'Report Created', timestamp: new Date('2024-03-05'), details: 'AI extracted metadata from PDF' },
     ],
   },
+  {
+    id: '4',
+    customerName: 'New Owner',
+    bankName: 'Pooluvapatti Town Panchayat',
+    propertyType: 'Residential',
+    location: 'Pooluvapatti, Coimbatore - 641101',
+    status: 'review',
+    createdAt: new Date('2025-12-18'),
+    updatedAt: new Date('2025-12-20'),
+    year: '2025',
+    month: 'December',
+    metadata: {
+      year: { value: '2025', aiConfidence: 'high', needsReview: false },
+      bankName: { value: 'Pooluvapatti Town Panchayat', aiConfidence: 'medium', needsReview: true },
+      month: { value: 'December', aiConfidence: 'high', needsReview: false },
+      customerName: { value: 'New Owner', aiConfidence: 'high', needsReview: false },
+      propertyType: { value: 'Residential', aiConfidence: 'high', needsReview: false },
+      location: { value: 'Pooluvapatti, Coimbatore', aiConfidence: 'high', needsReview: false },
+    },
+    files: [
+      { id: 'f10', name: 'extracted_data.json', type: 'extracted', size: '15 KB', uploadedAt: new Date('2025-12-18'), url: '/uploads/extracted_data.json' },
+    ],
+    content: {
+      summary: 'Property valuation report for a residential property in Pooluvapatti. Includes land valuation (Part A) and building valuation (Part B).',
+      propertyDetails: 'Site No.12, Sree selvanayagi garden. Total Area: 2188 Sqft.',
+      valuationMethod: 'Guideline rate and market value approach for land. Replacement cost method for building.',
+      finalValuation: 'Land Value: ₹60,27,940. Building Net Value: ₹67,47,250.',
+    },
+    comments: [],
+    auditTrail: [
+      { id: 'a8', user: 'System', action: 'Report Created', timestamp: new Date('2025-12-18'), details: 'Data extracted from multiple JSON pages and images.' },
+    ],
+  },
 ];
 
 export const mockDashboardStats: DashboardStats = {

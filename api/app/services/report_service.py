@@ -1,5 +1,6 @@
 import os
-from typing import Dict
+from typing import Dict, List, Any
+import io
 import asyncio
 import logging
 from app.models.report import DocumentRequest, DocumentResponse, PageData, ProcessingStatus
@@ -10,7 +11,9 @@ from app.repositories.report_repo import OriginalFileRepository
 from app.core.config import config
 from datetime import datetime
 from app.db.session import original_files
+from app.services.rendering_service import ValuationRenderingService
 import re
+import json
 
 from app.db.session import db
 from bson import ObjectId
@@ -27,6 +30,7 @@ class DocumentProcessingService:
             api_key=os.getenv("OPENAI_API_KEY")
         )
         self.sse_manager = SSEManager()
+        self.rendering_service = ValuationRenderingService()
         self.active_processes: Dict[str, asyncio.Task] = {}    
     
     async def import_document(self, file_path: str) -> str:
@@ -100,11 +104,8 @@ class DocumentProcessingService:
         return self.sse_manager.event_generator(document_id)
 
     def generate_pdf(self, title: str, content: str) -> bytes:
-        """Generate PDF from report content"""
+        """Generate PDF from report content (basic markdown-like)"""
         from reportlab.lib.pagesizes import letter
-        from reportlab.pdfgen import canvas
-        import io
-        from reportlab.lib.units import inch
         from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
         from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 
@@ -153,3 +154,11 @@ class DocumentProcessingService:
         doc.build(Story)
         buffer.seek(0)
         return buffer.getvalue()
+
+    def generate_valuation_report(self, json_data: List[Dict]) -> bytes:
+        """
+        Generate a premium valuation report PDF from JSON data
+        Flow: JSON -> HTML -> PDF
+        """
+        html_content = self.rendering_service.json_to_html(json_data)
+        return self.rendering_service.html_to_pdf(html_content)
