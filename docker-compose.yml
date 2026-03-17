@@ -19,7 +19,7 @@ services:
       - "27018:27017"
     restart: always
     healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -31,7 +31,7 @@ services:
       - "6379:6379"
     restart: always
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
       timeout: 3s
       retries: 5
@@ -60,11 +60,11 @@ services:
       redis:
         condition: service_healthy
     volumes:
-      - shared_uploads:/app/uploads # shared with workers
+      - ./api/uploads:/app/uploads # shared with workers
       - ./api:/app # live-reload in dev
     restart: always
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health" ]
       interval: 15s
       timeout: 5s
       retries: 5
@@ -98,7 +98,7 @@ services:
       redis:
         condition: service_healthy
     volumes:
-      - shared_uploads:/app/uploads # SAME named volume as backend
+      - ./api/uploads:/app/uploads # SAME named volume as backend
       - ./api:/app
     restart: always
 
@@ -137,16 +137,12 @@ services:
     depends_on:
       - backend
     restart: always
-
   # ============================================================
   # FastMCP
   # ============================================================
-# ============================================================
-# Volumes
-# ============================================================
+  # ============================================================
+  # Volumes
+  # ============================================================
 
 volumes:
   mongo_data: # Named volume ensures both backend and celery_worker share
-
-  # exactly the same filesystem namespace for uploads.
-  shared_uploads:
