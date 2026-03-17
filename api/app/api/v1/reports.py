@@ -17,6 +17,8 @@ from app.core.config import config
 from app.api.v1.dependencies import get_current_user
 import os
 
+def normalize_name(name: str) -> str:
+    return name.strip().lower()
 
 logger = logging.getLogger(__name__)
 
@@ -50,9 +52,26 @@ async def create_report(
 ):
     """Create a new report (no document upload)"""
 
+    normalized_name = normalize_name(payload.report_name)
+    normalized_bank = normalize_name(payload.bank_name)
+
+    exists = ReportRepository.exists_by_name_and_bank(
+        normalized_name,
+        normalized_bank,
+        current_user["id"],
+    )
+
+    if exists:
+        raise HTTPException(
+            status_code=400,
+            detail="Report with this name already exists under this bank"
+        )
+
     report = ReportRepository.create_report(
         report_name=payload.report_name,
         bank_name=payload.bank_name,
+        normalized_name=normalized_name,
+        normalized_bank=normalized_bank,
         user_id=current_user["id"],
         created_by=current_user["id"],
     )
@@ -82,13 +101,15 @@ async def get_reports(current_user: dict = Depends(get_current_user)):
 @router.get("/reports/check")
 async def check_report_name(
     report_name: str = Query(..., min_length=1),
+    bank_name: str = Query(...),
     current_user: dict = Depends(get_current_user),
 ):
     """Check if report name already exists"""
 
-    exists = ReportRepository.exists_by_name(
-        report_name,
-        user_id=current_user["id"],
+    exists = ReportRepository.exists_by_name_and_bank(
+        normalize_name(report_name),
+        normalize_name(bank_name),
+        current_user["id"],
     )
 
     return {"exists": exists}

@@ -231,9 +231,14 @@ export default function Upload() {
       setReportId(createdReport.id);
       navigate(`/upload/${createdReport.id}`);
       setCurrentStep(2);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to create report', error);
-      alert('Failed to create report. Please try another name.');
+      const apiMessage = error?.message || '';
+      if (apiMessage.toLowerCase().includes('already exists')) {
+        alert('A report with this name already exists in this bank.');
+      } else {
+        alert(apiMessage || 'Failed to create report. Please try again.');
+      }
     }
   };
 

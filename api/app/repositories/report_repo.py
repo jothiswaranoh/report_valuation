@@ -15,6 +15,8 @@ class ReportRepository:
     def create_report(
         report_name: str,
         bank_name: str,
+        normalized_name: str,
+        normalized_bank: str,
         user_id: str,
         created_by: str
         ) -> dict:
@@ -23,6 +25,8 @@ class ReportRepository:
         doc = {
             "report_name": report_name,
             "bank_name": bank_name,
+            "normalized_name": normalized_name,
+            "normalized_bank": normalized_bank,
             "user_id": ObjectId(user_id),
             "report_status": ReportStatus.DRAFT.value,
             "created_by": ObjectId(created_by),
@@ -33,6 +37,15 @@ class ReportRepository:
         result = reports.insert_one(doc)
         return ReportRepository.get_by_id(str(result.inserted_id))
     
+
+    @staticmethod
+    def exists_by_name_and_bank(report_name: str, bank_name: str, user_id: str) -> bool:
+        return reports.find_one({
+            "normalized_name": report_name,
+            "normalized_bank": bank_name,
+            "user_id": ObjectId(user_id)
+        }) is not None
+
     @staticmethod
     def get_by_id(report_id: str) -> Optional[dict]:
         """Get report by ID"""
