@@ -139,12 +139,13 @@ async def upload_files_to_report(
 
     now = datetime.utcnow()
     year = str(now.year)
-    month = now.strftime('%B') # Full month name
+    month = now.strftime('%b').lower()  # e.g. 'mar'
     
     bank_name = sanitize(report.get("bank_name", "Unknown_Bank"))
     report_name = sanitize(report.get("report_name", report_id))
     
-    upload_dir = os.path.join(config.UPLOAD_DIR, year, month, bank_name, report_name)
+    # Path: uploads/<year>/<bank>/<month>/<report_name>/<file>
+    upload_dir = os.path.join(config.UPLOAD_DIR, year, bank_name, month, report_name)
     os.makedirs(upload_dir, exist_ok=True)
 
     saved_files = []

@@ -107,7 +107,11 @@ async def process_document(
     now = datetime.utcnow()
     year = str(now.year)
     month = now.strftime("%b").lower()
-    safe_client = client_name.strip().replace(" ", "_").lower()
+    import re
+    def _sanitize(name):
+        return re.sub(r'[^a-zA-Z0-9_\-]', '_', str(name).strip())
+    safe_bank = _sanitize(report.get("bank_name", "unknown"))
+    safe_report = _sanitize(report.get("report_name", report_id))
     file_size_mb = len(content) / (1024 * 1024)
 
     # Create document record under existing report
@@ -121,14 +125,13 @@ async def process_document(
     )
     document_id = file_doc["id"]
 
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    UPLOAD_ROOT = os.path.join(BASE_DIR, "..", "..", "..", "uploads")
-
+    # Path: uploads/<year>/<bank>/<month>/<report_name>/<file>
     upload_dir = os.path.join(
-      UPLOAD_ROOT,
+      config.UPLOAD_DIR,
       year,
+      safe_bank,
       month,
-      safe_client
+      safe_report
     )
     os.makedirs(upload_dir, exist_ok=True)
 
@@ -220,16 +223,19 @@ async def process_multiple_documents(
         now = datetime.utcnow()
         year = str(now.year)
         month = now.strftime("%b").lower()
-        safe_client = client_name.strip().replace(" ", "_").lower()
+        import re
+        def _sanitize(name):
+            return re.sub(r'[^a-zA-Z0-9_\-]', '_', str(name).strip())
+        safe_bank = _sanitize(report.get("bank_name", "unknown"))
+        safe_report_name = _sanitize(report.get("report_name", report_id))
 
-        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-        UPLOAD_ROOT = os.path.join(BASE_DIR, "..", "..", "..", "uploads")
-
+        # Path: uploads/<year>/<bank>/<month>/<report_name>/<file>
         upload_dir = os.path.join(
-            UPLOAD_ROOT,
+            config.UPLOAD_DIR,
             year,
+            safe_bank,
             month,
-            safe_client
+            safe_report_name
         )
         os.makedirs(upload_dir, exist_ok=True)
 

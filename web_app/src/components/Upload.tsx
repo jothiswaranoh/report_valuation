@@ -45,7 +45,7 @@ export default function Upload() {
 
   // ==================== REFS ====================
 
-  const hasInitialized = useRef(false);
+  const lastInitializedId = useRef<string | null>(null);
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // ==================== HELPERS ====================
@@ -115,8 +115,9 @@ export default function Upload() {
 
   useEffect(() => {
     if (!urlReportId || !reportData || isLoadingReport) return;
-    if (hasInitialized.current) return;
-    hasInitialized.current = true;
+    // Only re-initialize if this is a different report than what we already loaded
+    if (lastInitializedId.current === urlReportId) return;
+    lastInitializedId.current = urlReportId;
     initializeFromExistingReport(reportData as any);
   }, [urlReportId, reportData, isLoadingReport]);
 
@@ -161,6 +162,11 @@ export default function Upload() {
       }
       if (requestedStep === 'select') {
         setCurrentStep(3);
+        return;
+      }
+      if (requestedStep === 'process') {
+        setCurrentStep(4);
+        startPolling(effectiveReportId);
         return;
       }
 
