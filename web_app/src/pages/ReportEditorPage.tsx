@@ -3,7 +3,7 @@ import ReportEditor from '../components/report/ReportEditor';
 import { useReport } from '../hooks/useReports';
 import { ValuationReport } from '../types';
 import { mapApiReportToValuation } from '../utils/reportMapper';
-import Loader from '../components/common/Loader';
+import Skeleton from 'react-loading-skeleton';
 
 export default function ReportEditorPage() {
   const navigate = useNavigate();
@@ -14,7 +14,7 @@ export default function ReportEditorPage() {
   const selectedReport = apiData ? mapApiReportToValuation(apiData) : null;
 
   const handleBack = () => {
-    navigate('/files');
+    navigate(-1);
   };
 
   const handleSave = async (_reportId: string, content: ValuationReport['content']) => {
@@ -40,7 +40,28 @@ export default function ReportEditorPage() {
   };
 
   if (isLoading) {
-    return <Loader />;
+    return (
+      <div className="h-full flex flex-col rounded-lg overflow-hidden bg-white">
+        <div className="bg-white border-b border-secondary-200 px-8 py-4">
+          <div className="flex items-center justify-between mb-4">
+            <Skeleton height={24} width={150} />
+            <div className="flex gap-3">
+              <Skeleton height={40} width={110} borderRadius={8} />
+              <Skeleton height={40} width={110} borderRadius={8} />
+              <Skeleton height={40} width={130} borderRadius={8} />
+            </div>
+          </div>
+          <Skeleton height={32} width={300} className="mb-2" />
+          <Skeleton height={16} width={400} />
+        </div>
+        <div className="flex-1 overflow-auto bg-secondary-50 p-8">
+          <div className="bg-white border border-secondary-200 rounded-lg p-6 shadow-sm">
+            <Skeleton height={24} width={150} className="mb-6" />
+            <Skeleton height={60} />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (error || (!isLoading && !selectedReport)) {
@@ -61,6 +82,7 @@ export default function ReportEditorPage() {
   return (
     <ReportEditor
       report={selectedReport}
+      reportId={id}
       onBack={handleBack}
       onSave={handleSave}
       onApprove={handleApprove}

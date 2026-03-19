@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { reportsApi, ApiReport, UpdateReportRequest } from '../apis';
+import { reportsApi, UpdateReportRequest } from '../apis';
 
 
 /* =========================
@@ -82,11 +82,9 @@ export function useUpdateReport() {
       data: UpdateReportRequest;
     }) => reportsApi.updateReport(reportId, data),
 
-    onSuccess: (updatedReport: ApiReport) => {
-      // Update single report cache
-      queryClient.setQueryData(REPORT_KEY(updatedReport?.id), updatedReport);
-
-      // Invalidate reports list
+    onSuccess: () => {
+      // Don't use the partial PUT response to update the cache — it lacks fields like bank_name.
+      // Instead, just invalidate so a fresh full GET is triggered automatically.
       queryClient.invalidateQueries({ queryKey: REPORTS_KEY });
     },
   });

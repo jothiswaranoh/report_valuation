@@ -3,7 +3,6 @@ import {
   Calendar,
   Building2,
   MapPin,
-  Loader2,
   Copy,
   Check,
   Download,
@@ -303,7 +302,7 @@ export default function ReportDetailView({ reportId }: ReportDetailViewProps) {
                 disabled={approving}
                 className="flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-lg transition-colors text-sm font-semibold shadow-sm shadow-brand-200"
               >
-                {approving ? <Loader2 size={16} className="animate-spin" /> : <ShieldCheck size={16} />}
+                <ShieldCheck size={16} />
                 {approving ? 'Approving...' : 'Approve'}
               </button>
             )}

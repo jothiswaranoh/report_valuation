@@ -60,7 +60,8 @@ export default function DashboardPage() {
     const recentReports: ValuationReport[] = useMemo(() => {
         if (!reportsData?.reports) return [];
 
-        let mappedReports = reportsData.reports
+        let mappedReports = [...reportsData.reports]
+            .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
             .slice(0, 5) // Show only latest 5
             .map((r: ApiReport) => ({
                 id: r.id,

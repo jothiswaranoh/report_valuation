@@ -19,7 +19,7 @@ export const UserHeader: React.FC<UserHeaderProps> = ({
                 <p className="text-slate-500">Manage your team members and their permissions.</p>
             </div>
 
-            <div className="flex flex-wrap gap-3 justify-center">
+            <div className="flex flex-wrap gap-8 justify-evenly mb-8 w-full px-12">
                 <div className="group bg-white rounded-lg border border-brand-100 p-6 shadow-lg hover:shadow-xl hover:shadow-brand-200/40 transition-all duration-500 relative overflow-hidden flex flex-col items-center justify-center text-center aspect-square isolate w-full max-w-[14rem]">
                     <div className="w-14 h-14 rounded-lg bg-sky-50 flex items-center justify-center text-sky-600 mb-4 group-hover:scale-110 transition-transform duration-500">
                         <Users size={28} />
