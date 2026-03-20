@@ -1,8 +1,10 @@
-# Quick Setup Guide
+# Detailed Setup Guide
+
+This guide covers setting up the Report Valuation project fully locally, without using Docker for the application code (though Docker is still recommended for MongoDB and Redis).
 
 ## Prerequisites Installation
 
-### 1. Install Tesseract OCR (Required for Backend)
+### 1. Install Tesseract OCR (Required for Backend on Local Machine)
 
 **macOS:**
 ```bash
@@ -29,15 +31,18 @@ node --version
 
 ### Backend Configuration
 
-1. Copy environment template:
+1. Copy the environment template:
 ```bash
-cd tamil-translator-api
+cd api
 cp .env.example .env
 ```
 
-2. Edit `.env` and add your OpenAI API key:
+2. Edit `.env` to include your configuration strings:
 ```bash
 OPENAI_API_KEY=sk-your-actual-api-key-here
+MONGO_URI=mongodb://localhost:27017
+CELERY_BROKER_URL=redis://localhost:6379/0
+CELERY_RESULT_BACKEND=redis://localhost:6379/0
 ```
 
 ### Frontend Configuration
@@ -47,68 +52,61 @@ cd web_app
 cp .env.example .env
 ```
 
-Default configuration works for local development.
+Default configuration works for local development connecting to `http://localhost:8000`.
 
-## Quick Start
+## Quick Start (Local Run)
 
-### Option 1: Automated Script (Recommended)
+You will need **MongoDB** and **Redis** running locally (e.g. via local installation or partial docker-compose).
 
-```bash
-./start.sh
-```
+1. **Start Infrastructure Services:**
+   Normally, you can just extract them from docker-compose:
+   ```bash
+   docker-compose up -d mongodb redis
+   ```
 
-This will:
-- Check all prerequisites
-- Set up environment files
-- Install dependencies
-- Start both backend and frontend
-- Show you the URLs
+2. **Terminal 1 - Backend API:**
+   ```bash
+   cd api
+   python -m venv env
+   source env/bin/activate  # or: env\Scripts\activate on Windows
+   pip install -r requirements.txt
+   uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+   ```
 
-### Option 2: Manual Start
+3. **Terminal 2 - Celery Worker:**
+   ```bash
+   cd api
+   source env/bin/activate
+   celery -A app.celery_app:celery_app worker --loglevel=info --queues=document_processing
+   ```
 
-**Terminal 1 - Backend:**
-```bash
-cd tamil-translator-api
-source venv/bin/activate  # or: venv\Scripts\activate on Windows
-python -m src.main
-```
-
-**Terminal 2 - Frontend:**
-```bash
-cd web_app
-npm run dev
-```
+4. **Terminal 3 - Frontend:**
+   ```bash
+   cd web_app
+   npm install
+   npm run dev
+   ```
 
 ## Access the Application
 
 - **Frontend:** http://localhost:5173
 - **Backend API:** http://localhost:8000
 - **API Documentation:** http://localhost:8000/docs
-- **Health Check:** http://localhost:8000/health
-
-## Testing
-
-1. Open http://localhost:5173
-2. Upload a Tamil PDF document
-3. Watch real-time processing progress
-4. Review extracted metadata
-5. Create the report
+- **Flower (If started):** http://localhost:5555
 
 ## Troubleshooting
 
 ### Backend won't start
 
-1. **Check OpenAI API key:**
+1. **Dependencies missing:**
    ```bash
-   cat tamil-translator-api/.env
-   ```
-
-2. **Check dependencies:**
-   ```bash
-   cd tamil-translator-api
-   source venv/bin/activate
+   cd api
+   source env/bin/activate
    pip install -r requirements.txt
    ```
+
+2. **Redis / MongoDB connection error:**
+   Make sure you have MongoDB and Redis running on their default ports.
 
 3. **Check Tesseract:**
    ```bash
@@ -117,34 +115,18 @@ npm run dev
 
 ### Frontend won't start
 
-1. **Check dependencies:**
+1. **Dependencies:**
    ```bash
    cd web_app
    npm install
    ```
 
-2. **Check port availability:**
-   Port 5173 might be in use. Kill the process or change port in `vite.config.ts`
+2. **Port 5173 in use:**
+   Kill the existing process or it will default to the next available port.
 
 ### CORS Errors
 
-Make sure backend `.env` has:
+Ensure the backend `.env` includes:
 ```bash
 ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000
 ```
-
-### API Connection Failed
-
-1. Verify backend is running: `curl http://localhost:8000/health`
-2. Check frontend `.env` has correct API URL
-3. Check browser console for errors
-
-## Next Steps
-
-1. ✅ Install Tesseract OCR
-2. ✅ Configure OpenAI API key
-3. ✅ Run `./start.sh`
-4. ✅ Upload test document
-5. ✅ Verify processing works
-
-For detailed documentation, see README.md

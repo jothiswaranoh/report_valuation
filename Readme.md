@@ -1,304 +1,117 @@
-# Tamil Land Document Translator - Full Stack Application
+# Report Valuation - Full Stack Application
 
-This application translates Tamil land documents to English using OCR and AI. It consists of a FastAPI backend and a React frontend.
+This application handles the valuation of reports using an asynchronous document processing pipeline. It consists of a FastAPI backend (with Celery workers for async processing) and a React (Vite + TypeScript) frontend.
 
 ## Project Structure
 
 ```
 .
-├── tamil-translator-api/    # FastAPI backend
-│   ├── src/
-│   │   ├── main.py          # API endpoints
-│   │   ├── services.py      # Processing service
-│   │   ├── ocr_service.py   # OCR extraction
-│   │   ├── translation_service.py  # AI translation
-│   │   └── config.py        # Configuration
-│   └── requirements.txt
+├── api/                     # FastAPI backend & Celery Workers
+│   ├── app/                 # Application code (API, Core, DB, Models, Tasks)
+│   ├── requirements.txt
+│   └── .env.example
 │
-└── web_app/                 # React frontend
-    ├── src/
-    │   ├── components/      # React components
-    │   ├── services/        # API service layer
-    │   └── config/          # Configuration
-    └── package.json
+├── web_app/                 # React frontend
+│   ├── src/                 # React components, pages, services, etc.
+│   ├── package.json
+│   └── .env.example
+│
+├── docker-compose.yml       # Docker configuration for the entire stack
+└── SETUP.md                 # Detailed setup instructions
 ```
+
+## Core Technologies
+
+- **Backend:** FastAPI, Python, MongoDB, Redis, Celery (for async tasks).
+- **Frontend:** React, TypeScript, Vite, Tailwind CSS.
+- **Infrastructure:** Docker, Docker Compose.
 
 ## Prerequisites
 
-- Python 3.8+
-- Node.js 18+
-- OpenAI API Key
-- Tesseract OCR installed
+- **Docker:** We highly recommend using Docker and Docker Compose for running the application, as it handles all external services like MongoDB and Redis automatically.
+- **Python 3.8+** (If running backend locally)
+- **Node.js 18+** (If running frontend locally)
+- **Tesseract OCR:** Required if you are processing documents directly on your local system without Docker.
 
-### Install Tesseract OCR
+## Configuration
 
-**macOS:**
+1. **Backend Environment:**
+   Navigate to the `api` directory and configure the environment:
+   ```bash
+   cd api
+   cp .env.example .env
+   ```
+   Add your required keys (e.g. OpenAI API key, MongoDB settings) to `.env`.
+
+2. **Frontend Environment:**
+   Navigate to the `web_app` directory:
+   ```bash
+   cd web_app
+   cp .env.example .env
+   ```
+
+## Running the Application (Recommended)
+
+The easiest way to start the entire system (MongoDB, Redis, FastAPI Backend, Celery Worker, Flower Dashboard, and React Frontend) is using Docker Compose.
+
 ```bash
-brew install tesseract
-brew install tesseract-lang  # For Tamil language support
+# In the project root directory
+docker-compose up --build
 ```
 
-**Ubuntu/Debian:**
-```bash
-sudo apt-get install tesseract-ocr
-sudo apt-get install tesseract-ocr-tam
-```
+- **Frontend:** `http://localhost:5173`
+- **Backend API:** `http://localhost:8000`
+- **API Documentation:** `http://localhost:8000/docs`
+- **Flower Dashboard (Celery Monitor):** `http://localhost:5555`
 
-## Backend Setup
+## Running Locally Without Docker
 
-### 1. Navigate to backend directory
-```bash
-cd tamil-translator-api
-```
-
-### 2. Create virtual environment
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
-
-### 3. Install dependencies
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Configure environment
-```bash
-cp .env.example .env
-```
-
-Edit `.env` and add your OpenAI API key:
-```
-OPENAI_API_KEY=your_api_key_here
-```
-
-### 5. Run the backend
-```bash
-# From tamil-translator-api directory
-python -m src.main
-
-# Or using uvicorn
-uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
-```
-
-The API will be available at `http://localhost:8000`
-- API Documentation: `http://localhost:8000/docs`
-- Health Check: `http://localhost:8000/health`
-
-## Frontend Setup
-
-### 1. Navigate to frontend directory
-```bash
-cd web_app
-```
-
-### 2. Install dependencies
-```bash
-npm install
-```
-
-### 3. Configure environment
-```bash
-cp .env.example .env
-```
-
-The default configuration points to `http://localhost:8000`. Modify if needed.
-
-### 4. Run the frontend
-```bash
-npm run dev
-```
-
-The application will be available at `http://localhost:5173`
-
-## Running the Full Application
-
-### Option 1: Separate Terminals
-
-**Terminal 1 - Backend:**
-```bash
-cd tamil-translator-api
-source venv/bin/activate
-python -m src.main
-```
-
-**Terminal 2 - Frontend:**
-```bash
-cd web_app
-npm run dev
-```
-
-### Option 2: Using a Process Manager
-
-Create a simple bash script `start.sh`:
-```bash
-#!/bin/bash
-
-# Start backend in background
-cd tamil-translator-api
-source venv/bin/activate
-python -m src.main &
-BACKEND_PID=$!
-
-# Start frontend
-cd ../web_app
-npm run dev &
-FRONTEND_PID=$!
-
-# Wait for both processes
-wait $BACKEND_PID $FRONTEND_PID
-```
+If you prefer to run the services individually without Docker, see [SETUP.md](SETUP.md) for detailed step-by-step instructions.
 
 ## Features
 
 ### Backend API
-- ✅ PDF and image OCR extraction
-- ✅ Tamil to English translation
-- ✅ Legal text simplification
-- ✅ Real-time progress via Server-Sent Events (SSE)
-- ✅ Comprehensive error handling
-- ✅ Health check endpoint
-- ✅ API documentation
+- ✅ Async document processing (Celery + Redis)
+- ✅ MongoDB for robust data storage
+- ✅ AI-powered translation and synthesis
+- ✅ Real-time processing updates (Server-Sent Events)
+- ✅ Scalable worker architecture
 
 ### Frontend
+- ✅ Intuitive Vite + React Dashboard
+- ✅ Real-time processing status updates
+- ✅ Interactive Report Viewer & Editor
 - ✅ Drag-and-drop file upload
-- ✅ Multiple file processing
-- ✅ Real-time progress updates
-- ✅ SSE integration
-- ✅ Error handling and display
-- ✅ Responsive design
-- ✅ Modern UI with Tailwind CSS
+- ✅ Responsive UI powered by Tailwind CSS
 
 ## API Endpoints
 
 ### POST `/api/v1/process`
-Upload and process a document
-- **Input:** Multipart form data with PDF file
-- **Output:** Document ID and SSE endpoint
-
-### GET `/api/v1/stream/{document_id}`
-Server-Sent Events stream for real-time updates
-- **Output:** Event stream with processing status
-
-### GET `/api/v1/status/{document_id}`
-Get current processing status
+Upload and process a document incrementally via Celery.
 
 ### GET `/health`
-Health check endpoint
+Health check endpoint.
 
-## Usage
-
-1. **Start both backend and frontend** (see instructions above)
-2. **Open the application** at `http://localhost:5173`
-3. **Upload PDF documents:** Drag and drop or click to select
-4. **Watch real-time processing:** OCR → Translation → Simplification
-5. **Review extracted metadata:** Edit fields as needed
-6. **Create report:** Finalize the processed document
-
-## Environment Variables
-
-### Backend (`.env`)
-```
-OPENAI_API_KEY=your_key_here
-OPENAI_MODEL=gpt-4o-mini
-TESSERACT_LANG=tam
-HOST=0.0.0.0
-PORT=8000
-DEBUG=True
-MAX_FILE_SIZE_MB=50
-ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000
-```
-
-### Frontend (`.env`)
-```
-VITE_API_BASE_URL=http://localhost:8000
-```
-
-## Troubleshooting
-
-### Backend Issues
-
-**Problem:** `OpenAI API key not configured`
-- **Solution:** Add your OpenAI API key to `.env` file
-
-**Problem:** `Tesseract not found`
-- **Solution:** Install Tesseract OCR (see Prerequisites)
-
-**Problem:** `CORS errors`
-- **Solution:** Check `ALLOWED_ORIGINS` in backend `.env`
-
-### Frontend Issues
-
-**Problem:** `API connection failed`
-- **Solution:** Ensure backend is running on `http://localhost:8000`
-
-**Problem:** `SSE not working`
-- **Solution:** Check browser console for errors, ensure CORS is configured
-
-## Development
-
-### Backend Development
-```bash
-cd tamil-translator-api
-source venv/bin/activate
-uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
-```
-
-### Frontend Development
-```bash
-cd web_app
-npm run dev
-```
-
-
-
-## Production Deployment
-
-### Backend
-```bash
-pip install gunicorn
-gunicorn src.main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
-```
-
-### Frontend
-```bash
-npm run build
-# Serve the dist/ directory with nginx or similar
-```
-
----
+For more details, visit `http://localhost:8000/docs`.
 
 ## Database Seeds (Initial Data)
 
-Seeds are used to populate the database with initial data such as users or default records.
+Seeds are used to populate the database with initial users or default configuration.
 
-### When to run seeds
-- Run seeds **only once**
-- Make sure the database is running before running seeds
-
----
-
-### Running Seeds (Local)
-
-1. Start MongoDB (Docker or local)
-
-If using Docker:
-```bash
-docker compose up mongodb
-```
-2. Navigate to backend directory:
-```bash
-cd tamil-translator-api
-```
-3.Run the seed script:
-```
-python src/seeds.py
-```
+1. Start MongoDB (via Docker):
+   ```bash
+   docker-compose up mongodb -d
+   ```
+2. Run the seed script:
+   ```bash
+   cd api
+   # Ensure your virtual environment is active
+   python -m app.db.seeds  # (or equivalent seed module if implemented)
+   ```
 
 ## License
 
 MIT
 
 ## Support
-
-For issues or questions, please check the documentation or create an issue in the repository.
+For issues or questions, please check the detailed documentation or create an issue in the repository.
