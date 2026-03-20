@@ -14,6 +14,7 @@ from app.services.report_service import DocumentProcessingService
 from app.repositories.report_repo import ReportRepository, OriginalFileRepository
 from app.core.config import config
 from app.api.v1.dependencies import get_current_user
+from app.api.v1.reports import get_report_upload_dir
 
 
 logger = logging.getLogger(__name__)
@@ -104,14 +105,6 @@ async def process_document(
       )
 
     content = await file.read()
-    now = datetime.utcnow()
-    year = str(now.year)
-    month = now.strftime("%b").lower()
-    import re
-    def _sanitize(name):
-        return re.sub(r'[^a-zA-Z0-9_\-]', '_', str(name).strip())
-    safe_bank = _sanitize(report.get("bank_name", "unknown"))
-    safe_report = _sanitize(report.get("report_name", report_id))
     file_size_mb = len(content) / (1024 * 1024)
 
     # Create document record under existing report
@@ -125,14 +118,8 @@ async def process_document(
     )
     document_id = file_doc["id"]
 
-    # Path: uploads/<year>/<bank>/<month>/<report_name>/<file>
-    upload_dir = os.path.join(
-      config.UPLOAD_DIR,
-      year,
-      safe_bank,
-      month,
-      safe_report
-    )
+    # Path: uploads/<year>/<bank>/<month>/<report_name>
+    upload_dir = get_report_upload_dir(report)
     os.makedirs(upload_dir, exist_ok=True)
 
     safe_name = f"{document_id}.{file_ext}"
@@ -220,23 +207,8 @@ async def process_multiple_documents(
                 detail="Access denied"
             )
 
-        now = datetime.utcnow()
-        year = str(now.year)
-        month = now.strftime("%b").lower()
-        import re
-        def _sanitize(name):
-            return re.sub(r'[^a-zA-Z0-9_\-]', '_', str(name).strip())
-        safe_bank = _sanitize(report.get("bank_name", "unknown"))
-        safe_report_name = _sanitize(report.get("report_name", report_id))
-
-        # Path: uploads/<year>/<bank>/<month>/<report_name>/<file>
-        upload_dir = os.path.join(
-            config.UPLOAD_DIR,
-            year,
-            safe_bank,
-            month,
-            safe_report_name
-        )
+        # Path: uploads/<year>/<bank>/<month>/<report_name>
+        upload_dir = get_report_upload_dir(report)
         os.makedirs(upload_dir, exist_ok=True)
 
         uploaded_documents = []

@@ -321,8 +321,12 @@ def process_document_task(self, document_id: str, user_id: str):
     # 5. Write translated PDF to shared volume                             #
     # ------------------------------------------------------------------ #
     try:
-        stem = os.path.splitext(file_path)[0]   # same dir, new extension
-        output_pdf_path = f"{stem}_translated.pdf"
+        file_dir = os.path.dirname(file_path)
+        extracted_dir = os.path.join(file_dir, "ExtractedFile")
+        os.makedirs(extracted_dir, exist_ok=True)
+
+        base_name = os.path.splitext(os.path.basename(file_path))[0]
+        output_pdf_path = os.path.join(extracted_dir, f"{base_name}_translated.pdf")
 
         pdf_bytes = _build_pdf(
             title=f"Translated Document – {file_name}",

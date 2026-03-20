@@ -16,9 +16,32 @@ from app.repositories.report_repo import ReportRepository, OriginalFileRepositor
 from app.core.config import config
 from app.api.v1.dependencies import get_current_user
 import os
+import shutil
 
 def normalize_name(name: str) -> str:
     return name.strip().lower()
+
+def get_report_upload_dir(report: dict) -> str:
+    import re
+    def sanitize(name):
+        return re.sub(r'[^a-zA-Z0-9_\-]', '_', str(name).strip())
+
+    created_at = report.get("created_at")
+    if isinstance(created_at, str):
+        try:
+            created_at = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
+        except Exception:
+            created_at = datetime.utcnow()
+    elif not isinstance(created_at, datetime):
+        created_at = datetime.utcnow()
+
+    year = str(created_at.year)
+    month = created_at.strftime('%b').lower()
+    
+    bank_name = sanitize(report.get("bank_name", "Unknown_Bank"))
+    report_name = sanitize(report.get("report_name", report.get("id", "Unknown_Report")))
+    
+    return os.path.join(config.UPLOAD_DIR, year, bank_name, month, report_name)
 
 logger = logging.getLogger(__name__)
 
@@ -79,6 +102,12 @@ async def create_report(
     if not report:
         raise HTTPException(status_code=500, detail="Failed to create report")
 
+    try:
+        upload_dir = get_report_upload_dir(report)
+        os.makedirs(upload_dir, exist_ok=True)
+    except Exception as e:
+        logger.error(f"Failed to create directory for report {report['id']}: {e}")
+
     return {
         "id": report["id"],
         "report_name": report["report_name"],
@@ -132,20 +161,7 @@ async def upload_files_to_report(
     ):
         raise HTTPException(status_code=403, detail="Access denied")
 
-    # Construct structured upload path: uploads/YYYY/Month/Bank/ReportName
-    import re
-    def sanitize(name):
-        return re.sub(r'[^a-zA-Z0-9_\-]', '_', str(name))
-
-    now = datetime.utcnow()
-    year = str(now.year)
-    month = now.strftime('%b').lower()  # e.g. 'mar'
-    
-    bank_name = sanitize(report.get("bank_name", "Unknown_Bank"))
-    report_name = sanitize(report.get("report_name", report_id))
-    
-    # Path: uploads/<year>/<bank>/<month>/<report_name>/<file>
-    upload_dir = os.path.join(config.UPLOAD_DIR, year, bank_name, month, report_name)
+    upload_dir = get_report_upload_dir(report)
     os.makedirs(upload_dir, exist_ok=True)
 
     saved_files = []
@@ -527,6 +543,13 @@ async def delete_report(
         and "admin" not in current_user.get("roles", [])
     ):
         raise HTTPException(status_code=403, detail="Access denied")
+
+    upload_dir = get_report_upload_dir(report)
+    if os.path.exists(upload_dir):
+        try:
+            shutil.rmtree(upload_dir)
+        except Exception as e:
+            logger.error(f"Failed to delete directory {upload_dir}: {e}")
 
     success = ReportRepository.delete(report_id)
     if not success:

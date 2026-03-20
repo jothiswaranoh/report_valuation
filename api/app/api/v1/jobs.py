@@ -18,6 +18,7 @@ from app.repositories.report_repo import ReportRepository, OriginalFileRepositor
 from app.core.config import config
 from app.api.v1.dependencies import get_current_user
 from app.celery_app import celery_app
+from app.api.v1.reports import get_report_upload_dir
 
 logger = logging.getLogger(__name__)
 
@@ -101,12 +102,7 @@ async def upload_and_dispatch(
             detail=f"File too large ({file_size_mb:.1f} MB). Limit: {config.MAX_FILE_SIZE_MB} MB",
         )
 
-    now         = datetime.utcnow()
-    year        = str(now.year)
-    month       = now.strftime("%b").lower()
-    safe_client = client_name.strip().replace(" ", "_").lower()
-
-    upload_dir = os.path.join(config.UPLOAD_DIR, year, month, safe_client)
+    upload_dir = get_report_upload_dir(report)
     os.makedirs(upload_dir, exist_ok=True)
 
     # Create DB record first to get the document_id
