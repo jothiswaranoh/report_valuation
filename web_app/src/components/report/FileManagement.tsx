@@ -1,94 +1,14 @@
-import { useState, useCallback, useMemo } from 'react';
-import { CheckCircle2, AlertCircle } from 'lucide-react';
-import { FileNode, ValuationReport, ReportFile } from '../../types';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { ApiFile } from '../../apis/files.api';
+import filesApi from '../../apis/files.api';
+import reportsApi from '../../apis/report.api';
 import FileList from './file-manager/FileList';
 import InlinePdfViewer from './file-manager/InlinePdfViewer';
 import FileManagerHeader from './file-manager/FileManagerHeader';
 import FileBreadcrumb from './file-manager/FileBreadcrumb';
 import { DeleteConfirmModal } from '../common/DeleteConfirmModal';
-import reportsApi from '../../apis/report.api';
-
-/**
- * Traverse the file tree and return an ordered array of FOLDER nodes
- * from the root down to the given targetId.
- * If targetId belongs to a file, the path stops at its parent folder.
- */
-function getNodePath(
-    nodes: FileNode[],
-    targetId: string,
-    currentPath: FileNode[] = []
-): FileNode[] | null {
-    for (const node of nodes) {
-        if (node.id === targetId) {
-            return node.type === 'folder' ? [...currentPath, node] : currentPath;
-        }
-        if (node.children && node.children.length > 0) {
-            const nextPath = node.type === 'folder' ? [...currentPath, node] : currentPath;
-            const result = getNodePath(node.children, targetId, nextPath);
-            if (result !== null) return result;
-        }
-    }
-    return null;
-}
-
-// ── Recursive State Mutators for Rename, Copy, Delete ─────────────────────────
-
-function copyNodeDeep(node: FileNode, newId: string, copyName: string): FileNode {
-    return {
-        ...node,
-        id: newId,
-        name: copyName,
-        children: node.children ? node.children.map(child => copyNodeDeep(child, crypto.randomUUID(), child.name)) : undefined,
-    };
-}
-
-function copyNode(tree: FileNode[], targetId: string): FileNode[] {
-    return tree.flatMap((node) => {
-        if (node.id === targetId) {
-            // Found it. Duplicate it with " copy" appended
-            const baseName = node.name.replace(/\.[^/.]+$/, '');
-            const ext = node.name.includes('.') ? node.name.slice(node.name.lastIndexOf('.')) : '';
-            const copyName = `${baseName} copy${ext}`;
-            const copiedNode = copyNodeDeep(node, crypto.randomUUID(), copyName);
-
-            // Return original plus copy in the exact same directory
-            return [node, copiedNode];
-        }
-        if (node.children) {
-            return [{ ...node, children: copyNode(node.children, targetId) }];
-        }
-        return [node];
-    });
-}
-
-function renameNode(tree: FileNode[], targetId: string, newName: string): FileNode[] {
-    return tree.map((node) => {
-        if (node.id === targetId) {
-            return { ...node, name: newName };
-        }
-        if (node.children) {
-            return { ...node, children: renameNode(node.children, targetId, newName) };
-        }
-        return node;
-    });
-}
-
-function deleteNode(tree: FileNode[], targetId: string): FileNode[] {
-    return tree.filter(node => node.id !== targetId).map(node => {
-        if (node.children) {
-            return { ...node, children: deleteNode(node.children, targetId) };
-        }
-        return node;
-    });
-}
-
-interface FileManagementProps {
-    fileTree: FileNode[];
-    reports: ValuationReport[];
-    onDownload?: (file: ReportFile) => void;
-    onDelete?: (file: ReportFile) => Promise<void>;
-    onMoveFile?: (fileId: string, targetNode: FileNode) => Promise<void>;
-}
 
 interface Toast {
     id: number;
@@ -96,34 +16,55 @@ interface Toast {
     message: string;
 }
 
-export default function FileManagement({
-    fileTree: propFileTree,
-    reports,
-    onDownload,
-    onDelete,
-    onMoveFile,
-}: FileManagementProps) {
-    // ── Navigation state ──────────────────────────────────────────────────────
-    /** The folder the user has navigated into. null = root ("My Files"). */
-    const [currentFolderNode, setCurrentFolderNode] = useState<FileNode | null>(null);
+export default function FileManagement() {
+    // ── URL-based navigation ──────────────────────────────────────────────────
+    const [searchParams, setSearchParams] = useSearchParams();
+    const currentPath = searchParams.get('path') ?? '';
 
-    // ── Other UI state ────────────────────────────────────────────────────────
+    // ── API data ──────────────────────────────────────────────────────────────
+    const [folders, setFolders] = useState<string[]>([]);
+    const [files, setFiles] = useState<ApiFile[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    // ── UI state ──────────────────────────────────────────────────────────────
     const [searchQuery, setSearchQuery] = useState('');
-    const [previewFile, setPreviewFile] = useState<ReportFile | null>(null);
+    const [previewFile, setPreviewFile] = useState<ApiFile | null>(null);
+    const [previewBlobUrl, setPreviewBlobUrl] = useState<string | null>(null);
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const [activeTab, setActiveTab] = useState<'files' | 'recents'>('files');
-    const [deleteItem, setDeleteItem] = useState<ReportFile | null>(null);
+    const [deleteItem, setDeleteItem] = useState<ApiFile | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
-    const [draggedFile, setDraggedFile] = useState<ReportFile | null>(null);
     const [toasts, setToasts] = useState<Toast[]>([]);
 
-    // Local file tree — mutated optimistically on drag & drop
-    const [localFileTree, setLocalFileTree] = useState<FileNode[]>(propFileTree);
-    const [prevPropFileTree, setPrevPropFileTree] = useState<FileNode[]>(propFileTree);
-    if (propFileTree !== prevPropFileTree) {
-        setPrevPropFileTree(propFileTree);
-        setLocalFileTree(propFileTree);
-    }
+    // ── Clipboard (for copy/paste) ────────────────────────────────────────────
+    const [clipboard, setClipboard] = useState<{ fileId: string; fileName: string } | null>(null);
+
+    // ── Fetch files from API ──────────────────────────────────────────────────
+    const fetchFiles = useCallback(async (path: string) => {
+        setLoading(true);
+        setError(null);
+        try {
+            const data = await filesApi.listFiles(path);
+            setFolders(data.folders);
+            setFiles(data.files);
+        } catch (err: any) {
+            setError(err.message || 'Failed to load files');
+            setFolders([]);
+            setFiles([]);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    // Re-fetch whenever the path changes
+    useEffect(() => {
+        fetchFiles(currentPath);
+    }, [currentPath, fetchFiles]);
+
+    const refresh = useCallback(() => {
+        fetchFiles(currentPath);
+    }, [currentPath, fetchFiles]);
 
     // ── Toast helpers ─────────────────────────────────────────────────────────
     const showToast = (type: 'success' | 'error', message: string) => {
@@ -132,180 +73,154 @@ export default function FileManagement({
         setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3500);
     };
 
-    // ── Preview ───────────────────────────────────────────────────────────────
-    const handlePreview = async (file: ReportFile) => {
-        if (file.url && file.url.includes('/api/')) {
-            try {
-                const blob = await reportsApi.downloadFile(file.id);
-                const blobUrl = URL.createObjectURL(blob);
-                setPreviewFile({ ...file, url: blobUrl });
-            } catch (error) {
-                console.error('Error fetching preview:', error);
-                setPreviewFile(file);
-            }
+    // ── Navigation ────────────────────────────────────────────────────────────
+    const navigateToFolder = (folderName: string) => {
+        const newPath = currentPath ? `${currentPath}/${folderName}` : folderName;
+        setSearchParams({ path: newPath });
+        setSearchQuery('');
+    };
+
+    const navigateBreadcrumb = (path: string) => {
+        if (path === '') {
+            setSearchParams({});
         } else {
+            setSearchParams({ path });
+        }
+        setSearchQuery('');
+    };
+
+    // ── Preview ───────────────────────────────────────────────────────────────
+    const handlePreview = async (file: ApiFile) => {
+        try {
+            const blob = await reportsApi.downloadFile(file.id);
+            const blobUrl = URL.createObjectURL(blob);
+            setPreviewBlobUrl(blobUrl);
+            setPreviewFile(file);
+        } catch (err) {
+            console.error('Error fetching preview:', err);
             setPreviewFile(file);
         }
     };
 
     const handleClosePreview = () => {
-        if (previewFile?.url && previewFile.url.startsWith('blob:')) {
-            URL.revokeObjectURL(previewFile.url);
+        if (previewBlobUrl) {
+            URL.revokeObjectURL(previewBlobUrl);
+            setPreviewBlobUrl(null);
         }
         setPreviewFile(null);
     };
 
+    // ── Download ──────────────────────────────────────────────────────────────
+    const handleDownload = async (file: ApiFile) => {
+        try {
+            const blob = await reportsApi.downloadFile(file.id);
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = file.file_name;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        } catch (err: any) {
+            showToast('error', err.message || 'Download failed');
+        }
+    };
+
+    // ── Rename ────────────────────────────────────────────────────────────────
+    const handleRename = async (file: ApiFile) => {
+        const newName = window.prompt(`Rename "${file.file_name}" to:`, file.file_name);
+        if (!newName || newName.trim() === '' || newName === file.file_name) return;
+        try {
+            await filesApi.renameFile(file.id, newName.trim());
+            showToast('success', `Renamed to "${newName.trim()}"`);
+            refresh();
+        } catch (err: any) {
+            showToast('error', err.message || 'Rename failed');
+        }
+    };
+
+    // ── Copy (clipboard) ─────────────────────────────────────────────────────
+    const handleCopy = (file: ApiFile) => {
+        console.log('[Clipboard] Copy:', file.id, file.file_name);
+        setClipboard({ fileId: file.id, fileName: file.file_name });
+        showToast('success', `"${file.file_name}" copied to clipboard`);
+    };
+
+    // ── Paste ─────────────────────────────────────────────────────────────────
+    const handlePaste = async () => {
+        if (!clipboard) {
+            console.log('[Clipboard] Paste called but clipboard is empty');
+            return;
+        }
+        console.log('[Clipboard] Paste:', clipboard.fileId, 'into path:', currentPath);
+        try {
+            await filesApi.copyFile(clipboard.fileId, currentPath);
+            showToast('success', `Pasted "${clipboard.fileName}"`);
+            setClipboard(null);
+            console.log('[Clipboard] Cleared after paste');
+            refresh();
+        } catch (err: any) {
+            showToast('error', err.message || 'Paste failed');
+        }
+    };
+
     // ── Delete ────────────────────────────────────────────────────────────────
     const confirmDelete = async () => {
-        if (!deleteItem || !onDelete) return;
+        if (!deleteItem) return;
         setIsDeleting(true);
         try {
-            await onDelete(deleteItem);
+            await filesApi.deleteFile(deleteItem.id);
+            showToast('success', `Deleted "${deleteItem.file_name}"`);
             setDeleteItem(null);
-        } catch (error) {
-            console.error('Delete failed:', error);
+            refresh();
+        } catch (err: any) {
+            showToast('error', err.message || 'Delete failed');
         } finally {
             setIsDeleting(false);
         }
     };
 
-    // ── Drag & drop (move file in tree) ───────────────────────────────────────
-    const moveFileInTree = useCallback(
-        (tree: FileNode[], fileId: string, targetFolderId: string): { tree: FileNode[]; movedNode: FileNode | null } => {
-            let movedNode: FileNode | null = null;
-
-            const removeFile = (nodes: FileNode[]): FileNode[] =>
-                nodes.reduce<FileNode[]>((acc, node) => {
-                    if (node.type === 'file' && node.id === fileId) { movedNode = node; return acc; }
-                    if (node.children) return [...acc, { ...node, children: removeFile(node.children) }];
-                    return [...acc, node];
-                }, []);
-
-            const addFile = (nodes: FileNode[], fileNode: FileNode): FileNode[] =>
-                nodes.map((node) => {
-                    if (node.id === targetFolderId && node.type === 'folder')
-                        return { ...node, children: [...(node.children || []), fileNode] };
-                    if (node.children) return { ...node, children: addFile(node.children, fileNode) };
-                    return node;
-                });
-
-            const treeWithoutFile = removeFile(tree);
-            if (!movedNode) return { tree, movedNode: null };
-            return { tree: addFile(treeWithoutFile, movedNode), movedNode };
-        },
-        []
-    );
-
-    // ── Local Kebab Actions (Copy, Rename, Delete) ────────────────────────────
-
-    const handleCopy = (node: FileNode | ReportFile) => {
-        setLocalFileTree(prev => copyNode(prev, node.id));
-        showToast('success', `Copied "${node.name}" successfully`);
+    const handleDeleteAction = (file: ApiFile) => {
+        setDeleteItem(file);
     };
 
-    const handleRename = (node: FileNode | ReportFile) => {
-        const newName = window.prompt(`Rename "${node.name}" to:`, node.name);
-        if (newName && newName.trim() !== '' && newName !== node.name) {
-            setLocalFileTree(prev => renameNode(prev, node.id, newName.trim()));
-            showToast('success', `Renamed to "${newName.trim()}"`);
-        }
-    };
-
-    const handleDeleteLocal = (node: FileNode | ReportFile) => {
-        // As per prompt: "Delete should remove a file or folder from the tree... The UI should update immediately"
-        // We will directly apply local state deletion.
-        setLocalFileTree(prev => deleteNode(prev, node.id));
-        showToast('success', `Deleted "${node.name}"`);
-    };
-
-    // ── Download ──────────────────────────────────────────────────────────────
-    const handleDownload = (file: ReportFile) => {
-        if (onDownload) { onDownload(file); return; }
-        if (file.url && file.url !== '#') {
-            const link = document.createElement('a');
-            link.href = file.url;
-            link.download = file.name;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        } else {
-            alert(`Downloading ${file.name} is not available in demo mode (simulated)`);
-        }
-    };
-
-    // ── Derived display data ──────────────────────────────────────────────────
-
-    /**
-     * Children of the current folder (or root nodes when at root).
-     * Filtered by searchQuery if present.
-     */
-    const currentChildren = useMemo<FileNode[]>(() => {
-        const children = currentFolderNode?.children ?? localFileTree;
-        if (!searchQuery.trim()) return children;
+    // ── Filtered data ─────────────────────────────────────────────────────────
+    const filteredFolders = useMemo(() => {
+        if (!searchQuery.trim()) return folders;
         const q = searchQuery.toLowerCase();
-        return children.filter((n) => n.name.toLowerCase().includes(q));
-    }, [currentFolderNode, localFileTree, searchQuery]);
+        return folders.filter((f) => f.toLowerCase().includes(q));
+    }, [folders, searchQuery]);
 
-    const displayFolderNodes = useMemo(
-        () => currentChildren.filter((n) => n.type === 'folder'),
-        [currentChildren]
-    );
+    const filteredFiles = useMemo(() => {
+        if (!searchQuery.trim()) return files;
+        const q = searchQuery.toLowerCase();
+        return files.filter((f) => f.file_name.toLowerCase().includes(q));
+    }, [files, searchQuery]);
 
-    const displayFiles = useMemo<ReportFile[]>(
-        () =>
-            currentChildren
-                .filter((n) => n.type === 'file' && n.reportId)
-                .map((n) => {
-                    const report = reports.find((r) => r.id === n.reportId);
-                    return report?.files.find((f) => f.id === n.id);
-                })
-                .filter(Boolean) as ReportFile[],
-        [currentChildren, reports]
-    );
+    const itemCount = filteredFolders.length + filteredFiles.length;
 
-    /** All files across all reports sorted by most recent — for Recents tab */
-    const allRecentFiles = useMemo<ReportFile[]>(() => {
-        const all = reports.flatMap((r) => r.files ?? []);
-        const filtered = searchQuery.trim()
-            ? all.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase()))
-            : all;
-        return [...filtered].sort(
-            (a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
-        );
-    }, [reports, searchQuery]);
-
-    /** Breadcrumb folder path for the current folder */
-    const folderPath = useMemo<FileNode[]>(() => {
-        if (!currentFolderNode) return [];
-        return getNodePath(localFileTree, currentFolderNode.id) ?? [];
-    }, [localFileTree, currentFolderNode]);
-
-    /** Total item count shown in breadcrumb */
-    const itemCount = activeTab === 'recents'
-        ? allRecentFiles.length
-        : displayFolderNodes.length + displayFiles.length;
-
-    // ── Folder navigation ─────────────────────────────────────────────────────
-    const navigateToFolder = (node: FileNode) => {
-        setCurrentFolderNode(node);
-        setSearchQuery('');
-    };
-
-    const navigateBreadcrumb = (node: FileNode | null) => {
-        setCurrentFolderNode(node);
-        setSearchQuery('');
-    };
+    // ── Build preview file object for InlinePdfViewer ─────────────────────────
+    const previewReportFile = previewFile
+        ? {
+            id: previewFile.id,
+            name: previewFile.file_name,
+            type: 'original' as const,
+            size: '',
+            uploadedAt: new Date(),
+            url: previewBlobUrl || '',
+        }
+        : null;
 
     return (
         <div className="flex-1 flex flex-col min-h-0">
             <div className="flex-1 min-h-0 flex flex-col bg-white rounded-xl border border-brand-100 shadow-lg overflow-hidden">
 
-                {previewFile ? (
-                    /* ── Inline PDF / file viewer — replaces the file list ── */
+                {previewReportFile ? (
                     <InlinePdfViewer
-                        file={previewFile}
+                        file={previewReportFile}
                         onClose={handleClosePreview}
-                        onDownload={handleDownload}
+                        onDownload={() => previewFile && handleDownload(previewFile)}
                     />
                 ) : (
                     <>
@@ -319,25 +234,20 @@ export default function FileManagement({
                             onTabChange={(tab) => {
                                 setActiveTab(tab);
                                 if (tab === 'recents') {
-                                    setCurrentFolderNode(null);
                                     setSearchQuery('');
                                 }
                             }}
+                            clipboard={clipboard}
+                            onPaste={handlePaste}
                         />
 
                         {/* ── Main content area ── */}
                         <div className="flex-1 bg-slate-50 overflow-auto">
-                            {draggedFile && (
-                                <div className="px-6 py-2 bg-blue-50 border-b border-blue-100 text-xs text-blue-600 font-medium">
-                                    📂 Dragging <strong>"{draggedFile.name}"</strong> — drop onto a folder to move it
-                                </div>
-                            )}
-
                             <div className="p-6">
                                 <div className="mb-6">
                                     {activeTab === 'files' ? (
                                         <FileBreadcrumb
-                                            folderPath={folderPath}
+                                            path={currentPath}
                                             onNavigate={navigateBreadcrumb}
                                             fileCount={itemCount}
                                         />
@@ -345,39 +255,39 @@ export default function FileManagement({
                                         <div className="flex items-center justify-between">
                                             <span className="text-sm font-bold text-slate-800">Recent Files</span>
                                             <span className="text-xs text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full">
-                                                {allRecentFiles.length} {allRecentFiles.length === 1 ? 'file' : 'files'}
+                                                {filteredFiles.length} {filteredFiles.length === 1 ? 'file' : 'files'}
                                             </span>
                                         </div>
                                     )}
                                 </div>
 
-                                {activeTab === 'recents' ? (
-                                    <FileList
-                                        folderNodes={[]}
-                                        files={allRecentFiles}
-                                        viewMode={viewMode}
-                                        reports={reports}
-                                        onFolderClick={() => { }}
-                                        onPreview={handlePreview}
-                                        onDownload={handleDownload}
-                                        onCopy={handleCopy}
-                                        onRename={handleRename}
-                                        onDelete={handleDeleteLocal}
-                                        onDragStart={setDraggedFile}
-                                    />
+                                {loading ? (
+                                    <div className="flex flex-col items-center justify-center py-24 text-center">
+                                        <Loader2 size={32} className="text-brand-500 animate-spin mb-4" />
+                                        <p className="text-sm text-slate-500">Loading files…</p>
+                                    </div>
+                                ) : error ? (
+                                    <div className="flex flex-col items-center justify-center py-24 text-center">
+                                        <AlertCircle size={32} className="text-red-400 mb-4" />
+                                        <p className="text-sm text-red-600 font-medium">{error}</p>
+                                        <button
+                                            onClick={refresh}
+                                            className="mt-3 px-4 py-2 text-sm bg-brand-500 text-white rounded-lg hover:bg-brand-600 transition-colors"
+                                        >
+                                            Retry
+                                        </button>
+                                    </div>
                                 ) : (
                                     <FileList
-                                        folderNodes={displayFolderNodes}
-                                        files={displayFiles}
+                                        folderNames={filteredFolders}
+                                        files={filteredFiles}
                                         viewMode={viewMode}
-                                        reports={reports}
                                         onFolderClick={navigateToFolder}
                                         onPreview={handlePreview}
                                         onDownload={handleDownload}
                                         onCopy={handleCopy}
                                         onRename={handleRename}
-                                        onDelete={handleDeleteLocal}
-                                        onDragStart={setDraggedFile}
+                                        onDelete={handleDeleteAction}
                                     />
                                 )}
                             </div>
@@ -393,7 +303,7 @@ export default function FileManagement({
                         onConfirm={confirmDelete}
                         title="Delete File"
                         message="Are you sure you want to delete this file?"
-                        itemName={deleteItem.name}
+                        itemName={deleteItem.file_name}
                         isDeleting={isDeleting}
                     />
                 )}

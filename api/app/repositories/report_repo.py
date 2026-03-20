@@ -73,7 +73,6 @@ class ReportRepository:
         for report in reports.find(query):
             report_id = str(report["_id"])
             files = OriginalFileRepository.get_by_report(report_id)
-            print(f"DEBUG: Report {report.get('report_name')} (ID: {report_id}), files count: {len(files)}")
             
             item = {
                 "id": report_id,
@@ -213,7 +212,66 @@ class OriginalFileRepository:
             return result.deleted_count > 0
         except:
             return False
-        
+
+    @staticmethod
+    def update_file_metadata(file_id: str, file_name: str, file_path: str, updated_by: str):
+        original_files.update_one(
+            {"_id": ObjectId(file_id)},
+            {"$set": {
+                "file_name": file_name,
+                "file_path": file_path,
+                "updated_by": ObjectId(updated_by),
+                "updated_at": datetime.utcnow()
+            }}
+        )
+        return OriginalFileRepository.get_by_id(file_id)
+
+
+    @staticmethod
+    def get_by_id_for_user(file_id: str, user_id: str) -> Optional[dict]:
+        file = original_files.find_one({"_id": ObjectId(file_id)})
+        if not file:
+            return None
+
+        report = reports.find_one({
+            "_id": file["report_id"],
+            "user_id": ObjectId(user_id)
+        })
+
+        if not report:
+            return None
+
+        file["id"] = str(file["_id"])
+        file["report_id"] = str(file["report_id"])
+        if "created_by" in file:
+            file["created_by"] = str(file["created_by"])
+        if "updated_by" in file:
+            file["updated_by"] = str(file["updated_by"])
+        del file["_id"]
+
+        return file
+
+    @staticmethod
+    def get_files_for_user(user_id: str) -> List[dict]:
+        """Get all files belonging to a user (via their reports), without loading full reports."""
+        user_report_ids = [
+            r["_id"] for r in reports.find({"user_id": ObjectId(user_id)}, {"_id": 1})
+        ]
+        if not user_report_ids:
+            return []
+
+        result = []
+        for file in original_files.find({"report_id": {"$in": user_report_ids}}):
+            file["id"] = str(file["_id"])
+            file["report_id"] = str(file["report_id"])
+            if "created_by" in file:
+                file["created_by"] = str(file["created_by"])
+            if "updated_by" in file:
+                file["updated_by"] = str(file["updated_by"])
+            del file["_id"]
+            result.append(file)
+        return result
+
     @staticmethod
     def update_file_content(file_id: str, content: str, updated_by: str) -> bool:
         result = original_files.update_one(

@@ -11,6 +11,7 @@ from app.api.v1.documents import router as documents_router
 from app.api.v1.reports import router as reports_router
 from app.api.v1.banks import router as banks_router
 from app.api.v1.jobs import router as jobs_router
+from app.api.v1.files import router as files_router
 
 # Configure logging
 logging.basicConfig(
@@ -36,6 +37,7 @@ app.include_router(documents_router)
 app.include_router(reports_router)
 app.include_router(banks_router)
 app.include_router(jobs_router)   # ← async Celery-based job API
+app.include_router(files_router)
 
 # Serve uploaded files statically so the browser can preview PDFs
 # Default to uploads/ next to this file rather than the Docker-only /app/uploads

@@ -1,4 +1,4 @@
-import { Search, LayoutGrid, LayoutList, X } from 'lucide-react';
+import { Search, LayoutGrid, LayoutList, X, ClipboardPaste } from 'lucide-react';
 
 interface FileManagerHeaderProps {
     searchQuery: string;
@@ -7,6 +7,8 @@ interface FileManagerHeaderProps {
     onViewModeChange: (mode: 'grid' | 'list') => void;
     activeTab: 'files' | 'recents';
     onTabChange: (tab: 'files' | 'recents') => void;
+    clipboard?: { fileId: string; fileName: string } | null;
+    onPaste?: () => void;
 }
 
 export default function FileManagerHeader({
@@ -16,6 +18,8 @@ export default function FileManagerHeader({
     onViewModeChange,
     activeTab,
     onTabChange,
+    clipboard,
+    onPaste,
 }: FileManagerHeaderProps) {
     return (
         <div className="bg-white border-b border-slate-200 px-6 py-3 flex items-center gap-4 flex-shrink-0">
@@ -47,6 +51,18 @@ export default function FileManagerHeader({
                     </button>
                 )}
             </div>
+
+            {/* Paste button (shown when clipboard has content) */}
+            {clipboard && onPaste && (
+                <button
+                    onClick={onPaste}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-brand-50 text-brand-700 border border-brand-200 rounded-lg hover:bg-brand-100 transition-colors flex-shrink-0"
+                    title={`Paste "${clipboard.fileName}"`}
+                >
+                    <ClipboardPaste size={14} />
+                    Paste
+                </button>
+            )}
 
             {/* Tabs */}
             <nav className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl flex-shrink-0">
@@ -99,3 +115,4 @@ export default function FileManagerHeader({
         </div>
     );
 }
+

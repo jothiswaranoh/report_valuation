@@ -32,3 +32,11 @@ export type {
     SSEEventCallback,
     SSEErrorCallback
 } from './documents.api';
+
+// Files API
+export { filesApi } from './files.api';
+export type {
+    ApiFile,
+    ListFilesResponse,
+    FileActionResponse
+} from './files.api';
