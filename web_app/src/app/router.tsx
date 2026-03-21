@@ -14,6 +14,7 @@ import SignupPage from "../pages/SignupPage";
 import ProcessingPage from "../pages/ProcessingPage";
 import ReportListPage from "../pages/ReportListPage";
 import CurrentReportPage from "../pages/CurrentReportPage";
+import HistoryPage from "../pages/HistoryPage";
 
 // Placeholder components for missing files
 const ErrorBoundary = () => (
@@ -58,6 +59,7 @@ const router = createBrowserRouter([
       { path: "users", element: <UsersPage /> },
       { path: "banks", element: <BankManagementPage /> },
       { path: "list", element: <ReportListPage /> },
+      { path: "history", element: <HistoryPage /> },
       { path: "current-report", element: <CurrentReportPage /> },
       { path: "*", element: <NotFound /> }, // Catch-all 404 route
     ],

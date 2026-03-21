@@ -29,6 +29,10 @@ export interface ApiReport {
 
 export interface GetReportsResponse {
   reports: ApiReport[];
+  total: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
 }
 
 export interface CheckReportNameResponse {
@@ -56,8 +60,11 @@ export const reportsApi = {
    * Get all reports
    * GET /api/v1/reports
    */
-  getReports: () =>
-    apiClient.get<GetReportsResponse>('/api/v1/reports'),
+  getReports: (page = 1, page_size = 10, search?: string) => {
+    const params = new URLSearchParams({ page: String(page), page_size: String(page_size) });
+    if (search) params.set('search', search);
+    return apiClient.get<GetReportsResponse>(`/api/v1/reports?${params.toString()}`);
+  },
 
   /**
    * Check report name availability

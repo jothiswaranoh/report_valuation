@@ -116,15 +116,33 @@ async def create_report(
 
 
 @router.get("/reports")
-async def get_reports(current_user: dict = Depends(get_current_user)):
-    """Get all reports for current user"""
+async def get_reports(
+    current_user: dict = Depends(get_current_user),
+    page: int = Query(1, ge=1, description="Page number (1-based)"),
+    page_size: int = Query(10, ge=1, le=100, description="Number of items per page"),
+    search: Optional[str] = Query(None, description="Search term for report name or bank name"),
+):
+    """Get paginated reports for current user"""
+
+    skip = (page - 1) * page_size
+    search_term = search.strip() if search else None
 
     if "admin" in current_user.get("roles", []):
-        reports = ReportRepository.get_all()
+        total = ReportRepository.count_all(search=search_term)
+        report_list = ReportRepository.get_all(skip=skip, limit=page_size, search=search_term)
     else:
-        reports = ReportRepository.get_all(user_id=current_user["id"])
+        total = ReportRepository.count_all(user_id=current_user["id"], search=search_term)
+        report_list = ReportRepository.get_all(user_id=current_user["id"], skip=skip, limit=page_size, search=search_term)
 
-    return {"success": True, "reports": reports}
+    return {
+        "success": True,
+        "reports": report_list,
+        "total": total,
+        "page": page,
+        "page_size": page_size,
+        "total_pages": max(1, -(-total // page_size)),  # ceiling division
+    }
+
 
 
 @router.get("/reports/check")

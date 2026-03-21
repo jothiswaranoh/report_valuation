@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { LayoutGrid, History } from 'lucide-react';
 import { config } from '../config/config';
 
 // Components
@@ -10,9 +9,6 @@ import UploadStep from './upload/UploadStep';
 import FileSelectionStep from './upload/FileSelectionStep';
 import ProcessingStep from './upload/ProcessingStep';
 import CompletionStep from './upload/CompletionStep';
-import ReportsSidebar from './upload/ReportsSidebar';
-import ReportDetailView from './upload/ReportDetailView';
-
 // Types
 import { UploadedFile, ProjectReport } from './upload/types';
 
@@ -21,12 +17,9 @@ import { useCreateReport, useReport } from '../hooks/useReports';
 import { reportsApi } from '../apis/report.api';
 import { useAppStore } from '../store/useAppStore';
 
-type ViewMode = 'upload' | 'browse';
-
 export default function Upload() {
   // ==================== STATE ====================
 
-  const [viewMode, setViewMode] = useState<ViewMode>('upload');
   const [currentStep, setCurrentStep] = useState(1);
 
   const [projectName, setProjectName] = useState('');
@@ -40,7 +33,6 @@ export default function Upload() {
     percentage: 0,
   });
 
-  const [selectedBrowseReportId, setSelectedBrowseReportId] = useState<string | null>(null);
   const [recentProjects] = useState<ProjectReport[]>([]);
 
   // ==================== REFS ====================
@@ -418,118 +410,79 @@ export default function Upload() {
 
               {/* Step Indicator */}
               <div className="flex items-center justify-center w-full pt-4 lg:pt-8">
-                {viewMode === 'upload' && (
-                  <StepIndicator currentStep={currentStep} />
-                )}
+                <StepIndicator currentStep={currentStep} />
               </div>
 
-              {/* View Mode Toggle */}
-              <div className="flex justify-center lg:justify-end w-full">
-                <div className="flex gap-2 bg-sky-500 shadow-md shadow-sky-200 p-1 rounded-lg shrink-0">
-                  <button
-                    onClick={() => setViewMode('upload')}
-                    className={`px-4 py-2 rounded-md font-medium transition-all flex items-center gap-2 ${viewMode === 'upload'
-                      ? 'bg-white text-sky-600 shadow-sm'
-                      : 'text-white/80 hover:text-white'
-                      }`}
-                  >
-                    <LayoutGrid size={16} />
-                    Wizard
-                  </button>
-                  <button
-                    onClick={() => setViewMode('browse')}
-                    className={`px-4 py-2 rounded-md font-medium transition-all flex items-center gap-2 ${viewMode === 'browse'
-                      ? 'bg-white text-sky-600 shadow-sm'
-                      : 'text-white/80 hover:text-white'
-                      }`}
-                  >
-                    <History size={16} />
-                    History
-                  </button>
-                </div>
-              </div>
+              {/* Empty Right Placeholder to balance Grid */}
+              <div className="hidden lg:block"></div>
             </div>
           </div>
         </header>
 
         {/* Main Content */}
         <main className="flex-1 min-h-0 overflow-y-auto max-w-7xl w-full mx-auto px-2 sm:px-3 lg:px-4 py-8">
-          {viewMode === 'browse' ? (
-            <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-6 min-h-full">
-              <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden flex flex-col min-h-0">
-                <ReportsSidebar
-                  selectedReportId={selectedBrowseReportId}
-                  onReportSelect={setSelectedBrowseReportId}
-                />
-              </div>
-              <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden flex flex-col min-h-0">
-                <ReportDetailView reportId={selectedBrowseReportId} />
-              </div>
-            </div>
-          ) : (
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-              {currentStep === 1 && (
-                <ProjectNameStep
-                  projectName={projectName}
-                  setProjectName={setProjectName}
-                  bankName={bankName}
-                  setBankName={setBankName}
-                  onNext={handleCreateReport}
-                  recentProjects={recentProjects}
-                />
-              )}
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {currentStep === 1 && (
+              <ProjectNameStep
+                projectName={projectName}
+                setProjectName={setProjectName}
+                bankName={bankName}
+                setBankName={setBankName}
+                onNext={handleCreateReport}
+                recentProjects={recentProjects}
+              />
+            )}
 
-              {currentStep === 2 && (
-                <UploadStep
-                  projectName={projectName}
-                  files={files}
-                  onFilesChange={setFiles}
-                  onUpload={handleFileUpload}
-                  onDownload={handleDownload}
-                  onNext={() => setCurrentStep(3)}
-                  onUploadOnly={() => navigate('/')}
-                  onBack={() => setCurrentStep(1)}
-                />
-              )}
+            {currentStep === 2 && (
+              <UploadStep
+                projectName={projectName}
+                files={files}
+                onFilesChange={setFiles}
+                onUpload={handleFileUpload}
+                onDownload={handleDownload}
+                onNext={() => setCurrentStep(3)}
+                onUploadOnly={() => navigate('/')}
+                onBack={() => setCurrentStep(1)}
+              />
+            )}
 
-              {currentStep === 3 && (
-                <FileSelectionStep
-                  files={files}
-                  selectedFiles={selectedFiles}
-                  setSelectedFiles={setSelectedFiles}
-                  onFilesChange={setFiles}
-                  onUpload={handleFileUpload}
-                  onDownload={handleDownload}
-                  onBack={() => setCurrentStep(2)}
-                  onNext={handleImportAndAnalyze}
-                />
-              )}
+            {currentStep === 3 && (
+              <FileSelectionStep
+                files={files}
+                selectedFiles={selectedFiles}
+                setSelectedFiles={setSelectedFiles}
+                onFilesChange={setFiles}
+                onUpload={handleFileUpload}
+                onDownload={handleDownload}
+                onBack={() => setCurrentStep(2)}
+                onNext={handleImportAndAnalyze}
+              />
+            )}
 
-              {currentStep === 4 && (
-                <ProcessingStep
-                  files={files}
-                  selectedFiles={selectedFiles}
-                  progress={processingProgress}
-                  onCopyLink={async () => {
-                    const effectiveReportId = reportId || urlReportId;
-                    if (!effectiveReportId) return false;
-                    const shareUrl = buildShareUrl(effectiveReportId);
-                    return copyToClipboard(shareUrl);
-                  }}
-                  onGoHome={() => navigate('/')}
-                />
-              )}
+            {currentStep === 4 && (
+              <ProcessingStep
+                files={files}
+                selectedFiles={selectedFiles}
+                progress={processingProgress}
+                onCopyLink={async () => {
+                  const effectiveReportId = reportId || urlReportId;
+                  if (!effectiveReportId) return false;
+                  const shareUrl = buildShareUrl(effectiveReportId);
+                  return copyToClipboard(shareUrl);
+                }}
+                onGoHome={() => navigate('/')}
+              />
+            )}
 
-              {currentStep === 5 && (
-                <CompletionStep
-                  files={files}
-                  selectedFiles={selectedFiles}
-                  onSave={handleCreateProject}
-                  onRestart={handleFinish}
-                />
-              )}
-            </div>
-          )}
+            {currentStep === 5 && (
+              <CompletionStep
+                files={files}
+                selectedFiles={selectedFiles}
+                onSave={handleCreateProject}
+                onRestart={handleFinish}
+              />
+            )}
+          </div>
         </main>
       </div>
     </div>

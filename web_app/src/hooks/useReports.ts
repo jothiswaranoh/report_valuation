@@ -34,10 +34,13 @@ export function useCreateReport() {
  * Get all reports
  * GET /api/v1/reports
  */
-export function useReports(options?: { refetchInterval?: number }) {
+export function useReports(options?: { refetchInterval?: number; page?: number; page_size?: number; search?: string }) {
+  const page = options?.page ?? 1;
+  const page_size = options?.page_size ?? 10;
+  const search = options?.search ?? '';
   return useQuery({
-    queryKey: REPORTS_KEY,
-    queryFn: reportsApi.getReports,
+    queryKey: [...REPORTS_KEY, { page, page_size, search }],
+    queryFn: () => reportsApi.getReports(page, page_size, search || undefined),
     ...(options?.refetchInterval ? { refetchInterval: options.refetchInterval } : {}),
   });
 }

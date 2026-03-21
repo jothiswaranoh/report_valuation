@@ -5,7 +5,6 @@ import {
     CheckCircle,
     FileSearch,
     TrendingUp,
-    ArrowRight,
     Activity
 } from 'lucide-react';
 import { DashboardStats, ValuationReport, ReportStatus, PropertyType } from '../types';
@@ -286,7 +285,7 @@ export default function DashboardPage() {
                             <p className="text-sm text-slate-500 font-semibold mt-1">Track your latest generated reports and their status.</p>
                         </div>
                         <button
-                            onClick={() => navigate('/list')}
+                            onClick={() => navigate('/history')}
                             className="text-sm font-bold text-brand-600 hover:text-brand-700 bg-brand-50 hover:bg-brand-100 px-6 py-2.5 rounded-lg transition-all border border-brand-100 active:scale-95"
                         >
                             View Full History
@@ -357,15 +356,6 @@ export default function DashboardPage() {
                                 )}
                             </tbody>
                         </table>
-                    </div>
-                    {/* Empty state footer or more reports hint */}
-                    <div className="px-6 py-4 bg-sky-50/20 border-t border-sky-50 flex justify-center">
-                        <button
-                            onClick={() => navigate('/list')}
-                            className="text-slate-400 text-xs font-bold uppercase tracking-widest hover:text-slate-600 transition-colors flex items-center gap-2"
-                        >
-                            Load More Reports <ArrowRight size={14} />
-                        </button>
                     </div>
                 </div>
             </div>

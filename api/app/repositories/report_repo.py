@@ -64,13 +64,32 @@ class ReportRepository:
             return None
     
     @staticmethod
-    def get_all(user_id: str = None) -> list:
+    def count_all(user_id: str = None, search: str = None) -> int:
         query = {}
         if user_id:
             query["user_id"] = ObjectId(user_id)
+        if search:
+            import re
+            pattern = re.compile(re.escape(search), re.IGNORECASE)
+            query["$or"] = [{"report_name": pattern}, {"bank_name": pattern}]
+        return reports.count_documents(query)
+
+    @staticmethod
+    def get_all(user_id: str = None, skip: int = 0, limit: int = 0, search: str = None) -> list:
+        query = {}
+        if user_id:
+            query["user_id"] = ObjectId(user_id)
+        if search:
+            import re
+            pattern = re.compile(re.escape(search), re.IGNORECASE)
+            query["$or"] = [{"report_name": pattern}, {"bank_name": pattern}]
+
+        cursor = reports.find(query).sort("updated_at", -1).skip(skip)
+        if limit > 0:
+            cursor = cursor.limit(limit)
 
         result = []
-        for report in reports.find(query):
+        for report in cursor:
             report_id = str(report["_id"])
             files = OriginalFileRepository.get_by_report(report_id)
             
@@ -87,6 +106,7 @@ class ReportRepository:
             result.append(item)
 
         return result
+
         
     @staticmethod
     def update_name(report_id: str, report_name: str, updated_by: str) -> Optional[dict]:
