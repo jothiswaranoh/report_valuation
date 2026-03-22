@@ -14,34 +14,6 @@ interface ProjectNameStepProps {
   recentProjects: ProjectReport[];
 }
 
-const INDIAN_BANKS = [
-
-  "State Bank of India (SBI)",
-  "HDFC Bank",
-  "ICICI Bank",
-  "Axis Bank",
-  "Kotak Mahindra Bank",
-  "Punjab National Bank (PNB)",
-  "Bank of Baroda",
-  "Canara Bank",
-  "Union Bank of India",
-  "Bank of India",
-  "Indian Bank",
-  "Central Bank of India",
-  "Indian Overseas Bank",
-  "UCO Bank",
-  "Bank of Maharashtra",
-  "Punjab & Sind Bank",
-  "IDBI Bank",
-  "Federal Bank",
-  "IDFC First Bank",
-  "South Indian Bank",
-  "Karur Vysya Bank",
-  "City Union Bank",
-  "Tamilnad Mercantile Bank",
-  "Karnataka Bank",
-  "Dhanlaxmi Bank"
-];
 
 export default function ProjectNameStep({
   projectName,
@@ -59,7 +31,6 @@ export default function ProjectNameStep({
   });
 
   const banks = Array.isArray(banksData) ? banksData : (banksData as any)?.banks || [];
-  console.log(banks);
 
   const handleProjectNameSubmit = () => {
     if (projectName?.trim() && bankName?.trim()) {
@@ -75,21 +46,11 @@ export default function ProjectNameStep({
     });
   };
 
-  // Combine static Indian banks with dynamic banks from API
-  const allBankOptions = useMemo(() => {
-    // Get bank names from API if available
-    const apiBankNames = banks?.map((bank: any) => bank.name) || [];
-
-    // Combine both lists and remove duplicates
-    const allBanks = [...INDIAN_BANKS, ...apiBankNames];
-    const uniqueBanks = Array.from(new Set(allBanks));
-
-    // Convert to Option format
-    return uniqueBanks.map((bank) => ({
-      label: bank,
-      value: bank,
-    }));
-  }, [banks]);
+  // Map banks from API directly — managed via Bank Management page
+  const allBankOptions = useMemo(() =>
+    (banks ?? []).map((bank: any) => ({ label: bank.name, value: bank.name })),
+    [banks]
+  );
 
   const selectedBank = useMemo(() => {
     if (!bankName) return null;

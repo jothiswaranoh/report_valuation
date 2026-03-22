@@ -6,8 +6,37 @@ Creates admin user: admin@jothis.com / password123
 
 from datetime import datetime
 from bson import ObjectId
-from app.db.session import db, users, roles, user_roles
+from app.db.session import db, users, roles, user_roles, banks
 from app.core.security import hash_password
+
+
+INDIAN_BANKS = [
+    "State Bank of India (SBI)",
+    "HDFC Bank",
+    "ICICI Bank",
+    "Axis Bank",
+    "Kotak Mahindra Bank",
+    "Punjab National Bank (PNB)",
+    "Bank of Baroda",
+    "Canara Bank",
+    "Union Bank of India",
+    "Bank of India",
+    "Indian Bank",
+    "Central Bank of India",
+    "Indian Overseas Bank",
+    "UCO Bank",
+    "Bank of Maharashtra",
+    "Punjab & Sind Bank",
+    "IDBI Bank",
+    "Federal Bank",
+    "IDFC First Bank",
+    "South Indian Bank",
+    "Karur Vysya Bank",
+    "City Union Bank",
+    "Tamilnad Mercantile Bank",
+    "Karnataka Bank",
+    "Dhanlaxmi Bank",
+]
 
 
 def seed_roles():
@@ -69,11 +98,27 @@ def seed_admin_user():
     print(f"   Password: {admin_password}")
 
 
+def seed_banks():
+    """Seed the default Indian banks"""
+    now = datetime.utcnow()
+    seeded = 0
+    for bank_name in INDIAN_BANKS:
+        existing = banks.find_one({"name": {"$regex": f"^{bank_name}$", "$options": "i"}})
+        if not existing:
+            banks.insert_one({"name": bank_name, "created_at": now, "updated_at": now})
+            seeded += 1
+    if seeded:
+        print(f"✅ Seeded {seeded} banks")
+    else:
+        print("⏭️  All default banks already exist")
+
+
 def run_seeds():
     """Run all seed functions"""
     print("\n🌱 Running database seeds...\n")
     seed_roles()
     seed_admin_user()
+    seed_banks()
     print("\n✅ Seeding complete!\n")
 
 

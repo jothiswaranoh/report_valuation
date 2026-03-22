@@ -47,7 +47,6 @@ export const ReactSelectField: React.FC<ReactSelectFieldProps> = ({
     }
   };
 
-  console.log(options);
 
   const customStyles: StylesConfig<Option, boolean, GroupBase<Option>> = useMemo(
     () => ({
