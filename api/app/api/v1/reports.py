@@ -119,7 +119,7 @@ async def create_report(
 async def get_reports(
     current_user: dict = Depends(get_current_user),
     page: int = Query(1, ge=1, description="Page number (1-based)"),
-    page_size: int = Query(10, ge=1, le=100, description="Number of items per page"),
+    page_size: int = Query(10, ge=1, description="Number of items per page"),
     search: Optional[str] = Query(None, description="Search term for report name or bank name"),
 ):
     """Get paginated reports for current user"""

@@ -15,8 +15,8 @@ import { useReports } from '../hooks/useReports';
 import { ApiReport } from '../apis/report.api';
 
 export default function DashboardPage() {
-    // Poll every 5s so importing status cards appear/disappear without manual refresh
-    const { data: reportsData, isLoading } = useReports({ refetchInterval: 5000 });
+    // Fetch all reports for accurate stats (page_size=9999 bypasses pagination)
+    const { data: reportsData, isLoading } = useReports({ refetchInterval: 5000, page_size: 9999 });
     const navigate = useNavigate();
 
     const handleReportClick = (report: ValuationReport) => {
@@ -44,7 +44,7 @@ export default function DashboardPage() {
 
         const reports = reportsData.reports;
         return {
-            totalReports: reports.length,
+            totalReports: reportsData.total ?? reports.length,
             draftReports: reports.filter(r => (r.report_status || r.status) === 'draft').length,
             processReports: reports.filter(r => (r.report_status || r.status) === 'process').length,
             reviewReports: reports.filter(r => (r.report_status || r.status) === 'review').length,
