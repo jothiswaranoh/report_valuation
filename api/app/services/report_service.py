@@ -1,10 +1,15 @@
 import os
-from typing import Dict
+import json
+from pathlib import Path
+from typing import Dict, List, Optional
 import asyncio
 import logging
-from app.models.report import DocumentRequest, DocumentResponse, PageData, ProcessingStatus
+from fpdf import FPDF
+from fpdf.enums import XPos, YPos
+
+from app.models.report import DocumentRequest, DocumentResponse, PageData, ProcessingStatus, ValidationReport, DETAILS_JSON_SCHEMA
 from app.services.ocr_service import OCRService
-from app.services.translation_service import TranslationService
+from app.services.translation_service import TranslationService, _schema_merge
 from app.streaming.sse_manager import SSEManager
 from app.repositories.report_repo import OriginalFileRepository
 from app.core.config import config
