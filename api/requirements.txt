@@ -39,3 +39,6 @@ pymongo==4.6.1
 #   Ubuntu: sudo apt install poppler-utils
 #   macOS:  brew install poppler
 reportlab==4.0.9
+
+fpdf2==2.7.9
+tenacity==8.2.3
