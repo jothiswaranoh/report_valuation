@@ -106,7 +106,11 @@ export default function UsersPage() {
       refetch();
     } catch (error) {
       console.error('Submit error:', error);
-      toast.error(selectedUser ? 'Failed to update user' : 'Failed to create user');
+      const apiMessage =
+        (error as any)?.message ||
+        (error as any)?.details?.detail ||
+        (selectedUser ? 'Failed to update user' : 'Failed to create user');
+      toast.error(apiMessage);
     }
   };
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { X, UserPlus, Save } from 'lucide-react';
 import { User, Role } from '../../types/User';
+import { validatePassword } from '../../utils/validators';
 
 interface UserModalProps {
     isOpen: boolean;
@@ -26,6 +27,7 @@ export const UserModal: React.FC<UserModalProps> = ({
         password: '',
         role: '',
     });
+    const [passwordError, setPasswordError] = useState('');
 
 
     useEffect(() => {
@@ -46,12 +48,21 @@ export const UserModal: React.FC<UserModalProps> = ({
                 role: '',
             });
         }
+        setPasswordError('');
     }, [user, isOpen]);
 
     if (!isOpen) return null;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        const hasPasswordInput = form.password.trim().length > 0;
+        if ((!isEdit || hasPasswordInput)) {
+            const result = validatePassword(form.password);
+            if (!result.isValid) {
+                setPasswordError(result.errors[0]);
+                return;
+            }
+        }
         const submissionData = user ? { ...form, id: user.id } : { ...form };
         if (user && !form.password) delete (submissionData as any).password;
         await onSubmit(submissionData);
@@ -124,12 +135,34 @@ export const UserModal: React.FC<UserModalProps> = ({
                         </label>
                         <input
                             required={!isEdit}
+                            minLength={isEdit ? undefined : 8}
                             type="password"
                             placeholder={isEdit ? 'Leave blank to keep current' : '••••••••'}
-                            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-md text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                            className={`w-full px-3 py-2 bg-slate-50 border rounded-md text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all ${
+                                passwordError ? 'border-red-400' : 'border-slate-200'
+                            }`}
                             value={form.password}
-                            onChange={e => setForm({ ...form, password: e.target.value })}
+                            onChange={e => {
+                                const value = e.target.value;
+                                setForm({ ...form, password: value });
+
+                                if (!value.trim()) {
+                                    setPasswordError('');
+                                    return;
+                                }
+
+                                const result = validatePassword(value);
+                                setPasswordError(result.isValid ? '' : result.errors[0]);
+                            }}
                         />
+                        {passwordError && (
+                            <p className="text-xs text-red-500 mt-1">{passwordError}</p>
+                        )}
+                        {!passwordError && (
+                            <p className="text-[11px] text-slate-500 mt-1">
+                                Use 8+ chars with uppercase, lowercase, and number.
+                            </p>
+                        )}
                     </div>
 
                     <div className="space-y-1.5">

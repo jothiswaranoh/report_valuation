@@ -1,4 +1,4 @@
-import React, { ReactNode, useState, useEffect } from 'react';
+import React, { ReactNode, useState, useEffect, useRef } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -35,6 +35,8 @@ export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const profileMenuRef = useRef<HTMLDivElement | null>(null);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -51,7 +53,20 @@ export default function Layout() {
     }
   }, [isLoadingUser, isAuthenticated, navigate]);
 
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (!profileMenuRef.current) return;
+      if (!profileMenuRef.current.contains(event.target as Node)) {
+        setProfileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, []);
+
   const initials = user?.first_name ? user.first_name[0].toUpperCase() : 'U';
+  const primaryRole = user?.roles?.[0] ? user.roles[0] : 'user';
 
   const performLogout = async () => {
     await logout();
@@ -96,10 +111,41 @@ export default function Layout() {
             <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-sky-400 rounded-full border-2 border-white" />
           </button>
           <div className="h-4 w-[1px] bg-sky-100 mx-1" />
-          <div className="flex items-center gap-2 pl-2">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-sky-400 to-sky-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">
+          <div className="relative flex items-center gap-2 pl-2" ref={profileMenuRef}>
+            <button
+              onClick={() => setProfileMenuOpen((prev) => !prev)}
+              className="w-10 h-10 rounded-full bg-gradient-to-br from-sky-400 to-sky-600 text-white flex items-center justify-center font-bold text-sm shadow-sm hover:shadow-md transition-all"
+              aria-label="Open profile menu"
+            >
               {initials}
-            </div>
+            </button>
+
+            {profileMenuOpen && (
+              <div className="absolute right-0 top-12 w-72 bg-white border border-sky-100 rounded-xl shadow-xl z-50 overflow-hidden">
+                <div className="px-4 py-3 bg-sky-50/70 border-b border-sky-100">
+                  <p className="text-sm font-bold text-slate-900 truncate">
+                    {user?.first_name} {user?.last_name}
+                  </p>
+                  <p className="text-xs text-slate-500 truncate mt-0.5">{user?.email}</p>
+                  <span className="inline-flex mt-2 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-sky-100 text-sky-700">
+                    {primaryRole.charAt(0).toUpperCase() + primaryRole.slice(1)}
+                  </span>
+                </div>
+
+                <div className="p-2">
+                  <button
+                    onClick={() => {
+                      setProfileMenuOpen(false);
+                      setLogoutModalOpen(true);
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    <LogOut size={16} />
+                    Logout
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </header>

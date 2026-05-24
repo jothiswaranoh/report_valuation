@@ -39,6 +39,7 @@ export default function FileManagement() {
 
     // ── Clipboard (for copy/paste) ────────────────────────────────────────────
     const [clipboard, setClipboard] = useState<{ fileId: string; fileName: string } | null>(null);
+    const isDiskBackedFile = (file: ApiFile) => file.id.startsWith('disk:');
 
     // ── Fetch files from API ──────────────────────────────────────────────────
     const fetchFiles = useCallback(async (path: string) => {
@@ -92,7 +93,9 @@ export default function FileManagement() {
     // ── Preview ───────────────────────────────────────────────────────────────
     const handlePreview = async (file: ApiFile) => {
         try {
-            const blob = await reportsApi.downloadFile(file.id);
+            const blob = isDiskBackedFile(file)
+                ? await filesApi.downloadByPath(file.file_path)
+                : await reportsApi.downloadFile(file.id);
             const blobUrl = URL.createObjectURL(blob);
             setPreviewBlobUrl(blobUrl);
             setPreviewFile(file);
@@ -113,7 +116,9 @@ export default function FileManagement() {
     // ── Download ──────────────────────────────────────────────────────────────
     const handleDownload = async (file: ApiFile) => {
         try {
-            const blob = await reportsApi.downloadFile(file.id);
+            const blob = isDiskBackedFile(file)
+                ? await filesApi.downloadByPath(file.file_path)
+                : await reportsApi.downloadFile(file.id);
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
@@ -129,6 +134,10 @@ export default function FileManagement() {
 
     // ── Rename ────────────────────────────────────────────────────────────────
     const handleRename = async (file: ApiFile) => {
+        if (isDiskBackedFile(file)) {
+            showToast('error', 'Rename is available only for uploaded source files');
+            return;
+        }
         const newName = window.prompt(`Rename "${file.file_name}" to:`, file.file_name);
         if (!newName || newName.trim() === '' || newName === file.file_name) return;
         try {
@@ -142,6 +151,10 @@ export default function FileManagement() {
 
     // ── Copy (clipboard) ─────────────────────────────────────────────────────
     const handleCopy = (file: ApiFile) => {
+        if (isDiskBackedFile(file)) {
+            showToast('error', 'Copy is available only for uploaded source files');
+            return;
+        }
         console.log('[Clipboard] Copy:', file.id, file.file_name);
         setClipboard({ fileId: file.id, fileName: file.file_name });
         showToast('success', `"${file.file_name}" copied to clipboard`);
@@ -182,6 +195,10 @@ export default function FileManagement() {
     };
 
     const handleDeleteAction = (file: ApiFile) => {
+        if (isDiskBackedFile(file)) {
+            showToast('error', 'Delete is available only for uploaded source files');
+            return;
+        }
         setDeleteItem(file);
     };
 

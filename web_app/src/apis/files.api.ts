@@ -70,6 +70,15 @@ export const filesApi = {
    */
   deleteFile: (fileId: string) =>
     apiClient.delete<FileActionResponse>(`/api/v1/files/${fileId}`),
+
+  /**
+   * Download a disk-backed file by relative path
+   * GET /api/v1/files/by-path/download?path={relativePath}
+   */
+  downloadByPath: (relativePath: string) =>
+    apiClient.downloadBlob(
+      `/api/v1/files/by-path/download?path=${encodeURIComponent(relativePath)}`
+    ),
 };
 
 export default filesApi;
