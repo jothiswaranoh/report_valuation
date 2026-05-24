@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   FileText,
@@ -12,6 +12,7 @@ import {
   RotateCcw,
   X,
   Download,
+  MoreVertical,
 } from 'lucide-react';
 
 import { ReportStatus } from '../types';
@@ -28,6 +29,8 @@ export default function ReviewApprovalPage() {
 
   const [showAuditTrail, setShowAuditTrail] = useState(false);
   const [showMoreFiles, setShowMoreFiles] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const [dragActive, setDragActive] = useState(false);
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
@@ -46,6 +49,16 @@ export default function ReviewApprovalPage() {
     setToast({ msg, type });
     setTimeout(() => setToast(null), 4000);
   };
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleBack = () => navigate(-1);
 
@@ -206,18 +219,6 @@ export default function ReviewApprovalPage() {
           </button>
 
           <div className="flex items-center gap-3">
-            {/* More Files */}
-            <button
-              onClick={() => setShowMoreFiles((v) => !v)}
-              className={`flex items-center gap-2 px-4 py-2 border rounded-lg font-medium transition-colors shadow-sm ${showMoreFiles
-                ? 'bg-brand-50 border-brand-300 text-brand-700'
-                : 'border-secondary-300 text-secondary-700 hover:bg-secondary-50'
-                }`}
-            >
-              <Upload size={16} />
-              More Files
-            </button>
-
             {/* Re-analyze */}
             <button
               onClick={handleReanalyze}
@@ -237,34 +238,58 @@ export default function ReviewApprovalPage() {
               Edit
             </button>
 
-            {/* Audit Trail */}
-            <button
-              onClick={() => setShowAuditTrail(!showAuditTrail)}
-              className="flex items-center gap-2 px-4 py-2 border border-secondary-300 rounded-lg text-secondary-700 hover:bg-secondary-50 font-medium transition-colors shadow-sm"
-            >
-              <History size={16} />
-              Audit Trail
-            </button>
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setShowDropdown(!showDropdown)}
+                className="flex items-center justify-center p-2 border border-secondary-300 rounded-lg text-secondary-700 hover:bg-secondary-50 transition-colors shadow-sm"
+              >
+                <MoreVertical size={20} />
+              </button>
 
-            {/* Export PDF */}
-            <button
-              onClick={() => handleExport('pdf')}
-              disabled={isExporting !== null}
-              className="flex items-center gap-2 px-4 py-2 bg-brand-50 text-brand-700 border border-brand-200 rounded-lg hover:bg-brand-100 transition-colors font-medium shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              <Download size={16} />
-              {isExporting === 'pdf' ? 'Generating PDF...' : 'Export PDF'}
-            </button>
+              {showDropdown && (
+                <div className="absolute right-0 mt-2 w-48 bg-white border border-secondary-200 rounded-lg shadow-lg z-50 py-1 flex flex-col">
+                  {/* More Files */}
+                  <button
+                    onClick={() => { setShowMoreFiles((v) => !v); setShowDropdown(false); }}
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-secondary-700 hover:bg-secondary-50 text-left w-full"
+                  >
+                    <Upload size={16} />
+                    More Files
+                  </button>
 
-            {/* Export DOCX */}
-            <button
-              onClick={() => handleExport('docx')}
-              disabled={isExporting !== null}
-              className="flex items-center gap-2 px-4 py-2 bg-brand-50 text-brand-700 border border-brand-200 rounded-lg hover:bg-brand-100 transition-colors font-medium shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              <Download size={16} />
-              {isExporting === 'docx' ? 'Generating DOCX...' : 'Export DOCX'}
-            </button>
+                  {/* Audit Trail */}
+                  <button
+                    onClick={() => { setShowAuditTrail(!showAuditTrail); setShowDropdown(false); }}
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-secondary-700 hover:bg-secondary-50 text-left w-full"
+                  >
+                    <History size={16} />
+                    Audit Trail
+                  </button>
+
+                  <div className="h-px bg-secondary-100 my-1 mx-2" />
+
+                  {/* Export PDF */}
+                  <button
+                    onClick={() => { handleExport('pdf'); setShowDropdown(false); }}
+                    disabled={isExporting !== null}
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-brand-700 hover:bg-brand-50 text-left w-full disabled:opacity-60"
+                  >
+                    <Download size={16} />
+                    Export PDF
+                  </button>
+
+                  {/* Export DOCX */}
+                  <button
+                    onClick={() => { handleExport('docx'); setShowDropdown(false); }}
+                    disabled={isExporting !== null}
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-brand-700 hover:bg-brand-50 text-left w-full disabled:opacity-60"
+                  >
+                    <Download size={16} />
+                    Export DOCX
+                  </button>
+                </div>
+              )}
+            </div>
 
             {/* Conditional: Rollback to Review (approved) or Approve (review) */}
             {isApproved ? (

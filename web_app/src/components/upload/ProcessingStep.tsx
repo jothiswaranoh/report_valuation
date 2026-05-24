@@ -27,6 +27,14 @@ export default function ProcessingStep({
     const [copied, setCopied] = useState(false);
     const [showCancelDialog, setShowCancelDialog] = useState(false);
     const [isCancelling, setIsCancelling] = useState(false);
+    const selectedUploadFiles = files.filter((f) => selectedFiles.includes(f.id));
+    const getStatusLabel = (file: UploadedFile) => {
+        if (file.status === 'completed') return 'Done';
+        if (file.status === 'error') return 'Failed';
+        if (file.status === 'processing') return 'Analyzing';
+        if (file.status === 'uploading') return 'Uploading';
+        return 'Pending';
+    };
 
     const handleConfirmCancel = async () => {
         if (!onCancel) return;
@@ -67,9 +75,7 @@ export default function ProcessingStep({
 
                     {/* Currently processing file banner */}
                     {(() => {
-                        const activeFile = files
-                            .filter(f => selectedFiles.includes(f.id))
-                            .find(f => (f.progress ?? 0) < 100);
+                        const activeFile = selectedUploadFiles.find((f) => (f.progress ?? 0) < 100);
                         return activeFile ? (
                             <div className="flex items-center justify-center gap-2 mb-5 px-4 py-2.5 bg-sky-50 border border-sky-100 rounded-lg max-w-sm mx-auto">
                                 <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse shrink-0" />
@@ -134,7 +140,7 @@ export default function ProcessingStep({
 
                     {/* Cancel Processing Button */}
                     {onCancel && (
-                        <div className="pt-2 pb-6 border-slate-100">
+                        <div className="pt-2 pb-2 border-slate-100">
                             <button
                                 onClick={() => setShowCancelDialog(true)}
                                 className="w-full flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-red-500 font-semibold hover:bg-red-50 hover:text-red-600 transition-all border border-transparent hover:border-red-100"
@@ -147,23 +153,21 @@ export default function ProcessingStep({
                 </div>
 
                 {/* Per-file list */}
-                <div className="space-y-3 max-h-[280px] overflow-y-auto pr-2 scrollbar-hide py-2">
-                    {files
-                        .filter((f) => selectedFiles.includes(f.id))
-                        .map((file, index) => (
+                {selectedUploadFiles.length > 0 && (
+                    <div className="space-y-3 max-h-[280px] overflow-y-auto pr-2 scrollbar-hide py-2">
+                        {selectedUploadFiles.map((file) => (
                             <div
                                 key={file.id}
                                 className="bg-slate-50 rounded-lg p-4 border border-slate-100 flex items-center gap-4 transition-all group"
-                                style={{
-                                    animation: `fadeInUp 0.5s ease-out forwards ${index * 0.1}s`,
-                                    opacity: 0
-                                }}
                             >
                                 <div className="p-2 bg-white rounded-md shadow-sm">
-                                    {file.progress >= 100
-                                        ? <CheckCircle2 size={16} className="text-emerald-500" />
-                                        : <Loader2 size={16} className="text-sky-500 animate-spin" />
-                                    }
+                                    {file.status === 'completed' ? (
+                                        <CheckCircle2 size={16} className="text-emerald-500" />
+                                    ) : file.status === 'error' ? (
+                                        <XCircle size={16} className="text-red-500" />
+                                    ) : (
+                                        <Loader2 size={16} className="text-sky-500 animate-spin" />
+                                    )}
                                 </div>
 
                                 <div className="flex-1 min-w-0 text-left">
@@ -171,8 +175,13 @@ export default function ProcessingStep({
                                         <h4 className="text-sm font-semibold text-slate-900 truncate tracking-tight">
                                             {file.name || file.file?.name}
                                         </h4>
-                                        <span className="text-[10px] font-bold text-sky-600 bg-sky-50 px-2 py-0.5 rounded border border-sky-100 uppercase tracking-wider flex-shrink-0 ml-2">
-                                            {file.progress >= 100 ? 'Done' : 'Analyzing'}
+                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded border uppercase tracking-wider flex-shrink-0 ml-2 ${file.status === 'completed'
+                                            ? 'text-emerald-700 bg-emerald-50 border-emerald-100'
+                                            : file.status === 'error'
+                                                ? 'text-red-700 bg-red-50 border-red-100'
+                                                : 'text-sky-600 bg-sky-50 border-sky-100'
+                                            }`}>
+                                            {getStatusLabel(file)}
                                         </span>
                                     </div>
 
@@ -185,7 +194,8 @@ export default function ProcessingStep({
                                 </div>
                             </div>
                         ))}
-                </div>
+                    </div>
+                )}
             </div>
 
             <p className="text-center text-xs font-bold text-slate-400 uppercase tracking-[0.2em] flex items-center justify-center gap-3">

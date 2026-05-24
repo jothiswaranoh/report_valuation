@@ -20,33 +20,33 @@ export const UserHeader: React.FC<UserHeaderProps> = ({
             </div>
 
             <div className="grid grid-cols-3 gap-4 mb-8">
-                <div className="group bg-white rounded-xl border border-brand-100 px-6 py-4 shadow-lg hover:shadow-xl hover:shadow-brand-200/40 transition-all duration-500 flex flex-row items-center gap-5 h-36">
-                    <div className="w-14 h-14 rounded-xl bg-sky-50 flex items-center justify-center text-sky-600 shrink-0 group-hover:scale-110 transition-transform duration-500">
-                        <Users size={28} />
+                <div className="group bg-white rounded-xl border border-brand-100 px-6 py-4 shadow-sm hover:shadow-md hover:shadow-brand-200/40 transition-all duration-500 flex flex-row items-center gap-4 h-24">
+                    <div className="w-12 h-12 rounded-xl bg-sky-50 flex items-center justify-center text-sky-600 shrink-0 group-hover:scale-110 transition-transform duration-500">
+                        <Users size={24} />
                     </div>
                     <div>
                         <p className="text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider">Total Users</p>
-                        <p className="text-4xl font-black text-slate-900">{totalUsers}</p>
+                        <p className="text-3xl font-black text-slate-900">{totalUsers}</p>
                     </div>
                 </div>
 
-                <div className="group bg-white rounded-xl border border-brand-100 px-6 py-4 shadow-lg hover:shadow-xl hover:shadow-brand-200/40 transition-all duration-500 flex flex-row items-center gap-5 h-36">
-                    <div className="w-14 h-14 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 shrink-0 group-hover:scale-110 transition-transform duration-500">
-                        <Shield size={28} />
+                <div className="group bg-white rounded-xl border border-brand-100 px-6 py-4 shadow-sm hover:shadow-md hover:shadow-brand-200/40 transition-all duration-500 flex flex-row items-center gap-4 h-24">
+                    <div className="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 shrink-0 group-hover:scale-110 transition-transform duration-500">
+                        <Shield size={24} />
                     </div>
                     <div>
                         <p className="text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider">Active Roles</p>
-                        <p className="text-4xl font-black text-slate-900">{rolesCount}</p>
+                        <p className="text-3xl font-black text-slate-900">{rolesCount}</p>
                     </div>
                 </div>
 
-                <div className="group bg-white rounded-xl border border-brand-100 px-6 py-4 shadow-lg hover:shadow-xl hover:shadow-brand-200/40 transition-all duration-500 flex flex-row items-center gap-5 h-36">
-                    <div className="w-14 h-14 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0 group-hover:scale-110 transition-transform duration-500">
-                        <UserPlus size={28} />
+                <div className="group bg-white rounded-xl border border-brand-100 px-6 py-4 shadow-sm hover:shadow-md hover:shadow-brand-200/40 transition-all duration-500 flex flex-row items-center gap-4 h-24">
+                    <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0 group-hover:scale-110 transition-transform duration-500">
+                        <UserPlus size={24} />
                     </div>
                     <div>
                         <p className="text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider">Administrators</p>
-                        <p className="text-4xl font-black text-slate-900">{adminsCount}</p>
+                        <p className="text-3xl font-black text-slate-900">{adminsCount}</p>
                     </div>
                 </div>
             </div>

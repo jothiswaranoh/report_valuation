@@ -170,15 +170,16 @@ export const reportsApi = {
    * POST /api/v1/reports/{reportId}/files
    */
   uploadFiles: async (reportId: string, files: File[]): Promise<any> => {
-    // Upload files individually to avoid batch payload size limits (e.g. Nginx 1MB default)
-    const promises = files.map(file => {
-      const formData = new FormData();
-      formData.append('files', file);
-      return apiClient.post(`/api/v1/reports/${reportId}/files`, formData);
-    });
-    
     try {
-      const results = await Promise.all(promises);
+      const results = [];
+      // Upload files sequentially to avoid network timeouts and server rate-limiting
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append('files', file);
+        const res = await apiClient.post(`/api/v1/reports/${reportId}/files`, formData);
+        results.push(res);
+      }
+      
       const combinedFiles = results.flatMap((r: any) => r.files || []);
       const success = results.every((r: any) => r.success);
       return { success, files: combinedFiles };

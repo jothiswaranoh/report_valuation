@@ -34,6 +34,12 @@ export default function Upload() {
   });
 
   const [recentProjects] = useState<ProjectReport[]>([]);
+  type StatusFile = {
+    id: string;
+    name: string;
+    status: string;
+    error?: string;
+  };
 
   // ==================== REFS ====================
 
@@ -164,6 +170,7 @@ export default function Upload() {
 
       // Check processing status to determine which step to resume
       const statusData = await reportsApi.getReportStatus(effectiveReportId);
+      syncFileStatusesFromPoll(statusData.files || []);
 
       if (statusData.status === 'completed' || statusData.has_analysis) {
         setCurrentStep(5);
@@ -196,6 +203,7 @@ export default function Upload() {
       try {
         const statusData = await reportsApi.getReportStatus(effectiveReportId);
         setProcessingProgress(statusData.progress);
+        syncFileStatusesFromPoll(statusData.files || []);
 
         if (statusData.status === 'completed') {
           if (pollingRef.current) clearInterval(pollingRef.current);
@@ -302,6 +310,13 @@ export default function Upload() {
       return;
     }
 
+    setFiles((prev) =>
+      prev.map((f) =>
+        selectedFiles.includes(f.id)
+          ? { ...f, status: 'processing', progress: Math.min(Math.max(f.progress || 0, 10), 95) }
+          : f
+      )
+    );
     setCurrentStep(4);
 
     try {
@@ -368,6 +383,42 @@ export default function Upload() {
   const generateFileId = () => Math.random().toString(36).substr(2, 9);
 
   const formatFileSize = (bytes: number): string => `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+
+  const mapBackendStatusToUiStatus = (status?: string): UploadedFile['status'] => {
+    if (status === 'completed') return 'completed';
+    if (status === 'failed') return 'error';
+    if (
+      ['queued', 'processing', 'ocr_started', 'ocr_completed', 'translation_started', 'translation_completed', 'summarising']
+        .includes(status || '')
+    ) {
+      return 'processing';
+    }
+    return 'pending';
+  };
+
+  const syncFileStatusesFromPoll = (statusFiles: StatusFile[]) => {
+    setFiles((prev) =>
+      prev.map((f) => {
+        const serverFile = statusFiles.find((sf) => sf.id === (f.serverFileId || f.id));
+        if (!serverFile) return f;
+
+        const uiStatus = mapBackendStatusToUiStatus(serverFile.status);
+        const nextProgress =
+          uiStatus === 'completed'
+            ? 100
+            : uiStatus === 'error'
+              ? 0
+              : Math.min(Math.max(f.progress || 0, 10), 95);
+
+        return {
+          ...f,
+          status: uiStatus,
+          progress: nextProgress,
+          ...(serverFile.error ? { error: serverFile.error } : {}),
+        };
+      })
+    );
+  };
 
   const updateFilesProgress = (fileIds: string[], progress: number) => {
     setFiles((prev) => prev.map((f) => (fileIds.includes(f.id) ? { ...f, progress } : f)));
