@@ -59,7 +59,7 @@ def seed_roles():
 def seed_admin_user():
     """Create the default admin user"""
     admin_email = "admin@jothis.com"
-    admin_password = "password123"
+    admin_password = "jothis@pass123"
     
     # Check if admin already exists
     existing_user = users.find_one({"email": admin_email})
