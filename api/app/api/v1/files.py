@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi.responses import FileResponse
 from typing import Optional
 import os
 import shutil
@@ -36,6 +37,37 @@ def _relative_path(absolute_path: str) -> str:
     return os.path.relpath(absolute_path, config.UPLOAD_DIR)
 
 
+def _to_real_abs_path(file_path: str) -> str:
+    """Normalize DB path values (absolute or UPLOAD_DIR-relative) to a real absolute path."""
+    if os.path.isabs(file_path):
+        return os.path.realpath(file_path)
+    return os.path.realpath(os.path.join(config.UPLOAD_DIR, file_path))
+
+
+def _user_access_roots(current_user: dict) -> set[str]:
+    """Folders a user is allowed to browse/download from (root of each report folder)."""
+    roots = set()
+    user_files = OriginalFileRepository.get_files_for_user(current_user["id"])
+    for file_doc in user_files:
+        file_path = file_doc.get("file_path")
+        if not file_path:
+            continue
+        abs_path = _to_real_abs_path(file_path)
+        roots.add(os.path.dirname(abs_path))
+    return roots
+
+
+def _can_access_path(full_path: str, current_user: dict, roots: Optional[set[str]] = None) -> bool:
+    if "admin" in current_user.get("roles", []):
+        return True
+
+    accessible_roots = roots if roots is not None else _user_access_roots(current_user)
+    for root in accessible_roots:
+        if full_path == root or full_path.startswith(root + os.sep):
+            return True
+    return False
+
+
 # ----------------------
 # LIST FILES + FOLDERS
 # ----------------------
@@ -49,6 +81,12 @@ async def list_files(
 
     if not os.path.exists(full_path):
         raise HTTPException(status_code=404, detail="Folder not found")
+    if not os.path.isdir(full_path):
+        raise HTTPException(status_code=400, detail="Path is not a folder")
+
+    user_roots = _user_access_roots(current_user)
+    if path and not _can_access_path(full_path, current_user, user_roots):
+        raise HTTPException(status_code=403, detail="Access denied")
 
     # Folders from disk (real filesystem hierarchy)
     folders = sorted([
@@ -56,26 +94,45 @@ async def list_files(
         if os.path.isdir(os.path.join(full_path, item))
     ])
 
-    # Files from DB (only user's files in this directory)
+    # DB map: absolute file path -> record (for id/metadata when available)
+    db_file_by_abs: dict[str, dict] = {}
     user_files = OriginalFileRepository.get_files_for_user(current_user["id"])
+    for db_file in user_files:
+        db_path = db_file.get("file_path")
+        if not db_path:
+            continue
+        db_file_by_abs[_to_real_abs_path(db_path)] = db_file
 
-    normalized_path = os.path.normpath(path) if path else "."
-
+    # Files from disk first (includes ExtractedFile PDFs that are not in DB)
     files = []
-    for f in user_files:
-        file_path = f.get("file_path")
-        if not file_path:
+    for item in sorted(os.listdir(full_path)):
+        abs_item = os.path.join(full_path, item)
+        if not os.path.isfile(abs_item):
             continue
 
-        rel_path = os.path.relpath(file_path, config.UPLOAD_DIR)
-        file_dir = os.path.normpath(os.path.dirname(rel_path))
+        rel_path = _relative_path(abs_item)
+        db_match = db_file_by_abs.get(os.path.realpath(abs_item))
+        file_id = db_match["id"] if db_match else f"disk:{rel_path}"
+        file_name = db_match["file_name"] if db_match else item
 
-        if file_dir == normalized_path:
-            files.append({
-                "id": f["id"],
-                "file_name": f["file_name"],
-                "file_path": rel_path,
-            })
+        files.append({
+            "id": file_id,
+            "file_name": file_name,
+            "file_path": rel_path,
+        })
+
+    # Add DB files that belong here but are currently missing on disk
+    for abs_db_path, db_file in db_file_by_abs.items():
+        if os.path.dirname(abs_db_path) != full_path:
+            continue
+        if os.path.exists(abs_db_path):
+            continue
+        rel_path = _relative_path(abs_db_path)
+        files.append({
+            "id": db_file["id"],
+            "file_name": db_file["file_name"],
+            "file_path": rel_path,
+        })
 
     return {
         "success": True,
@@ -218,6 +275,28 @@ async def copy_file(
         raise HTTPException(status_code=500, detail="Failed to create file record, copy rolled back")
 
     return {"success": True, "file": new_file, "message": "File copied successfully"}
+
+
+# ----------------------
+# DOWNLOAD FILE BY RELATIVE PATH (disk-backed files)
+# ----------------------
+@router.get("/by-path/download")
+async def download_file_by_path(
+    path: str = Query(..., min_length=1),
+    current_user: dict = Depends(get_current_user),
+):
+    full_path = _resolve_safe_path(path)
+    if not os.path.exists(full_path) or not os.path.isfile(full_path):
+        raise HTTPException(status_code=404, detail="File not found")
+
+    if not _can_access_path(full_path, current_user):
+        raise HTTPException(status_code=403, detail="Access denied")
+
+    return FileResponse(
+        path=full_path,
+        filename=os.path.basename(full_path),
+        media_type="application/pdf",
+    )
 
 
 # ----------------------

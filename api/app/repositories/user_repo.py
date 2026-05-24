@@ -10,6 +10,10 @@ from app.core.security import hash_password, verify_password
 
 
 class UserRepository:
+    @staticmethod
+    def _normalize_role_name(role_name: str) -> str:
+        # Backward compatibility:"viewer" maps to current "user" role.
+        return "user" if role_name == "viewer" else role_name
     
     @staticmethod
     def get_by_id(user_id: str) -> Optional[dict]:
@@ -44,16 +48,17 @@ class UserRepository:
     
     @staticmethod
     def create(first_name: str, last_name: str, email: str, password: str, 
-               role_name: str = "viewer", created_by: str = None) -> dict:
+               role_name: str = "user", created_by: str = None) -> dict:
         """Create a new user"""
         # Check if email exists
         if users.find_one({"email": email}):
             raise ValueError("Email already exists")
         
         # Get role
-        role = roles.find_one({"name": role_name})
+        normalized_role = UserRepository._normalize_role_name(role_name)
+        role = roles.find_one({"name": normalized_role})
         if not role:
-            raise ValueError(f"Role '{role_name}' not found")
+            raise ValueError(f"Role '{normalized_role}' not found")
         
         # Create user
         hashed_pwd = hash_password(password)
@@ -105,7 +110,8 @@ class UserRepository:
         
         # Update role if provided
         if "role" in kwargs and kwargs["role"]:
-            role = roles.find_one({"name": kwargs["role"]})
+            normalized_role = UserRepository._normalize_role_name(kwargs["role"])
+            role = roles.find_one({"name": normalized_role})
             if role:
                 # Remove existing roles
                 user_roles.delete_many({"user_id": ObjectId(user_id)})

@@ -32,7 +32,7 @@ async def register(user_data: UserCreate):
             last_name=user_data.last_name,
             email=user_data.email,
             password=user_data.password,
-            role_name="viewer" # Default role for self-registration
+            role_name="user" # Default role for self-registration
         )
         
         # Auto-login
