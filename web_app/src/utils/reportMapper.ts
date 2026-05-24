@@ -33,9 +33,11 @@ export function mapApiReportToValuation(apiData: any): ValuationReport {
 
     const content = {
         summary,
-        propertyDetails: analysis?.property_details || analysis?.extracted_fields?.property_details || 'Details extracted from document...',
+        propertyDetails: analysis?.extracted_fields 
+            ? JSON.stringify(analysis.extracted_fields, null, 2) 
+            : (analysis?.property_details || 'Details extracted from document...'),
         valuationMethod: analysis?.valuation_method || analysis?.extracted_fields?.valuation_method || 'Comparative Method',
-        finalValuation: analysis?.final_valuation || analysis?.extracted_fields?.final_valuation || 'Not specified',
+        finalValuation: analysis?.final_valuation || analysis?.extracted_fields?.final_valuation || analysis?.extracted_fields?.market_value || 'Not specified',
     };
 
     return {
