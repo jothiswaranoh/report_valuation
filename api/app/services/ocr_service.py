@@ -220,11 +220,9 @@ class OCRService:
 
     def extract_text_from_pdf(self, pdf_path: str, dpi: int = 300) -> List[Tuple[int, str]]:
         """Sync wrapper for legacy celery code"""
-        loop = asyncio.get_event_loop()
-        return loop.run_until_complete(self.extract_pages_async(pdf_path, dpi))
+        return asyncio.run(self.extract_pages_async(pdf_path, dpi))
 
     def extract_text_from_image(self, image_path: str) -> List[Tuple[int, str]]:
         img = Image.open(image_path)
-        loop = asyncio.get_event_loop()
-        text = loop.run_until_complete(self._ocr_page(img, 1, "image"))
+        text = asyncio.run(self._ocr_page(img, 1, "image"))
         return [(1, text)]
