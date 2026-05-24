@@ -185,11 +185,10 @@ async def upload_files_to_report(
     saved_files = []
     for upload_file in files:
         file_path = os.path.join(upload_dir, upload_file.filename)
-        contents = await upload_file.read()
         with open(file_path, "wb") as f:
-            f.write(contents)
+            shutil.copyfileobj(upload_file.file, f)
 
-        file_size_mb = len(contents) / (1024 * 1024)
+        file_size_mb = (upload_file.size or os.path.getsize(file_path)) / (1024 * 1024)
         file_type = upload_file.content_type or "application/pdf"
 
         file_record = OriginalFileRepository.create(

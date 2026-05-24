@@ -310,10 +310,22 @@ class AIExtractedContentRepository:
     @staticmethod
     def save_analysis(report_id: str, content: str, created_by: str = None) -> dict:
         """Save AI analysis result"""
+        import json
         doc_update = {
-            "summary": content,
             "updated_at": datetime.utcnow()
         }
+        
+        try:
+            parsed = json.loads(content)
+            if isinstance(parsed, dict):
+                doc_update["summary"] = parsed.get("summary", "")
+                doc_update["property_details"] = parsed.get("property_details", "")
+                doc_update["valuation_method"] = parsed.get("valuation_method", "")
+                doc_update["final_valuation"] = parsed.get("final_valuation", "")
+            else:
+                doc_update["summary"] = content
+        except Exception:
+            doc_update["summary"] = content
         
         result = ai_extracted_content.update_one(
             {"report_id": ObjectId(report_id)},

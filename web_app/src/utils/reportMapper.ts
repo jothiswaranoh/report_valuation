@@ -33,9 +33,9 @@ export function mapApiReportToValuation(apiData: any): ValuationReport {
 
     const content = {
         summary,
-        propertyDetails: 'Details extracted from document...',
-        valuationMethod: 'Comparative Method',
-        finalValuation: '₹ 45,00,000',
+        propertyDetails: analysis?.property_details || 'Details extracted from document...',
+        valuationMethod: analysis?.valuation_method || 'Comparative Method',
+        finalValuation: analysis?.final_valuation || 'Not specified',
     };
 
     return {

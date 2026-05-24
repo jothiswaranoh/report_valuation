@@ -12,6 +12,7 @@ from fastapi import APIRouter, UploadFile, File, Form, Depends, HTTPException
 from fastapi.responses import FileResponse
 import os
 import logging
+import shutil
 from datetime import datetime
 
 from app.repositories.report_repo import ReportRepository, OriginalFileRepository
@@ -93,8 +94,7 @@ async def upload_and_dispatch(
         )
 
     # ---- read & persist file ----
-    content         = await file.read()
-    file_size_mb    = len(content) / (1024 * 1024)
+    file_size_mb    = (file.size or 0) / (1024 * 1024)
 
     if file_size_mb > config.MAX_FILE_SIZE_MB:
         raise HTTPException(
@@ -119,7 +119,7 @@ async def upload_and_dispatch(
     # Save file using document_id as the stem so it is unique
     disk_path = os.path.join(upload_dir, f"{document_id}.{file_ext}")
     with open(disk_path, "wb") as fh:
-        fh.write(content)
+        shutil.copyfileobj(file.file, fh)
 
     # Update record with actual path + initial status
     OriginalFileRepository.update_path(document_id, disk_path, current_user["id"])

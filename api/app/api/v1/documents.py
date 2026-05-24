@@ -5,6 +5,7 @@ Document processing API routes
 from fastapi import APIRouter, UploadFile, File, HTTPException, Form, Depends
 from fastapi.responses import StreamingResponse
 import os
+import shutil
 import logging
 from typing import List
 from datetime import datetime
@@ -104,8 +105,8 @@ async def process_document(
         detail=f"Unsupported file type. Supported: {', '.join(config.SUPPORTED_FILE_TYPES)}"
       )
 
-    content = await file.read()
-    file_size_mb = len(content) / (1024 * 1024)
+    content = None
+    file_size_mb = (file.size or 0) / (1024 * 1024)
 
     # Create document record under existing report
     file_doc = OriginalFileRepository.create(
@@ -126,7 +127,7 @@ async def process_document(
     file_path = os.path.join(upload_dir, safe_name)
 
     with open(file_path, "wb") as f:
-      f.write(content)
+      shutil.copyfileobj(file.file, f)
 
     OriginalFileRepository.update_path(
       document_id,
@@ -221,8 +222,7 @@ async def process_multiple_documents(
                     detail=f"Unsupported file type: {file.filename}"
                 )
 
-            content = await file.read()
-            file_size_mb = len(content) / (1024 * 1024)
+            file_size_mb = (file.size or 0) / (1024 * 1024)
 
             # Create DB record
             file_doc = OriginalFileRepository.create(
@@ -241,7 +241,7 @@ async def process_multiple_documents(
             )
 
             with open(file_path, "wb") as f:
-                f.write(content)
+                shutil.copyfileobj(file.file, f)
 
             OriginalFileRepository.update_path(
                 document_id,
