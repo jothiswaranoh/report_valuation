@@ -48,7 +48,7 @@ export default function CurrentReportPage() {
     const hasActiveProcess = processingReports.length > 0;
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 max-w-5xl mx-auto">
+        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 w-full h-full flex flex-col">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                     <button

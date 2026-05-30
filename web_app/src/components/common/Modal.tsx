@@ -64,7 +64,7 @@ export function Modal({
             />
 
             {/* Modal Container */}
-            <div className="flex min-h-full items-start justify-center pt-16 px-4 pb-4">
+            <div className="flex min-h-full items-center justify-center p-4">
                 <div
                     className={`
             relative w-full ${sizeStyles[size]} bg-white rounded-xl shadow-2xl shadow-sky-200/50

@@ -10,7 +10,8 @@ import {
   Menu,
   ChevronLeft,
   ChevronRight,
-  Bell
+  History,
+  X
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import Modal from '../common/Modal';
@@ -28,6 +29,7 @@ const navItems: NavItem[] = [
   { path: '/upload', label: 'Upload & Process', icon: <Upload size={20} /> },
   { path: '/files', label: 'File Management', icon: <FolderTree size={20} /> },
   { path: '/banks', label: 'Bank Management', icon: <Landmark size={20} /> },
+  { path: '/history', label: 'Report History', icon: <History size={20} /> },
   { path: '/users', label: 'Users', icon: <Users size={20} />, roles: ['admin'] },
 ];
 
@@ -106,10 +108,7 @@ export default function Layout() {
 
         <div className="flex items-center gap-3">
 
-          <button className="p-2 text-slate-400 hover:text-sky-500 transition-colors relative">
-            <Bell size={20} />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-sky-400 rounded-full border-2 border-white" />
-          </button>
+          
           <div className="h-4 w-[1px] bg-sky-100 mx-1" />
           <div className="relative flex items-center gap-2 pl-2" ref={profileMenuRef}>
             <button
@@ -266,35 +265,31 @@ export default function Layout() {
       <Modal
         isOpen={logoutModalOpen}
         onClose={() => setLogoutModalOpen(false)}
-        title="Confirm Logout"
         size="sm"
-        footer={
-          <div className="flex items-center justify-end gap-3 w-full">
-            <Button
-              variant="outline"
+        showCloseButton={false}
+      >
+        <div className="relative pt-6 pb-2 px-2 text-center">
+          
+          <h2 className="text-2xl font-extrabold text-slate-900 mb-3 tracking-tight">Are you sure?</h2>
+          <p className="text-slate-500 font-medium mb-8 px-2 leading-relaxed">
+            Are you sure you want to log out of your session? You will need to sign in again.
+          </p>
+          
+          <div className="flex items-center gap-4 w-full">
+            <button
               onClick={() => setLogoutModalOpen(false)}
-              className="px-6"
+              className="flex-1 py-3 text-[15px] font-bold border-2 border-slate-700 text-slate-800 hover:bg-slate-50 rounded-xl transition-colors"
             >
               Cancel
-            </Button>
-            <Button
-              variant="danger"
+            </button>
+            <button
               onClick={performLogout}
-              isLoading={loginLoading}
-              className="px-6 bg-red-600 hover:bg-red-700 shadow-lg shadow-red-100"
+              disabled={loginLoading}
+              className="flex-1 py-3 text-[15px] font-bold bg-sky-500 hover:bg-sky-600 text-white rounded-xl transition-colors disabled:opacity-50"
             >
-              Logout
-            </Button>
+              {loginLoading ? 'Logging out...' : 'Logout'}
+            </button>
           </div>
-        }
-      >
-        <div className="flex flex-col items-center text-center py-4">
-          <div className="w-16 h-16 bg-red-50 text-red-600 rounded-full flex items-center justify-center mb-4">
-            <LogOut size={32} />
-          </div>
-          <p className="text-slate-600 font-medium">
-            Are you sure you want to log out of your session?
-          </p>
         </div>
       </Modal>
 
